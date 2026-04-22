@@ -1,0 +1,21 @@
+# Node
+node_modules/
+npm-debug.log
+
+# Next.js
+.next/
+
+# NestJS build
+dist/
+
+# Environment files
+.env
+.env.local
+
+# Logs
+logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
