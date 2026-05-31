@@ -1,53 +1,100 @@
 "use client";
 
-import { Flame, Trophy, PlayCircle, Swords } from "lucide-react";
+import {
+  Flame,
+  Trophy,
+  PlayCircle,
+  Swords,
+} from "lucide-react";
+
+import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
+  const router = useRouter();
+
   return (
     <div className="space-y-8">
 
       {/* HEADER */}
       <div>
-        <h2 className="text-2xl font-bold text-green-700">
+
+        <h2 className="text-4xl font-bold text-[#6b1f0f]">
           Welcome Back 👋
         </h2>
-        <p className="text-gray-600">
-          Ready to continue your learning journey?
+
+        <p className="text-gray-600 mt-2 text-lg">
+          Continue your learning journey and
+          earn more XP.
         </p>
+
       </div>
 
-      {/* STATS CARDS */}
+      {/* STATS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-        {/* XP CARD */}
-        <div className="bg-white p-6 rounded-xl shadow space-y-3">
-          <h3 className="text-gray-500">XP Points</h3>
-          <p className="text-2xl font-bold text-green-700">1200 XP</p>
+        {/* XP */}
+        <div className="bg-white rounded-2xl p-6 shadow-md border border-[#eaded4]">
 
-          {/* PROGRESS BAR */}
-          <div className="w-full bg-gray-200 h-3 rounded-full">
-            <div className="bg-green-600 h-3 rounded-full w-[60%]"></div>
+          <p className="text-gray-500">
+            XP Points
+          </p>
+
+          <h3 className="text-4xl font-bold text-[#8b4513] mt-2">
+            1200 XP
+          </h3>
+
+          <div className="w-full bg-gray-200 h-3 rounded-full mt-4">
+            <div className="bg-[#8b4513] h-3 rounded-full w-[60%]"></div>
           </div>
 
-          <p className="text-sm text-gray-500">Level 6</p>
+          <p className="mt-3 text-gray-500">
+            Level 6
+          </p>
+
         </div>
 
         {/* STREAK */}
-        <div className="bg-white p-6 rounded-xl shadow flex items-center gap-4">
-          <Flame className="text-orange-500" size={30} />
+        <div className="bg-white rounded-2xl p-6 shadow-md border border-[#eaded4] flex items-center gap-5">
+
+          <Flame
+            size={40}
+            className="text-orange-500"
+          />
+
           <div>
-            <p className="text-gray-500">Streak</p>
-            <p className="text-2xl font-bold text-green-700">5 Days</p>
+
+            <p className="text-gray-500">
+              Streak
+            </p>
+
+            <h3 className="text-4xl font-bold text-[#8b4513]">
+              5 Days
+            </h3>
+
           </div>
+
         </div>
 
         {/* RANK */}
-        <div className="bg-white p-6 rounded-xl shadow flex items-center gap-4">
-          <Trophy className="text-yellow-500" size={30} />
+        <div className="bg-white rounded-2xl p-6 shadow-md border border-[#eaded4] flex items-center gap-5">
+
+          <Trophy
+            size={40}
+            className="text-yellow-500"
+          />
+
           <div>
-            <p className="text-gray-500">Rank</p>
-            <p className="text-2xl font-bold text-green-700">#12</p>
+
+            <p className="text-gray-500">
+              Rank
+            </p>
+
+            <h3 className="text-4xl font-bold text-[#8b4513]">
+              #12
+            </h3>
+
           </div>
+
         </div>
 
       </div>
@@ -55,22 +102,36 @@ export default function Dashboard() {
       {/* ACTION BUTTONS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-        {/* START QUIZ */}
-        <button className="bg-green-600 text-white p-6 rounded-xl shadow hover:bg-green-700 transition flex items-center justify-center gap-3 text-lg font-semibold">
-          <PlayCircle />
+        {/* QUIZ */}
+        <button className="bg-[#8b4513] text-white p-7 rounded-2xl shadow-lg hover:bg-[#6b1f0f] transition flex items-center justify-center gap-3 text-xl font-semibold">
+
+          <PlayCircle size={28} />
+
           Start Quiz
+
         </button>
 
-        {/* DUEL MODE */}
-        <button className="bg-blue-600 text-white p-6 rounded-xl shadow hover:bg-blue-700 transition flex items-center justify-center gap-3 text-lg font-semibold">
-          <Swords />
+        {/* DUEL */}
+        <button
+          onClick={() =>
+            router.push("/duel")
+          }
+          className="bg-[#6f311c] text-white p-7 rounded-2xl shadow-lg hover:bg-[#431b11] transition flex items-center justify-center gap-3 text-xl font-semibold"
+        >
+
+          <Swords size={28} />
+
           Duel Mode
+
         </button>
 
         {/* LEADERBOARD */}
-        <button className="bg-yellow-500 text-white p-6 rounded-xl shadow hover:bg-yellow-600 transition flex items-center justify-center gap-3 text-lg font-semibold">
-          <Trophy />
+        <button className="bg-yellow-500 text-white p-7 rounded-2xl shadow-lg hover:bg-yellow-600 transition flex items-center justify-center gap-3 text-xl font-semibold">
+
+          <Trophy size={28} />
+
           Leaderboard
+
         </button>
 
       </div>

@@ -8,10 +8,10 @@ export class User {
   @Column()
   name!: string;
 
-  @Column({ unique: true })
+  @Column({ nullable: true, unique: true })
   rollNo!: string;
 
-  @Column({ unique: true })
+  @Column({ nullable: true, unique: true })
   studentId!: string;
 
   @Column({ unique: true })
@@ -19,6 +19,11 @@ export class User {
 
   @Column()
   password!: string;
+
+  @Column({
+    default: "student",
+  })
+  role!: string;
 
   @Column({ default: 0 })
   xp!: number;

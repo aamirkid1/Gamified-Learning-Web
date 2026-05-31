@@ -24,18 +24,31 @@ export default function DashboardLayout({ children }) {
   ];
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-[#f5f1ed] text-[#000000] font-sans antialiased">
 
       {/* SIDEBAR */}
-      <aside className="w-64 bg-green-900 text-white flex flex-col">
+      <aside className="w-72 bg-[#3b130d] text-white flex flex-col shadow-2xl relative z-20 border-r border-[#6b1f0f]/30">
+        
+        {/* Absolute Top Accent Ribbon */}
+        <div className="h-2 bg-[#6b1f0f] w-full" />
 
-        {/* LOGO */}
-        <div className="p-5 text-xl font-bold border-b border-green-800">
-          Gamified App
+        {/* LOGO SECTION */}
+        <div className="p-6 border-b border-[#6f311c]/40 flex flex-col gap-1">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#8b4513] flex items-center justify-center font-black text-base shadow-md border border-white/10">
+              G
+            </div>
+            <h1 className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
+              Gamified Learning
+            </h1>
+          </div>
+          <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mt-2 pl-0.5">
+            Student Portal
+          </p>
         </div>
 
-        {/* MENU */}
-        <nav className="flex-1 p-4 space-y-2">
+        {/* NAVIGATION SYSTEM */}
+        <nav className="flex-1 p-5 space-y-2">
           {menu.map((item, index) => {
             const Icon = item.icon;
             const isActive = pathname === item.path;
@@ -44,49 +57,67 @@ export default function DashboardLayout({ children }) {
               <Link
                 key={index}
                 href={item.path}
-                className={`flex items-center gap-3 p-3 rounded-lg transition 
+                className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-200 group relative
                 ${
                   isActive
-                    ? "bg-green-700"
-                    : "hover:bg-green-800"
+                    ? "bg-[#8b4513] text-white shadow-lg font-bold border-l-4 border-white"
+                    : "text-gray-300 hover:text-white hover:bg-[#6f311c]/40 font-medium"
                 }`}
               >
-                <Icon size={20} />
-                {item.name}
+                <Icon 
+                  size={20} 
+                  className={`transition-transform duration-300 group-hover:scale-110 ${
+                    isActive ? "text-white" : "text-gray-400 group-hover:text-white"
+                  }`} 
+                />
+                <span className="tracking-wide text-sm">{item.name}</span>
               </Link>
             );
           })}
         </nav>
 
-        {/* LOGOUT */}
-        <div className="p-4 border-t border-green-800">
-          <button className="flex items-center gap-2 text-sm hover:text-gray-300">
-            <LogOut size={18} />
-            Logout
+        {/* SECURE SESSION LOGOUT */}
+        <div className="p-5 border-t border-[#6f311c]/40 bg-[#35140d]/30">
+          <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-400 hover:text-white hover:bg-red-950/20 transition-all duration-150 group">
+            <LogOut size={18} className="text-gray-400 group-hover:text-white transition-colors" />
+            <span>Logout</span>
           </button>
         </div>
-
       </aside>
 
-      {/* MAIN */}
-      <div className="flex-1 flex flex-col">
+      {/* MAIN VIEWPORT FRAME */}
+      <div className="flex-1 flex flex-col min-w-0">
 
-        {/* TOP NAVBAR */}
-        <header className="bg-white shadow px-6 py-4 flex justify-between items-center">
-          <h1 className="text-lg font-semibold text-green-700">
-            Gamified Learning
-          </h1>
+        {/* TOPBAR BANNER */}
+        <header className="bg-white shadow-sm border-b border-[#eaded4] px-8 py-5 flex justify-between items-center z-10">
+          <div>
+            <span className="text-xs font-bold text-[#8b4513] bg-[#f5f1ed] px-3 py-1 rounded-full border border-[#eaded4] tracking-wide uppercase">
+              Academic Hub
+            </span>
+          </div>
 
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-green-600 text-white flex items-center justify-center rounded-full">
+          {/* USER INTERFACE PROFILE BLOCKS */}
+          <div className="flex items-center gap-4">
+            <div className="text-right hidden sm:block">
+              <p className="font-extrabold text-sm text-[#3b130d] tracking-tight leading-none mb-1">
+                Student Player
+              </p>
+              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+                Tier Rank #12
+              </p>
+            </div>
+            
+            {/* Custom Monogram Badge */}
+            <div className="w-10 h-10 rounded-xl bg-[#8b4513] text-white flex items-center justify-center font-black shadow-inner border border-white/10 ring-4 ring-[#f5f1ed]">
               A
             </div>
-            <span className="text-sm text-gray-700">Student</span>
           </div>
         </header>
 
-        {/* CONTENT */}
-        <main className="p-6">{children}</main>
+        {/* MAIN DYNAMIC CONTENT CONTAINER */}
+        <main className="p-8 md:p-10 flex-1 overflow-y-auto max-w-6xl w-full mx-auto">
+          {children}
+        </main>
 
       </div>
     </div>
