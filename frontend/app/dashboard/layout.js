@@ -4,6 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import {
+  useEffect,
+  useState,
+} from "react";
+
+import leaderboardService from "@/services/leaderboardService";
+
+import {
   LayoutDashboard,
   BookOpen,
   Brain,
@@ -12,8 +19,43 @@ import {
   Sword,
 } from "lucide-react";
 
-export default function DashboardLayout({ children }) {
+// export default function DashboardLayout({ children }) {
+//   const pathname = usePathname();
+export default function DashboardLayout({
+  children,
+}) {
   const pathname = usePathname();
+
+  const [user, setUser] =
+    useState(null);
+
+  const [rank, setRank] =
+    useState("-");
+
+  useEffect(() => {
+    loadUser();
+  }, []);
+
+  const loadUser =
+    async () => {
+      const currentUser =
+        JSON.parse(
+          localStorage.getItem(
+            "user"
+          )
+        );
+
+      if (!currentUser) return;
+
+      setUser(currentUser);
+
+      const result =
+        await leaderboardService.getMyRank(
+          currentUser.id
+        );
+
+      setRank(result.rank);
+    };
 
   const menu = [
     { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
@@ -28,7 +70,7 @@ export default function DashboardLayout({ children }) {
 
       {/* SIDEBAR */}
       <aside className="w-72 bg-[#3b130d] text-white flex flex-col shadow-2xl relative z-20 border-r border-[#6b1f0f]/30">
-        
+
         {/* Absolute Top Accent Ribbon */}
         <div className="h-2 bg-[#6b1f0f] w-full" />
 
@@ -58,17 +100,15 @@ export default function DashboardLayout({ children }) {
                 key={index}
                 href={item.path}
                 className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-200 group relative
-                ${
-                  isActive
+                ${isActive
                     ? "bg-[#8b4513] text-white shadow-lg font-bold border-l-4 border-white"
                     : "text-gray-300 hover:text-white hover:bg-[#6f311c]/40 font-medium"
-                }`}
+                  }`}
               >
-                <Icon 
-                  size={20} 
-                  className={`transition-transform duration-300 group-hover:scale-110 ${
-                    isActive ? "text-white" : "text-gray-400 group-hover:text-white"
-                  }`} 
+                <Icon
+                  size={20}
+                  className={`transition-transform duration-300 group-hover:scale-110 ${isActive ? "text-white" : "text-gray-400 group-hover:text-white"
+                    }`}
                 />
                 <span className="tracking-wide text-sm">{item.name}</span>
               </Link>
@@ -100,16 +140,20 @@ export default function DashboardLayout({ children }) {
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
               <p className="font-extrabold text-sm text-[#3b130d] tracking-tight leading-none mb-1">
-                Student Player
+                {user?.name || "Student"}
               </p>
               <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
-                Tier Rank #12
+                Tier Rank #{rank}
               </p>
             </div>
-            
+
             {/* Custom Monogram Badge */}
             <div className="w-10 h-10 rounded-xl bg-[#8b4513] text-white flex items-center justify-center font-black shadow-inner border border-white/10 ring-4 ring-[#f5f1ed]">
-              A
+              {
+                user?.name
+                  ?.charAt(0)
+                  ?.toUpperCase() || "U"
+              }
             </div>
           </div>
         </header>

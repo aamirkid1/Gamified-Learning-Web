@@ -1,0 +1,500 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+
+import quizAttemptService from "@/services/quizAttemptService";
+import quizAttemptSubmitService from "@/services/quizAttemptSubmitService";
+
+export default function QuizPage() {
+    const params = useParams();
+
+    const [quiz, setQuiz] = useState(null);
+    const [questions, setQuestions] = useState([]);
+
+    const [answers, setAnswers] = useState({});
+
+    const [submitted, setSubmitted] =
+        useState(false);
+
+    //const [score, setScore] = useState(0);
+    const [score, setScore] = useState(0);
+
+    const [
+        savedAnswers,
+        setSavedAnswers,
+    ] = useState({});
+
+    const [
+        alreadyAttempted,
+        setAlreadyAttempted,
+    ] = useState(false);
+
+    useEffect(() => {
+        loadQuiz();
+    }, []);
+
+    const loadQuiz = async () => {
+        const quizData =
+            await quizAttemptService.getQuiz(
+                params.quizId
+            );
+
+        const questionData =
+            await quizAttemptService.getQuestions(
+                params.quizId
+            );
+
+        setQuiz(quizData);
+        setQuestions(questionData);
+
+        const user = JSON.parse(
+            localStorage.getItem("user")
+        );
+
+        const attempt =
+            await quizAttemptSubmitService.checkAttempt(
+                user.id,
+                params.quizId
+            );
+
+        // if (attempt) {
+        //     setAlreadyAttempted(true);
+
+        //     setScore(attempt.score);
+
+        //     setSubmitted(true);
+        // }
+
+        if (attempt) {
+            setAlreadyAttempted(true);
+
+            setScore(attempt.score);
+
+            setSavedAnswers(
+                JSON.parse(
+                    attempt.answers
+                )
+            );
+
+            setSubmitted(true);
+        }
+    };
+
+    const handleMCQ = (
+        questionId,
+        option
+    ) => {
+        const current =
+            answers[questionId] || [];
+
+        let updated;
+
+        if (
+            current.includes(option)
+        ) {
+            updated =
+                current.filter(
+                    (item) =>
+                        item !== option
+                );
+        } else {
+            updated = [
+                ...current,
+                option,
+            ];
+        }
+
+        setAnswers({
+            ...answers,
+            [questionId]: updated,
+        });
+    };
+
+    const handleSubmit = async () => {
+        let total = 0;
+
+        questions.forEach((q) => {
+            if (q.type === "mcq") {
+                const selected =
+                    answers[q.id] || [];
+
+                const correct =
+                    q.correctAnswers
+                        .split(",")
+                        .map((x) =>
+                            x.trim()
+                        );
+
+                let correctSelected = 0;
+
+                selected.forEach((option) => {
+                    if (correct.includes(option)) {
+                        correctSelected++;
+                    }
+                });
+
+                const partialMarks =
+                    Math.floor(
+                        (q.marks /
+                            correct.length) *
+                        correctSelected
+                    );
+
+                total += partialMarks;
+            }
+        });
+
+        const user =
+            JSON.parse(
+                localStorage.getItem(
+                    "user"
+                )
+            );
+
+        const xpEarned = total;
+
+        // await quizAttemptSubmitService.submitAttempt(
+        //     {
+        //         userId: user.id,
+
+        //         quizId:
+        //             Number(
+        //                 params.quizId
+        //             ),
+
+        //         score: total,
+
+        //         xpEarned,
+
+        //         answers:
+        //             JSON.stringify(
+        //                 answers
+        //             ),
+        //     }
+        // );
+
+
+
+        // setScore(total);
+        const result =
+            await quizAttemptSubmitService.submitAttempt(
+                {
+                    userId: user.id,
+
+                    quizId:
+                        Number(
+                            params.quizId
+                        ),
+
+                    score: total,
+
+                    xpEarned,
+
+                    answers:
+                        JSON.stringify(
+                            answers
+                        ),
+                }
+            );
+
+        if (result.xp) {
+            const user =
+                JSON.parse(
+                    localStorage.getItem(
+                        "user"
+                    )
+                );
+
+            user.xp =
+                result.xp;
+
+            user.level =
+                result.level;
+
+            localStorage.setItem(
+                "user",
+                JSON.stringify(user)
+            );
+        }
+        // setSubmitted(true);
+
+        setScore(total);
+
+        setSavedAnswers(
+            answers
+        );
+
+        setSubmitted(true);
+    };
+
+    if (!quiz) {
+        return (
+            <div className="p-8">
+                Loading...
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-[#f5f5f5] p-8">
+            <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-lg p-8">
+
+                <h1 className="text-4xl font-bold text-[#6b1f0f] mb-8">
+                    {quiz.title}
+                </h1>
+
+                {alreadyAttempted && (
+                    <div className="mb-6 bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl">
+                        You have already attempted this quiz.
+                    </div>
+                )}
+
+                {!submitted ? (
+                    <>
+                        {questions.map((q, index) => (
+                            <div
+                                key={q.id}
+                                className="mb-8 p-6 border rounded-2xl"
+                            >
+                                <h2 className="text-xl font-semibold mb-4">
+                                    Q{index + 1}. {q.question}
+                                </h2>
+
+                                {q.type === "mcq" && (
+                                    <div className="space-y-3">
+
+                                        <label className="block">
+                                            <input
+                                                type="checkbox"
+                                                checked={
+                                                    answers[q.id]?.includes(
+                                                        "A"
+                                                    ) || false
+                                                }
+                                                onChange={() =>
+                                                    handleMCQ(
+                                                        q.id,
+                                                        "A"
+                                                    )
+                                                }
+                                            />
+                                            {" "}
+                                            {q.optionA}
+                                        </label>
+
+                                        <label className="block">
+                                            <input
+                                                type="checkbox"
+                                                checked={
+                                                    answers[q.id]?.includes(
+                                                        "B"
+                                                    ) || false
+                                                }
+                                                onChange={() =>
+                                                    handleMCQ(
+                                                        q.id,
+                                                        "B"
+                                                    )
+                                                }
+                                            />
+                                            {" "}
+                                            {q.optionB}
+                                        </label>
+
+                                        <label className="block">
+                                            <input
+                                                type="checkbox"
+                                                checked={
+                                                    answers[q.id]?.includes(
+                                                        "C"
+                                                    ) || false
+                                                }
+                                                onChange={() =>
+                                                    handleMCQ(
+                                                        q.id,
+                                                        "C"
+                                                    )
+                                                }
+                                            />
+                                            {" "}
+                                            {q.optionC}
+                                        </label>
+
+                                        <label className="block">
+                                            <input
+                                                type="checkbox"
+                                                checked={
+                                                    answers[q.id]?.includes(
+                                                        "D"
+                                                    ) || false
+                                                }
+                                                onChange={() =>
+                                                    handleMCQ(
+                                                        q.id,
+                                                        "D"
+                                                    )
+                                                }
+                                            />
+                                            {" "}
+                                            {q.optionD}
+                                        </label>
+
+                                    </div>
+                                )}
+
+                                {q.type ===
+                                    "short-answer" && (
+                                        <textarea
+                                            className="w-full border p-3 rounded-xl"
+                                            rows={4}
+                                            onChange={(e) =>
+                                                setAnswers({
+                                                    ...answers,
+                                                    [q.id]:
+                                                        e.target.value,
+                                                })
+                                            }
+                                        />
+                                    )}
+                            </div>
+                        ))}
+
+                        <button
+                            onClick={handleSubmit}
+                            className="bg-[#8b4513] text-white px-8 py-3 rounded-xl font-semibold hover:opacity-90"
+                        >
+                            Submit Quiz
+                        </button>
+                    </>
+                    // ) : (
+                    //     <div className="text-center py-10">
+
+                    //         <h2 className="text-4xl font-bold text-green-600 mb-4">
+                    //             Quiz Submitted
+                    //         </h2>
+
+                    //         <p className="text-2xl">
+                    //             Score:
+                    //             {" "}
+                    //             <span className="font-bold">
+                    //                 {score}
+                    //             </span>
+                    //         </p>
+
+                    //     </div>
+                    // )}
+
+                ) : (
+                    <div>
+
+                        <h2 className="text-4xl font-bold text-green-600 mb-6">
+                            Quiz Submitted
+                        </h2>
+
+                        {/* <p className="text-2xl mb-8">
+                            Score: {score}
+                        </p> */}
+
+                        <p className="text-2xl mb-3">
+                            Score: {score}
+                        </p>
+
+                        <p className="text-xl text-[#8b4513] font-semibold mb-8">
+                            XP Earned: {score}
+                        </p>
+
+                        {questions.map(
+                            (q, index) => {
+                                const selected =
+                                    savedAnswers[
+                                    q.id
+                                    ] || [];
+
+                                const correct =
+                                    q.correctAnswers
+                                        .split(",");
+
+                                return (
+                                    <div
+                                        key={q.id}
+                                        className="border rounded-2xl p-5 mb-5"
+                                    >
+                                        <h3 className="font-bold mb-3">
+                                            Q{index + 1}.{" "}
+                                            {q.question}
+                                        </h3>
+
+                                        <p className="text-sm text-gray-500 mb-4">
+                                            Correct Answer: {q.correctAnswers}
+                                        </p>
+
+                                        {[
+                                            {
+                                                key: "A",
+                                                text: q.optionA,
+                                            },
+                                            {
+                                                key: "B",
+                                                text: q.optionB,
+                                            },
+                                            {
+                                                key: "C",
+                                                text: q.optionC,
+                                            },
+                                            {
+                                                key: "D",
+                                                text: q.optionD,
+                                            },
+                                        ].map(
+                                            (
+                                                option
+                                            ) => {
+                                                let bg =
+                                                    "";
+
+                                                if (
+                                                    correct.includes(
+                                                        option.key
+                                                    )
+                                                ) {
+                                                    bg =
+                                                        "bg-green-100 border-green-500";
+                                                }
+
+                                                if (
+                                                    selected.includes(
+                                                        option.key
+                                                    ) &&
+                                                    !correct.includes(
+                                                        option.key
+                                                    )
+                                                ) {
+                                                    bg =
+                                                        "bg-red-100 border-red-500";
+                                                }
+
+                                                return (
+                                                    <div
+                                                        key={
+                                                            option.key
+                                                        }
+                                                        className={`border rounded-lg p-2 mb-2 ${bg}`}
+                                                    >
+                                                        {option.text}
+                                                    </div>
+                                                );
+                                            }
+                                        )}
+                                    </div>
+                                );
+                            }
+                        )}
+
+                    </div>
+                )}
+
+            </div>
+        </div>
+    );
+}

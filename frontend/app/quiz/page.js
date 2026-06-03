@@ -1,134 +1,173 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import {
+  Flame,
+  Trophy,
+  PlayCircle,
+  Swords,
+} from "lucide-react";
 
-const questions = [
-  {
-    question: "What is the capital of India?",
-    options: ["Mumbai", "Delhi", "Chennai", "Kolkata"],
-    answer: "Delhi",
-  },
-  {
-    question: "2 + 2 = ?",
-    options: ["3", "4", "5", "6"],
-    answer: "4",
-  },
-  {
-    question: "React is a ____?",
-    options: ["Library", "Framework", "Language", "Tool"],
-    answer: "Library",
-  },
-];
+import {
+  useRouter,
+} from "next/navigation";
 
-export default function QuizPage() {
-  const [currentQ, setCurrentQ] = useState(0);
-  const [selected, setSelected] = useState("");
-  const [score, setScore] = useState(0);
-  const [time, setTime] = useState(10);
-  const [showResult, setShowResult] = useState(false);
+import Link from "next/link";
 
-  const question = questions[currentQ];
+import {
+  useEffect,
+  useState,
+} from "react";
 
-  // TIMER
+import leaderboardService from "@/services/leaderboardService";
+
+export default function Dashboard() {
+  const router = useRouter();
+
+  const [stats, setStats] =
+    useState({
+      xp: 0,
+      level: 1,
+      rank: "-",
+    });
+
   useEffect(() => {
-    if (time === 0) {
-      handleNext();
-      return;
-    }
+    loadStats();
+  }, []);
 
-    const timer = setTimeout(() => setTime(time - 1), 1000);
-    return () => clearTimeout(timer);
-  }, [time]);
+  const loadStats = async () => {
+    const user = JSON.parse(
+      localStorage.getItem("user")
+    );
 
-  // NEXT
-  const handleNext = () => {
-    if (selected === question.answer) {
-      setScore(score + 1);
-    }
+    if (!user) return;
 
-    setSelected("");
-    setTime(10);
+    const result =
+      await leaderboardService.getMyRank(
+        user.id
+      );
 
-    if (currentQ + 1 < questions.length) {
-      setCurrentQ(currentQ + 1);
-    } else {
-      setShowResult(true);
-    }
+    setStats(result);
   };
 
-  // PROGRESS %
-  const progress = ((currentQ + 1) / questions.length) * 100;
-
-  // RESULT SCREEN
-  if (showResult) {
-    return (
-      <div className="flex flex-col items-center justify-center mt-20 space-y-4">
-        <h1 className="text-3xl font-bold text-green-700">
-          Quiz Completed 🎉
-        </h1>
-        <p className="text-xl">
-          Your Score: <span className="font-bold">{score}</span>
-        </p>
-        <button
-          onClick={() => window.location.reload()}
-          className="bg-green-600 text-white px-6 py-2 rounded-lg"
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-lg">
+    <div className="space-y-8">
 
-      {/* HEADER */}
-      <div className="flex justify-between items-center mb-4">
-        <p className="text-gray-500">
-          Question {currentQ + 1} / {questions.length}
+      <div>
+        <h2 className="text-4xl font-bold text-[#6b1f0f]">
+          Welcome Back 👋
+        </h2>
+
+        <p className="text-gray-600 mt-2 text-lg">
+          Continue your learning journey and
+          earn more XP.
         </p>
-        <p className="text-red-500 font-bold">⏳ {time}s</p>
       </div>
 
-      {/* PROGRESS BAR */}
-      <div className="w-full bg-gray-200 h-3 rounded-full mb-6">
-        <div
-          className="bg-green-600 h-3 rounded-full transition-all"
-          style={{ width: `${progress}%` }}
-        ></div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <div className="bg-white rounded-2xl p-6 shadow-md border border-[#eaded4]">
+
+          <p className="text-gray-500">
+            XP Points
+          </p>
+
+          <h3 className="text-4xl font-bold text-[#8b4513] mt-2">
+            {stats.xp} XP
+          </h3>
+
+          <div className="w-full bg-gray-200 h-3 rounded-full mt-4">
+            <div
+              className="bg-[#8b4513] h-3 rounded-full"
+              style={{
+                width: `${Math.min(
+                  (stats.xp % 100) || 5,
+                  100
+                )}%`,
+              }}
+            />
+          </div>
+
+          <p className="mt-3 text-gray-500">
+            Level {stats.level}
+          </p>
+
+        </div>
+
+        <div className="bg-white rounded-2xl p-6 shadow-md border border-[#eaded4] flex items-center gap-5">
+
+          <Flame
+            size={40}
+            className="text-orange-500"
+          />
+
+          <div>
+            <p className="text-gray-500">
+              Streak
+            </p>
+
+            <h3 className="text-4xl font-bold text-[#8b4513]">
+              5 Days
+            </h3>
+          </div>
+
+        </div>
+
+        <div className="bg-white rounded-2xl p-6 shadow-md border border-[#eaded4] flex items-center gap-5">
+
+          <Trophy
+            size={40}
+            className="text-yellow-500"
+          />
+
+          <div>
+
+            <p className="text-gray-500">
+              Rank
+            </p>
+
+            <h3 className="text-4xl font-bold text-[#8b4513]">
+              #{stats.rank}
+            </h3>
+
+          </div>
+
+        </div>
+
       </div>
 
-      {/* QUESTION */}
-      <h2 className="text-xl font-semibold mb-6">
-        {question.question}
-      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-      {/* OPTIONS */}
-      <div className="space-y-3">
-        {question.options.map((opt, index) => (
-          <button
-            key={index}
-            onClick={() => setSelected(opt)}
-            className={`w-full p-4 border rounded-xl text-left transition
-              ${
-                selected === opt
-                  ? "bg-green-100 border-green-500"
-                  : "hover:bg-gray-100"
-              }`}
-          >
-            {opt}
+        <button className="bg-[#8b4513] text-white p-7 rounded-2xl shadow-lg hover:bg-[#6b1f0f] transition flex items-center justify-center gap-3 text-xl font-semibold">
+
+          <PlayCircle size={28} />
+
+          Start Quiz
+
+        </button>
+
+        <button
+          onClick={() =>
+            router.push("/duel")
+          }
+          className="bg-[#6f311c] text-white p-7 rounded-2xl shadow-lg hover:bg-[#431b11] transition flex items-center justify-center gap-3 text-xl font-semibold"
+        >
+          <Swords size={28} />
+          Duel Mode
+        </button>
+
+        <Link href="/leaderboard">
+
+          <button className="w-full bg-yellow-500 text-white p-7 rounded-2xl shadow-lg hover:bg-yellow-600 transition flex items-center justify-center gap-3 text-xl font-semibold">
+
+            <Trophy size={28} />
+
+            Leaderboard
+
           </button>
-        ))}
-      </div>
 
-      {/* NEXT BUTTON */}
-      <button
-        onClick={handleNext}
-        disabled={!selected}
-        className="mt-6 w-full bg-green-600 text-white p-3 rounded-xl hover:bg-green-700 disabled:opacity-50"
-      >
-        Next
-      </button>
+        </Link>
+
+      </div>
 
     </div>
   );
