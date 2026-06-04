@@ -37,6 +37,16 @@ export class QuizAttempt {
   teacherScore!: number;
 
   @Column({
+  default: 0,
+})
+mcqScore!: number;
+
+@Column({
+  default: 0,
+})
+shortAnswerScore!: number;
+
+  @Column({
     type: 'text',
   })
   answers!: string;

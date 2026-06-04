@@ -44,12 +44,12 @@ export default function Dashboard() {
 
     setStats(result);
 
-   const userBadges =
-  await badgeService.getUserBadges(
-    user.id
-  );
+    const userBadges =
+      await badgeService.getUserBadges(
+        user.id
+      );
 
-setBadges(userBadges);
+    setBadges(userBadges);
   };
 
   return (
@@ -250,7 +250,8 @@ setBadges(userBadges);
         </button>
 
         {/* LEADERBOARD */}
-        <Link href="/leaderboard">
+        {/* <Link href="/leaderboard"> */}
+        <Link href="/dashboard/leaderboard">
 
           <button className="w-full bg-yellow-500 text-white p-7 rounded-2xl shadow-lg hover:bg-yellow-600 transition flex items-center justify-center gap-3 text-xl font-semibold">
 

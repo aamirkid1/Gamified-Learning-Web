@@ -61,7 +61,7 @@ export default function DashboardLayout({
     { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
     { name: "Courses", path: "/courses", icon: BookOpen },
     { name: "Quiz", path: "/quiz", icon: Brain },
-    { name: "Leaderboard", path: "/leaderboard", icon: Trophy },
+    { name: "Leaderboard", path: "/dashboard/leaderboard", icon: Trophy },
     { name: "Duel", path: "/duel", icon: Sword },
   ];
 

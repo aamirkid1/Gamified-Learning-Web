@@ -18,7 +18,7 @@ export default function CreateLesson() {
   }, []);
 
   const loadCourses = async () => {
-    const response = await fetch("http://localhost:3000/courses");
+    const response = await fetch("http://localhost:3000/dashboard/courses");
     const data = await response.json();
     setCourses(data);
   };

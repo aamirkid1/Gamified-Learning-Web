@@ -1,178 +1,201 @@
 "use client";
 
-import {
-  useEffect,
-  useState,
-} from "react";
-
-import { useRouter }
-from "next/navigation";
-
-import quizService
-from "@/services/quizService";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import quizService from "@/services/quizService";
+import { 
+  BookOpen, 
+  FileQuestion, 
+  GraduationCap, 
+  Sparkles,
+  Trophy
+} from "lucide-react";
 
 export default function CreateQuiz() {
   const router = useRouter();
 
-  const [courses,
-    setCourses] = useState([]);
-
-  const [lessons,
-    setLessons] = useState([]);
-
-  const [title,
-    setTitle] = useState("");
-
-  const [courseId,
-    setCourseId] = useState("");
-
-  const [lessonId,
-    setLessonId] = useState("");
+  const [courses, setCourses] = useState([]);
+  const [lessons, setLessons] = useState([]);
+  
+  const [title, setTitle] = useState("");
+  const [courseId, setCourseId] = useState("");
+  const [lessonId, setLessonId] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadCourses();
     loadLessons();
   }, []);
 
-  const loadCourses =
-    async () => {
-      const res =
-        await fetch(
-          "http://localhost:3000/courses"
-        );
-
-      const data =
-        await res.json();
-
+  const loadCourses = async () => {
+    try {
+      const res = await fetch("http://localhost:3000/courses");
+      const data = await res.json();
       setCourses(data);
-    };
+    } catch (error) {
+      console.error("Error loading courses:", error);
+    }
+  };
 
-  const loadLessons =
-    async () => {
-      const res =
-        await fetch(
-          "http://localhost:3000/lessons"
-        );
-
-      const data =
-        await res.json();
-
+  const loadLessons = async () => {
+    try {
+      const res = await fetch("http://localhost:3000/lessons");
+      const data = await res.json();
       setLessons(data);
-    };
+    } catch (error) {
+      console.error("Error loading lessons:", error);
+    }
+  };
 
-  const handleCreateQuiz =
-    async (e) => {
-      e.preventDefault();
+  const handleCreateQuiz = async (e) => {
+    e.preventDefault();
 
-      const quiz =
-        await quizService.createQuiz({
-          title,
-          courseId:
-            Number(courseId),
-          lessonId:
-            Number(lessonId),
-        });
+    // 2. Prevent creating quizzes with only spaces
+    if (!title.trim() || !courseId || !lessonId) {
+      alert("Please fill out all fields with valid information.");
+      return;
+    }
 
-      alert(
-        "Quiz Created"
-      );
+    setLoading(true);
 
-      router.push(
-        `/teacher/create-question/${quiz.id}`
-      );
-    };
+    try {
+      const quiz = await quizService.createQuiz({
+        title: title.trim(), // Trims leading/trailing whitespace before sending
+        courseId: Number(courseId),
+        lessonId: Number(lessonId),
+      });
+
+      // Routes directly forward to question creation workflow
+      router.push(`/teacher/create-question/${quiz.id}`);
+    } catch (error) {
+      console.error("Error creating quiz:", error);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Resets the selected lesson if the parent course drops or switches
+  const handleCourseChange = (e) => {
+    setCourseId(e.target.value);
+    setLessonId(""); 
+  };
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5] p-10">
+    <div className="min-h-screen bg-gradient-to-br from-[#f8f4f1] to-[#efe5dc] flex items-center justify-center p-6">
+      <div className="w-full max-w-3xl bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-[#eadfd7] overflow-hidden transition-all duration-300 hover:-translate-y-1">
+        
+        {/* Header Section with Gamified Badge */}
+        <div className="bg-gradient-to-r from-[#6b1f0f] to-[#8a3b20] px-8 py-8 relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-4 opacity-10">
+            <Sparkles className="w-24 h-24 text-white" />
+          </div>
+          <div className="flex items-center gap-3">
+            <FileQuestion className="w-9 h-9 text-white" />
+            <h1 className="text-4xl font-bold text-white">
+              Create Quiz
+            </h1>
+          </div>
+          <p className="text-white/80 mt-2 ml-12">
+            Create engaging quizzes for your students
+          </p>
+          
+          {/* Gamified touch */}
+          <div className="flex items-center gap-2 text-sm text-white/90 mt-4 ml-12 bg-white/10 w-fit px-3 py-1.5 rounded-full backdrop-blur-sm">
+            <Trophy className="w-4 h-4 text-amber-300 fill-amber-300" />
+            <span>Create quizzes and help students earn XP</span>
+          </div>
+        </div>
 
-      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-8">
+        {/* Form Section */}
+        <form onSubmit={handleCreateQuiz} className="p-8 space-y-6">
+          
+          {/* Quiz Title Field */}
+          <div>
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+              <FileQuestion className="w-4 h-4 text-[#6b1f0f]" />
+              Quiz Title
+            </label>
+            <input
+              type="text"
+              placeholder="Enter quiz title..."
+              className="w-full border-2 border-gray-200 rounded-2xl p-4 focus:outline-none focus:border-[#6b1f0f] focus:ring-4 focus:ring-[#6b1f0f]/10 transition-all duration-300 bg-gray-50/50 focus:bg-white"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              disabled={loading}
+            />
+          </div>
 
-        <h1 className="text-4xl font-bold text-[#6b1f0f] mb-8">
-          Create Quiz
-        </h1>
-
-        <form
-          onSubmit={
-            handleCreateQuiz
-          }
-          className="space-y-5"
-        >
-
-          <input
-            placeholder="Quiz Title"
-            className="w-full border rounded-xl p-4"
-            value={title}
-            onChange={(e) =>
-              setTitle(
-                e.target.value
-              )
-            }
-          />
-
-          <select
-            className="w-full border rounded-xl p-4"
-            value={courseId}
-            onChange={(e) =>
-              setCourseId(
-                e.target.value
-              )
-            }
-          >
-            <option value="">
-              Select Course
-            </option>
-
-            {courses.map(
-              (course) => (
-                <option
-                  key={course.id}
-                  value={
-                    course.id
-                  }
-                >
+          {/* Course Selection Field */}
+          <div>
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+              <GraduationCap className="w-4 h-4 text-[#6b1f0f]" />
+              Course
+            </label>
+            <select
+              className="w-full border-2 border-gray-200 rounded-2xl p-4 focus:outline-none focus:border-[#6b1f0f] focus:ring-4 focus:ring-[#6b1f0f]/10 transition-all duration-300 bg-gray-50/50 focus:bg-white cursor-pointer"
+              value={courseId}
+              onChange={handleCourseChange}
+              required
+              disabled={loading}
+            >
+              <option value="">Select Course</option>
+              {courses.map((course) => (
+                <option key={course.id} value={course.id}>
                   {course.title}
                 </option>
-              )
-            )}
-          </select>
+              ))}
+            </select>
+          </div>
 
-          <select
-            className="w-full border rounded-xl p-4"
-            value={lessonId}
-            onChange={(e) =>
-              setLessonId(
-                e.target.value
-              )
-            }
-          >
-            <option value="">
-              Select Lesson
-            </option>
+          {/* Lesson Selection Field */}
+          <div>
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+              <BookOpen className="w-4 h-4 text-[#6b1f0f]" />
+              Lesson
+            </label>
+            <select
+              className="w-full border-2 border-gray-200 rounded-2xl p-4 focus:outline-none focus:border-[#6b1f0f] focus:ring-4 focus:ring-[#6b1f0f]/10 transition-all duration-300 bg-gray-50/50 focus:bg-white cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+              value={lessonId}
+              onChange={(e) => setLessonId(e.target.value)}
+              required
+              disabled={!courseId || loading}
+            >
+              {!courseId ? (
+                <option value="">Select Course First</option>
+              ) : (
+                <>
+                  <option value="">Select Lesson</option>
+                  {lessons
+                    .filter((lesson) => lesson.courseId === Number(courseId))
+                    .map((lesson) => (
+                      <option key={lesson.id} value={lesson.id}>
+                        {lesson.title}
+                      </option>
+                    ))}
+                </>
+              )}
+            </select>
+          </div>
 
-            {lessons.map(
-              (lesson) => (
-                <option
-                  key={lesson.id}
-                  value={
-                    lesson.id
-                  }
-                >
-                  {lesson.title}
-                </option>
-              )
-            )}
-          </select>
-
+          {/* Submit Button */}
           <button
-            className="w-full bg-[#6f311c] text-white py-4 rounded-xl font-semibold"
+            type="submit"
+            disabled={loading}
+            className="w-full mt-4 bg-gradient-to-r from-[#6b1f0f] to-[#8a3b20] text-white py-4 rounded-2xl font-semibold text-lg shadow-lg active:scale-[0.99] transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
           >
-            Create Quiz
+            {loading ? (
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span>Creating Quiz...</span>
+              </div>
+            ) : (
+              "Create Quiz"
+            )}
           </button>
-
         </form>
-
       </div>
-
     </div>
   );
 }

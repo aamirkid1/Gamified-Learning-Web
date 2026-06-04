@@ -74,8 +74,17 @@ export class QuizAttemptService {
             };
         }
 
+        // const attempt =
+        //     this.repo.create(data);
+
         const attempt =
-            this.repo.create(data);
+            this.repo.create({
+                ...data,
+
+                mcqScore: data.score,
+
+                shortAnswerScore: 0,
+            });
 
         const savedAttempt =
             await this.repo.save(
@@ -187,12 +196,26 @@ export class QuizAttemptService {
             };
         }
 
-        attempt.teacherScore =
+        // attempt.teacherScore =
+        //     score;
+
+        // attempt.score = score;
+
+        // attempt.xpEarned = score;
+
+        // attempt.reviewed = true;
+
+
+        attempt.teacherScore = score;
+
+        attempt.shortAnswerScore =
             score;
 
-        attempt.score = score;
+        attempt.score =
+            attempt.mcqScore + score;
 
-        attempt.xpEarned = score;
+        attempt.xpEarned =
+            attempt.mcqScore + score;
 
         attempt.reviewed = true;
 

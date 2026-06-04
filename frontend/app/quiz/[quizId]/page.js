@@ -66,10 +66,24 @@ export default function QuizPage() {
         //     setSubmitted(true);
         // }
 
+        // if (attempt) {
+        //     setAlreadyAttempted(true);
+
+        //     setScore(attempt.score);
+
+        //     setSavedAnswers(
+        //         JSON.parse(
+        //             attempt.answers
+        //         )
+        //     );
+
+        //     setSubmitted(true);
+        // }
+
         if (attempt) {
             setAlreadyAttempted(true);
 
-            setScore(attempt.score);
+            setScore(attempt);
 
             setSavedAnswers(
                 JSON.parse(
@@ -227,6 +241,27 @@ export default function QuizPage() {
 
         setSubmitted(true);
     };
+
+
+    const mcqScore =
+        typeof score === "object"
+            ? score.mcqScore || 0
+            : score;
+
+    const shortAnswerScore =
+        typeof score === "object"
+            ? score.shortAnswerScore || 0
+            : 0;
+
+    const totalScore =
+        typeof score === "object"
+            ? score.score || 0
+            : score;
+
+    const reviewCompleted =
+        typeof score === "object"
+            ? score.reviewed
+            : false;
 
     if (!quiz) {
         return (
@@ -407,158 +442,293 @@ export default function QuizPage() {
                         </h2>
 
 
+                        {(() => {
 
-                        {/* <p className="text-2xl mb-3">
-                            Score: {score}
-                        </p>
+                            const shortQuestions =
+                                questions.filter(
+                                    (q) =>
+                                        q.type === "short"
+                                );
 
-                        <p className="text-xl text-[#8b4513] font-semibold mb-8">
-                            XP Earned: {score}
-                        </p> */}
+                            const hasShortQuestions =
+                                shortQuestions.length > 0;
 
-                        {score === 0 ? (
+                            return (
+                                <>
 
-                            <div className="mb-8">
 
-                                <div className="bg-amber-50 border border-amber-300 rounded-2xl p-6">
 
-                                    <h3 className="text-2xl font-bold text-amber-700 mb-2">
-                                        ⏳ Under Review
-                                    </h3>
 
-                                    <p className="text-gray-700">
-                                        Your short-answer response has been submitted successfully.
-                                    </p>
 
-                                    <p className="text-gray-700 mt-2">
-                                        A teacher will review your answer and award XP.
-                                    </p>
+
+                                    {/* {
+                                score === 0 ? (
+
+                                    <div className="mb-8">
+
+                                        <div className="bg-amber-50 border border-amber-300 rounded-2xl p-6">
+
+                                            <h3 className="text-2xl font-bold text-amber-700 mb-2">
+                                                ⏳ Under Review
+                                            </h3>
+
+                                            <p className="text-gray-700">
+                                                Your short-answer response has been submitted successfully.
+                                            </p>
+
+                                            <p className="text-gray-700 mt-2">
+                                                A teacher will review your answer and award XP.
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                ) : (
+
+                                <div className="mb-8">
+
+                                    <div className="bg-green-50 border border-green-300 rounded-2xl p-6">
+
+                                        <h3 className="text-2xl font-bold text-green-700 mb-2">
+                                            ✅ Review Complete
+                                        </h3>
+
+                                        <p className="text-xl">
+                                            Score:
+                                            <span className="font-bold ml-2">
+                                                {score}
+                                            </span>
+                                        </p>
+
+                                        <p className="text-xl text-[#8b4513] font-semibold mt-3">
+                                            XP Earned:
+                                            <span className="ml-2">
+                                                {score}
+                                            </span>
+                                        </p>
+
+                                    </div>
 
                                 </div>
 
-                            </div>
+                            )
+                            } */}
 
-                        ) : (
+                                    <div className="mb-8">
 
-                            <div className="mb-8">
+                                        <div className="bg-green-50 border border-green-300 rounded-2xl p-6 mb-5">
 
-                                <div className="bg-green-50 border border-green-300 rounded-2xl p-6">
+                                            <h3 className="text-2xl font-bold text-green-700 mb-3">
+                                                ✅ Auto Evaluation Complete
+                                            </h3>
 
-                                    <h3 className="text-2xl font-bold text-green-700 mb-2">
-                                        ✅ Review Complete
-                                    </h3>
+                                            <p className="text-xl">
+                                                {/* MCQ Score:
+                                                <span className="font-bold ml-2">
+                                                    {score}
+                                                </span> */}
 
-                                    <p className="text-xl">
-                                        Score:
-                                        <span className="font-bold ml-2">
-                                            {score}
-                                        </span>
-                                    </p>
+                                                MCQ Score:
+                                                <span className="font-bold ml-2">
+                                                    {mcqScore}
+                                                </span>
+                                            </p>
 
-                                    <p className="text-xl text-[#8b4513] font-semibold mt-3">
-                                        XP Earned:
-                                        <span className="ml-2">
-                                            {score}
-                                        </span>
-                                    </p>
+                                            <p className="text-xl text-[#8b4513] font-semibold mt-3">
+                                                XP Earned:
+                                                <span className="ml-2">
+                                                    {mcqScore}
+                                                </span>
+                                            </p>
 
-                                </div>
+                                        </div>
 
-                            </div>
+                                        {hasShortQuestions && !reviewCompleted && (
 
-                        )}
+                                            <div className="bg-amber-50 border border-amber-300 rounded-2xl p-6">
+
+                                                <h3 className="text-2xl font-bold text-amber-700 mb-3">
+                                                    ⏳ Short Answers Under Review
+                                                </h3>
+
+                                                <p className="text-gray-700 mb-4">
+                                                    The following questions are waiting for teacher evaluation:
+                                                </p>
+
+                                                <div className="space-y-3">
+
+                                                    {shortQuestions.map(
+                                                        (q, index) => (
+
+                                                            <div
+                                                                key={q.id}
+                                                                className="bg-white border rounded-xl p-4"
+                                                            >
+
+                                                                <p className="font-semibold text-[#6b1f0f]">
+                                                                    Question #{index + 1}
+                                                                </p>
+
+                                                                <p className="text-gray-600 mt-1">
+                                                                    {q.question}
+                                                                </p>
+
+                                                            </div>
+
+                                                        )
+                                                    )}
+
+                                                </div>
+
+                                                <p className="mt-4 text-gray-700">
+                                                    Additional XP will be awarded after teacher review.
+                                                </p>
+
+                                            </div>
+
+                                        )}
+
+                                        {hasShortQuestions && reviewCompleted && (
+
+                                            <div className="bg-blue-50 border border-blue-300 rounded-2xl p-6">
+
+                                                <h3 className="text-2xl font-bold text-blue-700 mb-4">
+                                                    ✅ Short Answer Review Complete
+                                                </h3>
+
+                                                <div className="space-y-3">
+
+                                                    <p className="text-xl">
+                                                        MCQ XP:
+                                                        <span className="font-bold ml-2">
+                                                            {mcqScore}
+                                                        </span>
+                                                    </p>
+
+                                                    <p className="text-xl">
+                                                        Short Answer XP:
+                                                        <span className="font-bold ml-2">
+                                                            {shortAnswerScore}
+                                                        </span>
+                                                    </p>
+
+                                                    <div className="border-t pt-4">
+
+                                                        <p className="text-3xl font-bold text-[#8b4513]">
+                                                            Total XP Earned:
+                                                            <span className="ml-3">
+                                                                {totalScore}
+                                                            </span>
+                                                        </p>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        )}
+
+                                    </div>
+
+                                </>
+                            );
+                        })()}
 
                         {/* {questions.map(
                             (q, index) => { */}
-                        {questions
-                            .filter((q) => q.type === "mcq")
-                            .map((q, index) => {
-                                const selected =
-                                    savedAnswers[
-                                    q.id
-                                    ] || [];
+                        {
+                            questions
+                                .filter((q) => q.type === "mcq")
+                                .map((q, index) => {
+                                    const selected =
+                                        savedAnswers[
+                                        q.id
+                                        ] || [];
 
-                                const correct =
-                                    q.correctAnswers
-                                        .split(",");
+                                    const correct =
+                                        q.correctAnswers
+                                            .split(",");
 
-                                return (
-                                    <div
-                                        key={q.id}
-                                        className="border rounded-2xl p-5 mb-5"
-                                    >
-                                        <h3 className="font-bold mb-3">
-                                            Q{index + 1}.{" "}
-                                            {q.question}
-                                        </h3>
+                                    return (
+                                        <div
+                                            key={q.id}
+                                            className="border rounded-2xl p-5 mb-5"
+                                        >
+                                            <h3 className="font-bold mb-3">
+                                                Q{index + 1}.{" "}
+                                                {q.question}
+                                            </h3>
 
-                                        <p className="text-sm text-gray-500 mb-4">
-                                            Correct Answer: {q.correctAnswers}
-                                        </p>
+                                            <p className="text-sm text-gray-500 mb-4">
+                                                Correct Answer: {q.correctAnswers}
+                                            </p>
 
-                                        {[
-                                            {
-                                                key: "A",
-                                                text: q.optionA,
-                                            },
-                                            {
-                                                key: "B",
-                                                text: q.optionB,
-                                            },
-                                            {
-                                                key: "C",
-                                                text: q.optionC,
-                                            },
-                                            {
-                                                key: "D",
-                                                text: q.optionD,
-                                            },
-                                        ].map(
-                                            (
-                                                option
-                                            ) => {
-                                                let bg =
-                                                    "";
+                                            {[
+                                                {
+                                                    key: "A",
+                                                    text: q.optionA,
+                                                },
+                                                {
+                                                    key: "B",
+                                                    text: q.optionB,
+                                                },
+                                                {
+                                                    key: "C",
+                                                    text: q.optionC,
+                                                },
+                                                {
+                                                    key: "D",
+                                                    text: q.optionD,
+                                                },
+                                            ].map(
+                                                (
+                                                    option
+                                                ) => {
+                                                    let bg =
+                                                        "";
 
-                                                if (
-                                                    correct.includes(
-                                                        option.key
-                                                    )
-                                                ) {
-                                                    bg =
-                                                        "bg-green-100 border-green-500";
-                                                }
-
-                                                if (
-                                                    selected.includes(
-                                                        option.key
-                                                    ) &&
-                                                    !correct.includes(
-                                                        option.key
-                                                    )
-                                                ) {
-                                                    bg =
-                                                        "bg-red-100 border-red-500";
-                                                }
-
-                                                return (
-                                                    <div
-                                                        key={
+                                                    if (
+                                                        correct.includes(
                                                             option.key
-                                                        }
-                                                        className={`border rounded-lg p-2 mb-2 ${bg}`}
-                                                    >
-                                                        {option.text}
-                                                    </div>
-                                                );
-                                            }
-                                        )}
-                                    </div>
-                                );
-                            }
-                            )}
+                                                        )
+                                                    ) {
+                                                        bg =
+                                                            "bg-green-100 border-green-500";
+                                                    }
 
-                    </div>
+                                                    if (
+                                                        selected.includes(
+                                                            option.key
+                                                        ) &&
+                                                        !correct.includes(
+                                                            option.key
+                                                        )
+                                                    ) {
+                                                        bg =
+                                                            "bg-red-100 border-red-500";
+                                                    }
+
+                                                    return (
+                                                        <div
+                                                            key={
+                                                                option.key
+                                                            }
+                                                            className={`border rounded-lg p-2 mb-2 ${bg}`}
+                                                        >
+                                                            {option.text}
+                                                        </div>
+                                                    );
+                                                }
+                                            )}
+                                        </div>
+                                    );
+                                }
+                                )
+                        }
+
+                    </div >
                 )}
 
             </div>

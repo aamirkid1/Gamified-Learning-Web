@@ -110,7 +110,11 @@ export default function CourseDetails() {
 
           {lessons.map((lesson, index) => {
 
-            const lessonQuiz = quizzes.find(
+            // const lessonQuiz = quizzes.find(
+            //   (quiz) => quiz.lessonId === lesson.id
+            // );
+
+            const lessonQuizzes = quizzes.filter(
               (quiz) => quiz.lessonId === lesson.id
             );
 
@@ -152,8 +156,8 @@ export default function CourseDetails() {
                       <p className="text-gray-500 text-sm font-medium leading-relaxed line-clamp-1">
                         {lesson.content
                           ? lesson.content
-                              .replace(/[^\w\s]/gi, "")
-                              .substring(0, 110)
+                            .replace(/[^\w\s]/gi, "")
+                            .substring(0, 110)
                           : "No lecture content description summarized."}
                         ...
                       </p>
@@ -168,7 +172,7 @@ export default function CourseDetails() {
                 </Link>
 
                 {/* QUIZ CARD */}
-                {lessonQuiz && (
+                {/* {lessonQuiz && (
                   <div className="ml-20 mt-3 bg-amber-50 border border-amber-200 rounded-xl p-4 shadow-sm">
 
                     <div className="flex items-center justify-between">
@@ -192,7 +196,34 @@ export default function CourseDetails() {
                     </div>
 
                   </div>
-                )}
+                )} */}
+
+                {lessonQuizzes.map((quiz) => (
+                  <div
+                    key={quiz.id}
+                    className="ml-20 mt-3 bg-amber-50 border border-amber-200 rounded-xl p-4 shadow-sm"
+                  >
+                    <div className="flex items-center justify-between">
+
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-wider text-amber-700">
+                          Quiz Available
+                        </p>
+
+                        <h3 className="font-bold text-[#3b130d]">
+                          {quiz.title}
+                        </h3>
+                      </div>
+
+                      <Link href={`/quiz/${quiz.id}`}>
+                        <button className="bg-[#8b4513] hover:bg-[#6f311c] text-white px-5 py-2 rounded-lg font-semibold">
+                          Start Quiz
+                        </button>
+                      </Link>
+
+                    </div>
+                  </div>
+                ))}
 
               </div>
             );
