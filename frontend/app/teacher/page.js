@@ -58,7 +58,7 @@ export default function TeacherDashboard() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
 
             {/* Create Course Card */}
             <Link href="/teacher/create-course" className="group">
@@ -139,6 +139,34 @@ export default function TeacherDashboard() {
 
                 <div className="mt-8 w-full bg-[#431b11] py-3 rounded-xl font-semibold tracking-wide text-center text-sm border border-transparent group-hover:bg-[#35140d] group-hover:border-white/10 transition-all shadow-md">
                   Create Quiz
+                </div>
+
+              </div>
+            </Link>
+
+            {/* Review Answers Card */}
+            <Link
+              href="/teacher/review-answers"
+              className="group"
+            >
+              <div className="h-full bg-[#6f311c] rounded-2xl p-8 shadow-xl border border-[#8b4513]/60 hover:border-white/20 transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between group-hover:shadow-2xl group-hover:bg-[#6f311c]/90">
+
+                <div>
+                  <div className="w-14 h-14 bg-[#3b130d]/60 rounded-xl flex items-center justify-center text-3xl mb-6 shadow-inner border border-white/5 group-hover:scale-110 transition-transform duration-300">
+                    📋
+                  </div>
+
+                  <h3 className="text-xl font-bold mb-2 text-white group-hover:text-gray-100">
+                    Review Answers
+                  </h3>
+
+                  <p className="text-gray-300/90 text-sm leading-relaxed">
+                    Review short-answer submissions, assign scores, award XP and update student progress.
+                  </p>
+                </div>
+
+                <div className="mt-8 w-full bg-[#431b11] py-3 rounded-xl font-semibold tracking-wide text-center text-sm border border-transparent group-hover:bg-[#35140d] group-hover:border-white/10 transition-all shadow-md">
+                  Open Reviews
                 </div>
 
               </div>

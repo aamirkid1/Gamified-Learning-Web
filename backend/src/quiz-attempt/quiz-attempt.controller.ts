@@ -26,6 +26,11 @@ export class QuizAttemptController {
     return this.quizAttemptService.findAll();
   }
 
+  @Get('pending')
+  getPending() {
+    return this.quizAttemptService.getPending();
+  }
+
   @Get('user/:userId')
   findByUser(
     @Param('userId')
@@ -59,6 +64,20 @@ export class QuizAttemptController {
     return this.quizAttemptService.findUserQuizAttempt(
       Number(userId),
       Number(quizId),
+    );
+  }
+
+  @Post('review/:id')
+  review(
+    @Param('id')
+    id: string,
+
+    @Body()
+    body,
+  ) {
+    return this.quizAttemptService.reviewAttempt(
+      Number(id),
+      body.score,
     );
   }
 }

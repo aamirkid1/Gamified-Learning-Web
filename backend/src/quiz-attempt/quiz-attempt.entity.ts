@@ -27,6 +27,16 @@ export class QuizAttempt {
   xpEarned!: number;
 
   @Column({
+    default: false,
+  })
+  reviewed!: boolean;
+
+  @Column({
+    default: 0,
+  })
+  teacherScore!: number;
+
+  @Column({
     type: 'text',
   })
   answers!: string;

@@ -237,8 +237,8 @@ export default function QuizPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#f5f5f5] p-8">
-            <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-lg p-8">
+        <div className="min-h-screen bg-[#f8f4ef] p-8">
+            <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl border border-[#eaded4] p-8">
 
                 <h1 className="text-4xl font-bold text-[#6b1f0f] mb-8">
                     {quiz.title}
@@ -343,7 +343,7 @@ export default function QuizPage() {
                                     </div>
                                 )}
 
-                                {q.type ===
+                                {/* {q.type ===
                                     "short-answer" && (
                                         <textarea
                                             className="w-full border p-3 rounded-xl"
@@ -356,7 +356,21 @@ export default function QuizPage() {
                                                 })
                                             }
                                         />
-                                    )}
+                                    )} */}
+
+                                {q.type === "short" && (
+                                    <textarea
+                                        className="w-full border p-3 rounded-xl"
+                                        rows={4}
+                                        placeholder="Write your answer here..."
+                                        onChange={(e) =>
+                                            setAnswers({
+                                                ...answers,
+                                                [q.id]: e.target.value,
+                                            })
+                                        }
+                                    />
+                                )}
                             </div>
                         ))}
 
@@ -388,24 +402,77 @@ export default function QuizPage() {
                 ) : (
                     <div>
 
-                        <h2 className="text-4xl font-bold text-green-600 mb-6">
-                            Quiz Submitted
+                        <h2 className="text-5xl font-bold text-[#6b1f0f] mb-6">
+                            Assessment Submitted
                         </h2>
 
-                        {/* <p className="text-2xl mb-8">
-                            Score: {score}
-                        </p> */}
 
-                        <p className="text-2xl mb-3">
+
+                        {/* <p className="text-2xl mb-3">
                             Score: {score}
                         </p>
 
                         <p className="text-xl text-[#8b4513] font-semibold mb-8">
                             XP Earned: {score}
-                        </p>
+                        </p> */}
 
-                        {questions.map(
-                            (q, index) => {
+                        {score === 0 ? (
+
+                            <div className="mb-8">
+
+                                <div className="bg-amber-50 border border-amber-300 rounded-2xl p-6">
+
+                                    <h3 className="text-2xl font-bold text-amber-700 mb-2">
+                                        ⏳ Under Review
+                                    </h3>
+
+                                    <p className="text-gray-700">
+                                        Your short-answer response has been submitted successfully.
+                                    </p>
+
+                                    <p className="text-gray-700 mt-2">
+                                        A teacher will review your answer and award XP.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        ) : (
+
+                            <div className="mb-8">
+
+                                <div className="bg-green-50 border border-green-300 rounded-2xl p-6">
+
+                                    <h3 className="text-2xl font-bold text-green-700 mb-2">
+                                        ✅ Review Complete
+                                    </h3>
+
+                                    <p className="text-xl">
+                                        Score:
+                                        <span className="font-bold ml-2">
+                                            {score}
+                                        </span>
+                                    </p>
+
+                                    <p className="text-xl text-[#8b4513] font-semibold mt-3">
+                                        XP Earned:
+                                        <span className="ml-2">
+                                            {score}
+                                        </span>
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        )}
+
+                        {/* {questions.map(
+                            (q, index) => { */}
+                        {questions
+                            .filter((q) => q.type === "mcq")
+                            .map((q, index) => {
                                 const selected =
                                     savedAnswers[
                                     q.id
@@ -489,7 +556,7 @@ export default function QuizPage() {
                                     </div>
                                 );
                             }
-                        )}
+                            )}
 
                     </div>
                 )}
