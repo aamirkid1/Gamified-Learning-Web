@@ -4,19 +4,67 @@ import { useEffect, useState } from "react";
 import reviewAnswerService from "@/services/reviewAnswerService";
 
 export default function ReviewAnswers() {
-    const [attempts, setAttempts] = useState([]);
-    const [scores, setScores] = useState({});
+    // const [attempts, setAttempts] = useState([]);
+    // const [scores, setScores] = useState({});
+
+    const [attempts, setAttempts] =
+        useState([]);
+
+    const [scores, setScores] =
+        useState({});
+
+    const [questions, setQuestions] =
+        useState({});
+
+
 
     useEffect(() => {
         loadData();
     }, []);
+
+    // const loadData = async () => {
+    //     const data =
+    //         await reviewAnswerService.getPending();
+
+    //     setAttempts(data);
+    // };
+
 
     const loadData = async () => {
         const data =
             await reviewAnswerService.getPending();
 
         setAttempts(data);
+
+        const questionMap = {};
+
+        for (const attempt of data) {
+            const answers =
+                JSON.parse(
+                    attempt.answers || "{}"
+                );
+
+            for (const questionId of Object.keys(
+                answers
+            )) {
+                try {
+                    const question =
+                        await reviewAnswerService.getQuestion(
+                            questionId
+                        );
+
+                    questionMap[questionId] =
+                        question;
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        }
+
+        setQuestions(questionMap);
     };
+
+
 
     const submitReview = async (id) => {
         const score =
@@ -96,9 +144,10 @@ export default function ReviewAnswers() {
                                 Object.entries(
                                     answers
                                 ).filter(
-                                    ([, answer]) =>
-                                        typeof answer ===
-                                        "string"
+                                    ([questionId]) =>
+                                        questions[
+                                            questionId
+                                        ]?.type === "short"
                                 );
 
                             if (
@@ -163,10 +212,10 @@ export default function ReviewAnswers() {
                                                 >
 
                                                     <p className="font-bold text-[#6b1f0f] mb-3">
-                                                        Question ID:
-                                                        {" "}
                                                         {
-                                                            questionId
+                                                            questions[
+                                                                questionId
+                                                            ]?.question
                                                         }
                                                     </p>
 

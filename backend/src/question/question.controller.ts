@@ -12,7 +12,7 @@ import { QuestionService } from './question.service';
 export class QuestionController {
   constructor(
     private questionService: QuestionService,
-  ) {}
+  ) { }
 
   @Post()
   create(@Body() body) {
@@ -32,6 +32,16 @@ export class QuestionController {
   ) {
     return this.questionService.findByQuiz(
       Number(quizId),
+    );
+  }
+
+
+  @Get(':id')
+  findOne(
+    @Param('id') id: string,
+  ) {
+    return this.questionService.findOne(
+      Number(id),
     );
   }
 }

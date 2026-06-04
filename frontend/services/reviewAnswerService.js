@@ -32,6 +32,16 @@ const reviewAnswerService = {
 
     return res.json();
   },
+
+  async getQuestion(
+    questionId
+  ) {
+    const res = await fetch(
+      `${API}/questions/${questionId}`
+    );
+
+    return res.json();
+  },
 };
 
 export default reviewAnswerService;

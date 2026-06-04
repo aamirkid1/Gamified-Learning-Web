@@ -27,4 +27,10 @@ export class QuestionService {
       where: { quizId },
     });
   }
+
+  findOne(id: number) {
+    return this.repo.findOne({
+      where: { id },
+    });
+  }
 }
