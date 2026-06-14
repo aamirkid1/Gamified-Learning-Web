@@ -265,7 +265,7 @@ hover:shadow-[0_15px_50px_rgba(255,255,255,0.08)] flex flex-col justify-between 
               href="/teacher/review-answers"
               className="group"
             >
-              <div className="h-full bg-[#6f311c] rounded-2xl p-8 shadow-xl border border-[#8b4513]/60 hover:border-white/20 transition-all duration-300hover:-translate-y-2
+              <div className="h-full bg-[#6f311c] rounded-2xl p-8 shadow-xl border border-[#8b4513]/60 hover:border-white/20 transition-all duration-300 hover:-translate-y-2
 hover:shadow-[0_15px_50px_rgba(255,255,255,0.08)]  flex flex-col justify-between group-hover:shadow-2xl group-hover:bg-[#6f311c]/90">
 
                 <div>

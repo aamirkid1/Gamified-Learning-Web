@@ -70,24 +70,43 @@ export default function DashboardLayout({
   };
 
   const menu = [
-  { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-  { name: "Courses", path: "/courses", icon: BookOpen },
-  { name: "Quiz", path: "/quiz", icon: Brain },
+    {
+      name: "Dashboard",
+      path: "/dashboard",
+      icon: LayoutDashboard,
+    },
 
-  {
-    name: "Flashcards",
-    path: "/dashboard/flashcards",
-    icon: Layers,
-  },
+    {
+      name: "Courses",
+      path: "/courses",
+      icon: BookOpen,
+    },
 
-  {
-    name: "Leaderboard",
-    path: "/dashboard/leaderboard",
-    icon: Trophy,
-  },
+    {
+      name: "Quiz",
+      path: "/quiz",
+      icon: Brain,
+    },
 
-  { name: "Duel", path: "/duel", icon: Sword },
-];
+    {
+      name: "Flashcards",
+      path: "/dashboard/flashcards",
+      icon: Layers,
+    },
+
+    {
+      name: "Leaderboard",
+      path: "/dashboard/leaderboard",
+      icon: Trophy,
+    },
+
+    {
+      name: "Duel",
+      path: "/duel",
+      icon: Sword,
+    },
+  ];
+
 
   return (
     <div className="flex min-h-screen bg-[#f5f1ed] text-[#000000] font-sans antialiased">
