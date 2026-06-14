@@ -49,7 +49,37 @@ export default function CourseDetails() {
   };
 
   return (
-    <div className="space-y-8 font-sans">
+    <div className="relative space-y-8 font-sans">
+
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+
+        <div
+          className="
+    absolute
+    top-20
+    right-20
+    w-[300px]
+    h-[300px]
+    bg-[#8b4513]/5
+    blur-[120px]
+    rounded-full
+    "
+        />
+
+        <div
+          className="
+    absolute
+    bottom-20
+    left-20
+    w-[250px]
+    h-[250px]
+    bg-[#a0522d]/5
+    blur-[100px]
+    rounded-full
+    "
+        />
+
+      </div>
 
       {/* TOP NAVIGATION BACK LINK */}
       <div className="flex items-center justify-between pb-4 border-b border-[#eaded4]">
@@ -70,7 +100,32 @@ export default function CourseDetails() {
       </div>
 
       {/* HEADER HERO AREA */}
-      <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-[#eaded4] relative overflow-hidden">
+      <div
+        className="
+  relative
+  overflow-hidden
+  bg-white/80
+  backdrop-blur-md
+  rounded-3xl
+  p-8
+  border
+  border-[#eaded4]
+  shadow-lg
+  "
+      >
+
+        <div
+  className="
+  absolute
+  right-0
+  top-0
+  w-48
+  h-48
+  bg-[#8b4513]/10
+  blur-[80px]
+  rounded-full
+  "
+/>
         <div className="absolute top-0 left-0 w-2 h-full bg-[#8b4513]" />
         <div className="pl-3 space-y-1">
           <h1 className="text-3xl font-black text-[#3b130d] tracking-tight">
@@ -106,7 +161,20 @@ export default function CourseDetails() {
           </p>
         </div>
       ) : (
-        <div className="max-w-4xl mx-auto space-y-4 relative before:absolute before:top-2 before:bottom-2 before:left-[27px] before:w-0.5 before:bg-[#eaded4]/60">
+        <div className="
+max-w-4xl
+mx-auto
+space-y-4
+relative
+before:absolute
+before:top-2
+before:bottom-2
+before:left-[31px]
+before:w-0.5
+before:bg-gradient-to-b
+before:from-[#8b4513]
+before:to-[#eaded4]
+">
 
           {lessons.map((lesson, index) => {
 
@@ -125,15 +193,47 @@ export default function CourseDetails() {
                   href={`/lesson/${lesson.id}`}
                   className="block group"
                 >
-                  <div className="bg-white rounded-2xl border border-[#eaded4] shadow-sm p-5 flex items-center gap-5 transition-all duration-300 hover:shadow-md hover:border-[#8b4513]/40 hover:translate-x-1 relative z-10">
+                  <div className="
+bg-white
+rounded-3xl
+border
+border-[#eaded4]
+shadow-sm
+p-5
+flex
+items-center
+gap-5
+transition-all
+duration-300
+hover:shadow-2xl
+hover:shadow-[0_10px_40px_rgba(139,69,19,0.15)]
+hover:-translate-y-1
+hover:border-[#8b4513]/40
+relative
+z-10
+">
 
                     {/* MODULE NODE */}
-                    <div className="w-14 h-14 rounded-xl bg-[#f5f1ed] border border-[#eaded4] flex flex-col items-center justify-center flex-shrink-0 group-hover:bg-[#8b4513] group-hover:border-[#8b4513] transition-colors duration-300">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-amber-200/80 leading-none">
+                    <div
+                      className="
+  w-16
+  h-16
+  rounded-2xl
+  bg-gradient-to-br
+  from-[#8b4513]
+  to-[#6b1f0f]
+  flex
+  flex-col
+  items-center
+  justify-center
+  shadow-md
+  "
+                    >
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-amber-200 leading-none">
                         Mod
                       </span>
 
-                      <span className="text-xl font-black text-[#3b130d] group-hover:text-white transition-colors leading-tight">
+                      <span className="text-xl font-black text-white leading-tight">
                         {String(index + 1).padStart(2, "0")}
                       </span>
                     </div>
@@ -175,7 +275,7 @@ export default function CourseDetails() {
                 {/* {lessonQuiz && (
                   <div className="ml-20 mt-3 bg-amber-50 border border-amber-200 rounded-xl p-4 shadow-sm">
 
-                    <div className="flex items-center justify-between">
+                    hover:scale-105
 
                       <div>
                         <p className="text-xs font-bold uppercase tracking-wider text-amber-700">
@@ -201,9 +301,23 @@ export default function CourseDetails() {
                 {lessonQuizzes.map((quiz) => (
                   <div
                     key={quiz.id}
-                    className="ml-20 mt-3 bg-amber-50 border border-amber-200 rounded-xl p-4 shadow-sm"
+                    className="
+ml-0
+md:ml-20
+mt-4
+bg-gradient-to-r
+from-[#fff8e6]
+to-[#fffdf8]
+border
+border-[#f0d88c]
+rounded-2xl
+p-5
+shadow-sm
+hover:shadow-md
+transition-all
+"
                   >
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
                       <div>
                         <p className="text-xs font-bold uppercase tracking-wider text-amber-700">
@@ -216,7 +330,20 @@ export default function CourseDetails() {
                       </div>
 
                       <Link href={`/quiz/${quiz.id}`}>
-                        <button className="bg-[#8b4513] hover:bg-[#6f311c] text-white px-5 py-2 rounded-lg font-semibold">
+                        <button className="
+bg-gradient-to-r
+from-[#8b4513]
+to-[#a0522d]
+text-white
+px-6
+py-3
+rounded-xl
+font-bold
+shadow-md
+hover:scale-105
+hover:shadow-[0_10px_30px_rgba(139,69,19,0.35)]
+transition-all
+">
                           Start Quiz
                         </button>
                       </Link>

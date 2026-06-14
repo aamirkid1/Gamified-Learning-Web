@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import HeroAnimation from "@/components/common/HeroAnimation";
 import { motion, useMotionValue } from "framer-motion";
+import { Menu } from "lucide-react";
 import {
   Trophy,
   Flame,
@@ -14,6 +16,8 @@ export default function Home() {
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const [mobileMenuOpen, setMobileMenuOpen] =
+    useState(false);
 
   const handleMouseMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -40,7 +44,10 @@ export default function Home() {
     flex
     items-center
     justify-between
-    px-20
+    px-4
+sm:px-6
+lg:px-12
+xl:px-20
     border-b
     backdrop-blur-md
     bg-white/70
@@ -68,7 +75,34 @@ export default function Home() {
           GLP
         </motion.div>
 
-        <div className="flex gap-14 font-medium items-center">
+        <button
+          onClick={() =>
+            setMobileMenuOpen(
+              !mobileMenuOpen
+            )
+          }
+          className="
+  lg:hidden
+  text-[#6b1f0f]
+  p-2
+  rounded-lg
+  hover:bg-[#f5ede8]
+  transition
+  "
+        >
+          <Menu size={28} />
+        </button>
+
+
+
+        <div className="
+hidden
+lg:flex
+gap-10
+xl:gap-14
+font-medium
+items-center
+">
 
           <motion.div
             whileHover={{
@@ -172,7 +206,11 @@ export default function Home() {
 
         </div>
 
-        <div className="flex gap-4">
+        <div className="
+flex
+gap-2
+sm:gap-4
+">
 
           <motion.div
             whileHover={{
@@ -234,12 +272,58 @@ export default function Home() {
 
       </nav>
 
+      {mobileMenuOpen && (
+        <div
+          className="
+    lg:hidden
+    bg-white
+    border-b
+    border-[#eaded4]
+    shadow-md
+    px-6
+    py-5
+    space-y-4
+    "
+        >
+
+          <Link
+            href="#"
+            className="block font-medium"
+          >
+            About Us
+          </Link>
+
+          <Link
+            href="/courses"
+            className="block font-medium"
+          >
+            Courses
+          </Link>
+
+          <Link
+            href="/leaderboard"
+            className="block font-medium"
+          >
+            Leaderboards
+          </Link>
+
+          <Link
+            href="#"
+            className="block font-medium"
+          >
+            Contact Us
+          </Link>
+
+        </div>
+      )}
+
       {/* Hero Section */}
 
       <section
         className="
     grid
-    grid-cols-2
+    grid-cols-1
+lg:grid-cols-2
     min-h-[85vh]
     bg-gradient-to-br
     from-white
@@ -251,7 +335,18 @@ export default function Home() {
 
         {/* Left Side */}
 
-        <div className="flex flex-col justify-center px-24">
+        <div
+          className="
+flex
+flex-col
+justify-center
+px-6
+sm:px-10
+md:px-16
+lg:px-24
+py-12
+"
+        >
 
           <motion.h1
             initial={{ opacity: 0, x: -80 }}
@@ -260,7 +355,13 @@ export default function Home() {
               duration: 0.8,
               ease: "easeOut",
             }}
-            className="text-7xl font-bold leading-tight"
+            className="
+text-5xl
+sm:text-6xl
+lg:text-7xl
+font-bold
+leading-tight
+"
           >
 
             <span
@@ -293,7 +394,14 @@ export default function Home() {
               delay: 0.4,
               duration: 0.8,
             }}
-            className="mt-8 text-xl text-gray-700 max-w-xl"
+            className="
+mt-6
+text-base
+sm:text-lg
+lg:text-xl
+text-gray-700
+max-w-xl
+"
           >
 
             Learn through courses, quizzes,
@@ -302,7 +410,15 @@ export default function Home() {
 
           </motion.p>
 
-          <div className="flex gap-5 mt-10">
+          <div
+            className="
+flex
+flex-col
+sm:flex-row
+gap-4
+mt-8
+"
+          >
 
             <motion.div
               whileHover={{
@@ -365,7 +481,12 @@ export default function Home() {
         {/* Right Side */}
 
         <div
-          className="flex items-center justify-center"
+          className="
+hidden
+md:flex
+items-center
+justify-center
+"
           onMouseMove={handleMouseMove}
         >
 
@@ -442,7 +563,18 @@ to-[#d4a373]/20
 
       {/* Why Choose Us Section */}
 
-      <section className="py-24 px-20 bg-gradient-to-b from-gray-50 to-white">
+      <section
+        className="
+py-16
+md:py-24
+px-6
+sm:px-10
+lg:px-20
+bg-gradient-to-b
+from-gray-50
+to-white
+"
+      >
 
         <div className="text-center mb-16">
 
@@ -451,7 +583,13 @@ to-[#d4a373]/20
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-5xl font-bold text-[#6b1f0f]"
+            className="
+text-3xl
+sm:text-4xl
+lg:text-5xl
+font-bold
+text-[#6b1f0f]
+"
           >
             Why Choose Us?
           </motion.h2>

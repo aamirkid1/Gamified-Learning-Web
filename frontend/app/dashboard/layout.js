@@ -1,7 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import {
+  usePathname,
+  useRouter,
+} from "next/navigation";
+
 
 import {
   useEffect,
@@ -17,6 +21,7 @@ import {
   Trophy,
   LogOut,
   Sword,
+  Layers,
 } from "lucide-react";
 
 // export default function DashboardLayout({ children }) {
@@ -25,6 +30,7 @@ export default function DashboardLayout({
   children,
 }) {
   const pathname = usePathname();
+  const router = useRouter();
 
   const [user, setUser] =
     useState(null);
@@ -57,19 +63,49 @@ export default function DashboardLayout({
       setRank(result.rank);
     };
 
+  const handleLogout = () => {
+    localStorage.clear();
+
+    router.replace("/login");
+  };
+
   const menu = [
-    { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-    { name: "Courses", path: "/courses", icon: BookOpen },
-    { name: "Quiz", path: "/quiz", icon: Brain },
-    { name: "Leaderboard", path: "/dashboard/leaderboard", icon: Trophy },
-    { name: "Duel", path: "/duel", icon: Sword },
-  ];
+  { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+  { name: "Courses", path: "/courses", icon: BookOpen },
+  { name: "Quiz", path: "/quiz", icon: Brain },
+
+  {
+    name: "Flashcards",
+    path: "/dashboard/flashcards",
+    icon: Layers,
+  },
+
+  {
+    name: "Leaderboard",
+    path: "/dashboard/leaderboard",
+    icon: Trophy,
+  },
+
+  { name: "Duel", path: "/duel", icon: Sword },
+];
 
   return (
     <div className="flex min-h-screen bg-[#f5f1ed] text-[#000000] font-sans antialiased">
 
       {/* SIDEBAR */}
-      <aside className="w-72 bg-[#3b130d] text-white flex flex-col shadow-2xl relative z-20 border-r border-[#6b1f0f]/30">
+      <aside className="
+hidden
+lg:flex
+w-72
+bg-[#3b130d]
+text-white
+flex-col
+shadow-2xl
+relative
+z-20
+border-r
+border-[#6b1f0f]/30
+">
 
         {/* Absolute Top Accent Ribbon */}
         <div className="h-2 bg-[#6b1f0f] w-full" />
@@ -118,7 +154,10 @@ export default function DashboardLayout({
 
         {/* SECURE SESSION LOGOUT */}
         <div className="p-5 border-t border-[#6f311c]/40 bg-[#35140d]/30">
-          <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-400 hover:text-white hover:bg-red-950/20 transition-all duration-150 group">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-400 hover:text-white hover:bg-red-950/20 transition-all duration-150 group"
+          >
             <LogOut size={18} className="text-gray-400 group-hover:text-white transition-colors" />
             <span>Logout</span>
           </button>
@@ -129,9 +168,45 @@ export default function DashboardLayout({
       <div className="flex-1 flex flex-col min-w-0">
 
         {/* TOPBAR BANNER */}
-        <header className="bg-white shadow-sm border-b border-[#eaded4] px-8 py-5 flex justify-between items-center z-10">
+        <header className="
+relative
+sticky
+top-0
+z-50
+backdrop-blur-xl
+bg-white/70
+border-b
+border-white/30
+shadow-lg
+px-4
+sm:px-6
+lg:px-8
+py-4
+flex
+justify-between
+items-center
+">
+
+          {/* HEADER GLOW */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute right-20 top-0 w-48 h-48 bg-[#8b4513]/20 blur-[120px] rounded-full" />
+          </div>
           <div>
-            <span className="text-xs font-bold text-[#8b4513] bg-[#f5f1ed] px-3 py-1 rounded-full border border-[#eaded4] tracking-wide uppercase">
+            <span className="
+text-xs
+font-bold
+text-[#8b4513]
+bg-white/60
+backdrop-blur-md
+px-4
+py-2
+rounded-full
+border
+border-white/40
+shadow-sm
+tracking-wide
+uppercase
+">
               Academic Hub
             </span>
           </div>
@@ -139,16 +214,45 @@ export default function DashboardLayout({
           {/* USER INTERFACE PROFILE BLOCKS */}
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <p className="font-extrabold text-sm text-[#3b130d] tracking-tight leading-none mb-1">
+              <p className="
+font-bold
+text-base
+text-[#3b130d]
+tracking-tight
+">
                 {user?.name || "Student"}
               </p>
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+              <p className="
+text-xs
+font-semibold
+text-gray-400
+uppercase
+tracking-widest
+">
                 Tier Rank #{rank}
               </p>
             </div>
 
             {/* Custom Monogram Badge */}
-            <div className="w-10 h-10 rounded-xl bg-[#8b4513] text-white flex items-center justify-center font-black shadow-inner border border-white/10 ring-4 ring-[#f5f1ed]">
+            <div className="
+w-12
+h-12
+rounded-2xl
+bg-gradient-to-br
+from-[#8b4513]
+to-[#a0522d]
+text-white
+flex
+items-center
+justify-center
+font-black
+text-lg
+shadow-lg
+border
+border-white/20
+ring-4
+ring-white/40
+">
               {
                 user?.name
                   ?.charAt(0)
@@ -159,7 +263,17 @@ export default function DashboardLayout({
         </header>
 
         {/* MAIN DYNAMIC CONTENT CONTAINER */}
-        <main className="p-8 md:p-10 flex-1 overflow-y-auto max-w-6xl w-full mx-auto">
+        <main className="
+p-4
+sm:p-6
+md:p-8
+lg:p-10
+flex-1
+overflow-y-auto
+max-w-7xl
+w-full
+mx-auto
+">
           {children}
         </main>
 

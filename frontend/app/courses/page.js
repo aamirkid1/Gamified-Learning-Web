@@ -1,158 +1,13 @@
-// "use client";
-
-// import Link from "next/link";
-// import {
-//   GraduationCap,
-//   Lock,
-// } from "lucide-react";
-
-// const courses = [
-//   {
-//     id: 1,
-//     title: "Educational Psychology",
-//     description:
-//       "Introduction to Educational Psychology",
-//   },
-//   {
-//     id: 2,
-//     title: "DSA",
-//     description:
-//       "Useful for building applications",
-//   },
-//   {
-//     id: 3,
-//     title: "Introduction to JavaScript",
-//     description:
-//       "Helpful in web development",
-//   },
-// ];
-
-// export default function PublicCourses() {
-//   return (
-//     <div className="min-h-screen bg-[#f8f8f8] p-8">
-
-//       <div className="max-w-7xl mx-auto">
-
-//         <div className="text-center mb-12">
-
-//           <h1 className="text-5xl font-bold text-[#6b1f0f]">
-//             Explore Courses
-//           </h1>
-
-//           <p className="text-gray-600 mt-4">
-//             Browse available learning tracks.
-//             Login to start learning.
-//           </p>
-
-//         </div>
-
-//         <div className="grid md:grid-cols-3 gap-8">
-
-//           {courses.map((course) => (
-
-//             <div
-//               key={course.id}
-//               className="
-//                 bg-white
-//                 rounded-3xl
-//                 shadow-lg
-//                 overflow-hidden
-//                 hover:shadow-xl
-//                 transition
-//               "
-//             >
-
-//               <div
-//                 className="
-//                   h-52
-//                   flex
-//                   items-center
-//                   justify-center
-//                   bg-gray-100
-//                 "
-//               >
-
-//                 <GraduationCap
-//                   size={80}
-//                   className="text-[#8b4513]"
-//                 />
-
-//               </div>
-
-//               <div className="p-6">
-
-//                 <h2 className="text-2xl font-bold">
-
-//                   {course.title}
-
-//                 </h2>
-
-//                 <p className="mt-3 text-gray-600">
-
-//                   {course.description}
-
-//                 </p>
-
-//                 <button
-//                   disabled
-//                   className="
-//                     mt-6
-//                     w-full
-//                     bg-gray-200
-//                     text-gray-500
-//                     py-3
-//                     rounded-xl
-//                     flex
-//                     items-center
-//                     justify-center
-//                     gap-2
-//                     cursor-not-allowed
-//                   "
-//                 >
-
-//                   <Lock size={18} />
-
-//                   Login To Access
-
-//                 </button>
-
-//               </div>
-
-//             </div>
-
-//           ))}
-
-//         </div>
-
-//         <div className="text-center mt-16">
-
-//           <Link
-//             href="/login"
-//             className="
-//               bg-[#8b4513]
-//               text-white
-//               px-8
-//               py-4
-//               rounded-xl
-//             "
-//           >
-//             Login To Start Learning
-//           </Link>
-
-//         </div>
-
-//       </div>
-//     </div>
-//   );
-// }
-
-
-
 "use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { BookOpen, GraduationCap, ArrowRight } from "lucide-react";
+import {
+  BookOpen,
+  GraduationCap,
+  ArrowRight,
+  ArrowLeft,
+} from "lucide-react";
 import courseService from "../../services/courseService";
 
 export default function CoursesPage() {
@@ -172,12 +27,78 @@ export default function CoursesPage() {
   };
 
   return (
-    <div className="space-y-8 font-sans">
+    <div className="relative space-y-8 font-sans">
+
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+
+        <div
+          className="
+    absolute
+    top-0
+    right-0
+    w-[300px]
+    h-[300px]
+    bg-[#8b4513]/5
+    blur-[120px]
+    rounded-full
+    "
+        />
+
+        <div
+          className="
+    absolute
+    bottom-0
+    left-0
+    w-[250px]
+    h-[250px]
+    bg-[#a0522d]/5
+    blur-[100px]
+    rounded-full
+    "
+        />
+
+      </div>
+
+      <div className="mb-4">
+        <Link href="/dashboard">
+          <button
+            className="
+      flex
+      items-center
+      gap-2
+      px-4
+      py-2
+      bg-white/80
+backdrop-blur-md
+      border
+      border-[#eaded4]
+      rounded-xl
+      shadow-sm
+      hover:shadow-md
+      hover:-translate-y-0.5
+      transition-all
+      text-[#6b1f0f]
+      font-semibold
+      "
+          >
+            <ArrowLeft size={18} />
+            Dashboard
+          </button>
+        </Link>
+      </div>
 
       {/* HEADER */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b border-[#eaded4]">
         <div>
-          <h1 className="text-3xl md:text-4xl font-black text-[#3b130d] tracking-tight">
+          <h1
+            className="
+  text-4xl
+  md:text-5xl
+  font-black
+  text-[#3b130d]
+  tracking-tight
+  "
+          >
             Explore Courses
           </h1>
 
@@ -186,7 +107,8 @@ export default function CoursesPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#8b4513] bg-white px-4 py-2 rounded-xl border border-[#eaded4] shadow-sm">
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#8b4513] bg-white/80
+backdrop-blur-md px-4 py-2 rounded-xl border border-[#eaded4] shadow-sm">
           <BookOpen size={14} />
           <span>{courses.length} Tracks Available</span>
         </div>
@@ -216,10 +138,40 @@ export default function CoursesPage() {
               key={course.id}
               className="group"
             >
-              <div className="h-full bg-white rounded-2xl border border-[#eaded4] shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+              <div
+                className="
+  h-full
+  bg-white
+  rounded-2xl
+  border
+  border-[#eaded4]
+  shadow-sm
+  overflow-hidden
+  flex
+  flex-col
+  justify-between
+  hover:shadow-2xl
+  hover:shadow-[0_10px_40px_rgba(139,69,19,0.18)]
+  hover:-translate-y-2
+  hover:border-[#8b4513]/30
+  transition-all
+  duration-300
+  "
+              >
 
                 {/* IMAGE SECTION */}
-                <div className="w-full h-52 bg-[#f5f5f5] flex items-center justify-center border-b border-[#eaded4]">
+                <div className="
+w-full
+h-56
+bg-gradient-to-br
+from-[#8b4513]
+to-[#6b1f0f]
+flex
+items-center
+justify-center
+border-b
+border-[#eaded4]
+">
 
                   {course.thumbnail ? (
                     <img
@@ -243,7 +195,7 @@ export default function CoursesPage() {
                     <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#6f311c] to-[#3b130d] flex items-center justify-center mb-3">
                       <GraduationCap
                         className="text-white"
-                        size={28}
+                        size={36}
                       />
                     </div>
 
@@ -266,8 +218,8 @@ export default function CoursesPage() {
                   </div>
 
                   <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between text-[#8b4513] font-bold uppercase text-xs tracking-wider">
-                    <span className="group-hover:underline">
-                      Enter Course
+                    <span>
+                      Start Learning
                     </span>
 
                     <ArrowRight
