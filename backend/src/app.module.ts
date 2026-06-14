@@ -15,6 +15,8 @@ import { LeaderboardModule } from './leaderboard/leaderboard.module';
 import { BadgeModule } from './badge/badge.module';
 import { UserBadgeModule } from './user-badge/user-badge.module';
 
+import { FlashcardsModule } from './flashcards/flashcards.module';
+
 @Module({
   imports: [
 
@@ -45,6 +47,7 @@ import { UserBadgeModule } from './user-badge/user-badge.module';
     LeaderboardModule,
     BadgeModule,
     UserBadgeModule,
+    FlashcardsModule,
   ],
 })
 export class AppModule { }

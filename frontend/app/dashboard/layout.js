@@ -17,6 +17,7 @@ import {
   Trophy,
   LogOut,
   Sword,
+  Layers,
 } from "lucide-react";
 
 // export default function DashboardLayout({ children }) {
@@ -61,6 +62,7 @@ export default function DashboardLayout({
     { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
     { name: "Courses", path: "/courses", icon: BookOpen },
     { name: "Quiz", path: "/quiz", icon: Brain },
+    { name: "Flashcards", path: "/dashboard/flashcards", icon: Layers },
     { name: "Leaderboard", path: "/dashboard/leaderboard", icon: Trophy },
     { name: "Duel", path: "/duel", icon: Sword },
   ];

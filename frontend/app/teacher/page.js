@@ -172,6 +172,26 @@ export default function TeacherDashboard() {
               </div>
             </Link>
 
+            {/*flash card */}
+            <Link href="/teacher/flashcards" className="group">
+              <div className="h-full bg-[#6f311c] rounded-2xl p-8 shadow-xl border border-[#8b4513]/60 hover:border-white/20 transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between group-hover:shadow-2xl group-hover:bg-[#6f311c]/90">
+                <div>
+                  <div className="w-14 h-14 bg-[#3b130d]/60 rounded-xl flex items-center justify-center text-3xl mb-6 shadow-inner border border-white/5 group-hover:scale-110 transition-transform duration-300">
+                    🃏
+                  </div>
+                  <h3 className="text-xl font-bold mb-2 text-white group-hover:text-gray-100">
+                    Flashcards
+                  </h3>
+                  <p className="text-gray-300/90 text-sm leading-relaxed">
+                    Create and manage flashcard decks for students to practice concepts and revision topics.
+                  </p>
+                </div>
+                <div className="mt-8 w-full bg-[#431b11] py-3 rounded-xl font-semibold tracking-wide text-center text-sm border border-transparent group-hover:bg-[#35140d] group-hover:border-white/10 transition-all shadow-md">
+                  Manage Decks
+                </div>
+              </div>
+            </Link>
+
           </div>
         </section>
 
