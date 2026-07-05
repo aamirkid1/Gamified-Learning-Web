@@ -5,13 +5,13 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private userService: UserService) {}
 
-  // ✅ REGISTER
+  //  REGISTER
   @Post('register')
   register(@Body() body) {
     return this.userService.register(body);
   }
 
-  // ✅ LOGIN
+  //  LOGIN
   @Post('login')
   login(@Body() body) {
     return this.userService.login(body);
