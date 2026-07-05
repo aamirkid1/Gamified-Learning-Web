@@ -26,6 +26,60 @@ export class FlashcardsController {
     return this.flashcardsService.getAllDecks();
   }
 
+  @Get('student/:studentId/decks')
+  getStudentDecks(
+    @Param('studentId') studentId: string,
+  ) {
+    return this.flashcardsService.getStudentDecks(
+      Number(studentId),
+    );
+  }
+
+  @Post('personal-decks')
+  createPersonalDeck(
+    @Body() body: any,
+  ) {
+    return this.flashcardsService.createPersonalDeck(
+      body,
+    );
+  }
+
+  @Get('personal-decks/student/:studentId')
+  getPersonalDecks(
+    @Param('studentId') studentId: string,
+  ) {
+    return this.flashcardsService.getPersonalDecks(
+      Number(studentId),
+    );
+  }
+
+  @Post('personal-cards')
+  createPersonalCard(
+    @Body() body: any,
+  ) {
+    return this.flashcardsService.createPersonalCard(
+      body,
+    );
+  }
+
+  @Get('personal-decks/:deckId/cards')
+  getPersonalCards(
+    @Param('deckId') deckId: string,
+  ) {
+    return this.flashcardsService.getPersonalCards(
+      Number(deckId),
+    );
+  }
+
+  @Delete('personal-cards/:id')
+    deletePersonalCard(
+      @Param('id') id: string,
+    ) {
+      return this.flashcardsService.deletePersonalCard(
+        Number(id),
+      );
+    }
+
   @Delete('decks/:id')
     deleteDeck(
       @Param('id') id: number,

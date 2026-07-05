@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { FileText, Play, ArrowLeft, HelpCircle } from "lucide-react";
+import enrollmentService from "@/services/enrollmentService";
 
 export default function CourseDetails() {
   const params = useParams();
@@ -11,11 +12,54 @@ export default function CourseDetails() {
   const [lessons, setLessons] = useState([]);
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const [isEnrolled, setIsEnrolled] = useState(false);
 
   useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+
     loadLessons();
     loadQuizzes();
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+
+    checkEnrollment();
+  }, [user]);
+
+  const checkEnrollment = async () => {
+    try {
+      const enrollments =
+        await enrollmentService.getStudentEnrollments(user.id);
+      
+
+      const enrolled = enrollments.some(
+        (e) => e.courseId === Number(params.id)
+      );
+
+      setIsEnrolled(enrolled);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleEnroll = async () => {
+    try {
+      await enrollmentService.enroll(
+        user.id,
+        Number(params.id)
+      );
+
+      setIsEnrolled(true);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const loadLessons = async () => {
     try {
@@ -98,7 +142,24 @@ export default function CourseDetails() {
           Syllabus Track
         </span>
       </div>
+      {!isEnrolled && (
+        <div className="bg-white rounded-2xl border border-[#eaded4] p-6 shadow-md mb-6">
+          <h2 className="text-xl font-bold text-[#3b130d]">
+            You are not enrolled in this course.
+          </h2>
 
+          <p className="text-gray-500 mt-2">
+            Enroll to access lessons and quizzes.
+          </p>
+
+          <button
+            onClick={handleEnroll}
+            className="mt-4 bg-[#8b4513] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#6b1f0f]"
+          >
+            Enroll in Course
+          </button>
+        </div>
+      )}
       {/* HEADER HERO AREA */}
       <div
         className="
