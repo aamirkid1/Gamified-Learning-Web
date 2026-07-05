@@ -1,38 +1,59 @@
-// import { Injectable } from '@nestjs/common';
-
-// @Injectable()
-// export class CourseService {
-//   private courses: any[] = [];
-
-//   create(courseData: any) {
-//     this.courses.push(courseData);
-//     return courseData;
-//   }
-
-//   findAll() {
-//     return this.courses;
-//   }
-// }
-
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { Course } from './course.entity';
+import { User } from '../user/user.entity';
 
 @Injectable()
 export class CourseService {
   constructor(
     @InjectRepository(Course)
-    private courseRepository: Repository<Course>,
+    private readonly courseRepository: Repository<Course>,
+
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
-  create(courseData: Partial<Course>) {
-    const course = this.courseRepository.create(courseData);
-    return this.courseRepository.save(course);
+  async create(courseData: any) {
+    const teacher = await this.userRepository.findOne({
+      where: {
+        id: Number(courseData.teacherId),
+      },
+    });
+
+    if (!teacher) {
+      throw new NotFoundException('Teacher not found');
+    }
+
+    const course = this.courseRepository.create({
+      title: courseData.title,
+      description: courseData.description,
+      thumbnail: courseData.thumbnail,
+      teacher,
+    });
+
+    return await this.courseRepository.save(course);
   }
 
-  findAll() {
-    return this.courseRepository.find();
+
+  async findAll() {
+  return await this.courseRepository.find({
+    relations: ["teacher"],
+  });
+}
+
+  async findByTeacher(teacherId: number) {
+    return await this.courseRepository.find({
+      where: {
+        teacher: {
+          id: teacherId,
+        },
+      },
+      relations: ['teacher'],
+    });
   }
 }

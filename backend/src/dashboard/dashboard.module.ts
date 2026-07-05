@@ -6,12 +6,14 @@ import { DashboardService } from './dashboard.service';
 
 import { Course } from '../course/course.entity';
 import { Lesson } from '../lesson/lesson.entity';
+import { Quiz } from '../quiz/quiz.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       Course,
       Lesson,
+       Quiz,
     ]),
   ],
   controllers: [DashboardController],

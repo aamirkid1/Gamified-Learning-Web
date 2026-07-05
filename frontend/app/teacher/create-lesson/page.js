@@ -44,7 +44,13 @@ export default function CreateLesson() {
 
   const loadCourses = async () => {
     try {
-      const response = await fetch("http://localhost:3000/courses");
+     const user = JSON.parse(
+    localStorage.getItem("user") || "{}"
+);
+
+const response = await fetch(
+    `http://localhost:3000/courses/teacher/${user.id}`
+);
       const data = await response.json();
       setCourses(data);
     } finally {
@@ -72,13 +78,18 @@ export default function CreateLesson() {
     e.preventDefault();
     setSubmitting(true);
     try {
+const user = JSON.parse(
+    localStorage.getItem("user") || "{}"
+);
+
       await lessonService.createLesson({
-        title,
-        content,
-        videoUrl,
-        pdfUrl,
-        courseId: Number(courseId),
-      });
+    title,
+    content,
+    videoUrl,
+    pdfUrl,
+    courseId: Number(courseId),
+    teacherId: user.id,
+});
 
       alert("Lesson Created Successfully");
 

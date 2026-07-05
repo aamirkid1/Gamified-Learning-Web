@@ -12,6 +12,8 @@ import { Enrollment } from '../enrollment/enrollment.entity';
 import { PersonalDeck } from './personal_deck.entity';
 import { PersonalCard } from './personal_card.entity';
 
+import { Course } from '../course/course.entity';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -20,6 +22,7 @@ import { PersonalCard } from './personal_card.entity';
       Enrollment,
       PersonalDeck,
       PersonalCard,
+      Course,
     ]),
   ],
   controllers: [FlashcardsController],

@@ -26,6 +26,16 @@ export class FlashcardsController {
     return this.flashcardsService.getAllDecks();
   }
 
+  @Get('decks/teacher/:teacherId')
+getTeacherDecks(
+  @Param('teacherId')
+  teacherId: string,
+) {
+  return this.flashcardsService.getDecksByTeacher(
+    Number(teacherId),
+  );
+}
+
   @Get('student/:studentId/decks')
   getStudentDecks(
     @Param('studentId') studentId: string,

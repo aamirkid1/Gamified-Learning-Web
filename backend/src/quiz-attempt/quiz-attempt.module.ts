@@ -9,13 +9,17 @@ import { User } from '../user/user.entity';
 
 import { UserBadgeModule } from '../user-badge/user-badge.module';
 import { BadgeModule } from '../badge/badge.module';
+import { Course } from "../course/course.entity";
+import { Quiz } from "../quiz/quiz.entity";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      QuizAttempt,
-      User,
-    ]),
+    QuizAttempt,
+    User,
+    Quiz,
+    Course,
+]),
 
     UserBadgeModule,
     BadgeModule,

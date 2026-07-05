@@ -1,301 +1,323 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+} from "@nestjs/common";
 
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 
-import { Repository } from 'typeorm';
+import { QuizAttempt } from "./quiz-attempt.entity";
+import { User } from "../user/user.entity";
+import { Quiz } from "../quiz/quiz.entity";
+import { Course } from "../course/course.entity";
 
-import { QuizAttempt } from './quiz-attempt.entity';
-
-import { User } from '../user/user.entity';
-
-import { UserBadgeService } from '../user-badge/user-badge.service';
-
-import { BadgeService } from '../badge/badge.service';
+import { UserBadgeService } from "../user-badge/user-badge.service";
+import { BadgeService } from "../badge/badge.service";
 
 @Injectable()
 export class QuizAttemptService {
-    constructor(
-        @InjectRepository(QuizAttempt)
-        private repo: Repository<QuizAttempt>,
+  constructor(
+    @InjectRepository(QuizAttempt)
+    private repo: Repository<QuizAttempt>,
 
-        @InjectRepository(User)
-        private userRepo: Repository<User>,
+    @InjectRepository(User)
+    private userRepo: Repository<User>,
 
-        private userBadgeService: UserBadgeService,
+    @InjectRepository(Quiz)
+    private quizRepo: Repository<Quiz>,
 
-        private badgeService: BadgeService,
-    ) { }
+    @InjectRepository(Course)
+    private courseRepo: Repository<Course>,
 
-    private async evaluateBadges(user: User) {
-        const totalAttempts =
-            await this.repo.count({
-                where: {
-                    userId: user.id,
-                },
-            });
+    private userBadgeService: UserBadgeService,
 
-        // Scholar
-        if (totalAttempts >= 1) {
-            await this.userBadgeService.awardBadge(
-                user.id,
-                1,
-            );
-        }
+    private badgeService: BadgeService,
+  ) {}
 
-        // Expert
-        if (user.level >= 5) {
-            await this.userBadgeService.awardBadge(
-                user.id,
-                2,
-            );
-        }
+  private async evaluateBadges(user: User) {
+    const totalAttempts = await this.repo.count({
+      where: {
+        userId: user.id,
+      },
+    });
 
-        // Fast Learner
-        if (totalAttempts >= 5) {
-            await this.userBadgeService.awardBadge(
-                user.id,
-                4,
-            );
-        }
+    // Scholar
+    if (totalAttempts >= 1) {
+      await this.userBadgeService.awardBadge(
+        user.id,
+        1,
+      );
     }
 
-    async create(data: any) {
-        const existingAttempt =
-            await this.repo.findOne({
-                where: {
-                    userId: data.userId,
-                    quizId: data.quizId,
-                },
-            });
-
-        if (existingAttempt) {
-            return {
-                message: 'Quiz already attempted',
-            };
-        }
-
-        // const attempt =
-        //     this.repo.create(data);
-
-        const attempt =
-            this.repo.create({
-                ...data,
-
-                mcqScore: data.score,
-
-                shortAnswerScore: 0,
-            });
-
-        const savedAttempt =
-            await this.repo.save(
-                attempt,
-            );
-
-        const user =
-            await this.userRepo.findOne({
-                where: {
-                    id: data.userId,
-                },
-            });
-
-        if (user) {
-            user.xp += data.xpEarned;
-
-            user.level =
-                Math.floor(
-                    user.xp / 100,
-                ) + 1;
-
-            await this.userRepo.save(
-                user,
-            );
-
-            await this.evaluateBadges(
-                user,
-            );
-        }
-
-        return {
-            message:
-                'Quiz submitted successfully',
-
-            attempt:
-                savedAttempt,
-
-            xp:
-                user?.xp,
-
-            level:
-                user?.level,
-        };
+    // Expert
+    if (user.level >= 5) {
+      await this.userBadgeService.awardBadge(
+        user.id,
+        2,
+      );
     }
 
-    //   async getPending() {
-    //     return this.repo.find({
-    //       where: {
-    //         reviewed: false,
-    //       },
-    //       order: {
-    //         submittedAt: 'DESC',
-    //       },
-    //     });
-    //   }
+    // Fast Learner
+    if (totalAttempts >= 5) {
+      await this.userBadgeService.awardBadge(
+        user.id,
+        4,
+      );
+    }
+  }
 
-    async getPending() {
-        const attempts =
-            await this.repo.find({
-                where: {
-                    reviewed: false,
-                },
+  async create(data: any) {
+    const existingAttempt =
+      await this.repo.findOne({
+        where: {
+          userId: data.userId,
+          quizId: data.quizId,
+        },
+      });
 
-                order: {
-                    submittedAt: 'DESC',
-                },
-            });
+    if (existingAttempt) {
+      return {
+        message: "Quiz already attempted",
+      };
+    }
 
-        return attempts.filter(
-            (attempt) => {
-                const answers =
-                    JSON.parse(
-                        attempt.answers
-                    );
+    const attempt = this.repo.create({
+      ...data,
+      mcqScore: data.score,
+      shortAnswerScore: 0,
+    });
 
-                return Object.values(
-                    answers
-                ).some(
-                    (a) =>
-                        typeof a ===
-                        'string'
-                );
-            },
+    const savedAttempt =
+      await this.repo.save(attempt);
+
+    const user =
+      await this.userRepo.findOne({
+        where: {
+          id: data.userId,
+        },
+      });
+
+    if (user) {
+      user.xp += data.xpEarned;
+
+      user.level =
+        Math.floor(user.xp / 100) + 1;
+
+      await this.userRepo.save(user);
+
+      await this.evaluateBadges(user);
+    }
+
+    return {
+      message: "Quiz submitted successfully",
+      attempt: savedAttempt,
+      xp: user?.xp,
+      level: user?.level,
+    };
+  }
+
+  async getPending() {
+    const attempts =
+      await this.repo.find({
+        where: {
+          reviewed: false,
+        },
+
+        order: {
+          submittedAt: "DESC",
+        },
+      });
+
+    return attempts.filter((attempt) => {
+      const answers = JSON.parse(
+        attempt.answers,
+      );
+
+      return Object.values(
+        answers,
+      ).some(
+        (a) => typeof a === "string",
+      );
+    });
+  }
+
+  async getPendingByTeacher(
+    teacherId: number,
+  ) {
+    const courses =
+      await this.courseRepo.find({
+        where: {
+          teacher: {
+            id: teacherId,
+          },
+        },
+      });
+
+    const courseIds = courses.map(
+      (course) => course.id,
+    );
+
+    const quizzes =
+      await this.quizRepo.find();
+
+    const quizIds = quizzes
+      .filter((quiz) =>
+        courseIds.includes(
+          quiz.courseId,
+        ),
+      )
+      .map((quiz) => quiz.id);
+
+    const attempts =
+      await this.repo.find({
+        where: {
+          reviewed: false,
+        },
+
+        order: {
+          submittedAt: "DESC",
+        },
+      });
+
+    return attempts.filter(
+      (attempt) => {
+        if (
+          !quizIds.includes(
+            attempt.quizId,
+          )
+        ) {
+          return false;
+        }
+
+        const answers =
+          JSON.parse(
+            attempt.answers,
+          );
+
+        return Object.values(
+          answers,
+        ).some(
+          (a) =>
+            typeof a === "string",
         );
+      },
+    );
+  }
+
+  async reviewAttempt(
+    attemptId: number,
+    score: number,
+  ) {
+    const attempt =
+      await this.repo.findOne({
+        where: {
+          id: attemptId,
+        },
+      });
+
+    if (!attempt) {
+      return {
+        message:
+          "Attempt not found",
+      };
     }
 
-    async reviewAttempt(
-        attemptId: number,
-        score: number,
-    ) {
-        const attempt =
-            await this.repo.findOne({
-                where: {
-                    id: attemptId,
-                },
-            });
-
-        if (!attempt) {
-            return {
-                message:
-                    'Attempt not found',
-            };
-        }
-
-        if (attempt.reviewed) {
-            return {
-                message:
-                    'Already reviewed',
-            };
-        }
-
-        // attempt.teacherScore =
-        //     score;
-
-        // attempt.score = score;
-
-        // attempt.xpEarned = score;
-
-        // attempt.reviewed = true;
-
-
-        attempt.teacherScore = score;
-
-        attempt.shortAnswerScore =
-            score;
-
-        attempt.score =
-            attempt.mcqScore + score;
-
-        attempt.xpEarned =
-            attempt.mcqScore + score;
-
-        attempt.reviewed = true;
-
-        await this.repo.save(
-            attempt,
-        );
-
-        const user =
-            await this.userRepo.findOne({
-                where: {
-                    id: attempt.userId,
-                },
-            });
-
-        if (user) {
-            user.xp += score;
-
-            user.level =
-                Math.floor(
-                    user.xp / 100,
-                ) + 1;
-
-            await this.userRepo.save(
-                user,
-            );
-
-            await this.evaluateBadges(
-                user,
-            );
-        }
-
-        return attempt;
+    if (attempt.reviewed) {
+      return {
+        message:
+          "Already reviewed",
+      };
     }
 
-    findAll() {
-        return this.repo.find({
-            order: {
-                submittedAt:
-                    'DESC',
-            },
-        });
+    attempt.teacherScore = score;
+
+    attempt.shortAnswerScore =
+      score;
+
+    attempt.score =
+      attempt.mcqScore + score;
+
+    attempt.xpEarned =
+      attempt.mcqScore + score;
+
+    attempt.reviewed = true;
+
+    await this.repo.save(
+      attempt,
+    );
+
+    const user =
+      await this.userRepo.findOne({
+        where: {
+          id: attempt.userId,
+        },
+      });
+
+    if (user) {
+      user.xp += score;
+
+      user.level =
+        Math.floor(
+          user.xp / 100,
+        ) + 1;
+
+      await this.userRepo.save(
+        user,
+      );
+
+      await this.evaluateBadges(
+        user,
+      );
     }
 
-    findByUser(
-        userId: number,
-    ) {
-        return this.repo.find({
-            where: {
-                userId,
-            },
+    return attempt;
+  }
 
-            order: {
-                submittedAt:
-                    'DESC',
-            },
-        });
-    }
+  findAll() {
+    return this.repo.find({
+      order: {
+        submittedAt:
+          "DESC",
+      },
+    });
+  }
 
-    findByQuiz(
-        quizId: number,
-    ) {
-        return this.repo.find({
-            where: {
-                quizId,
-            },
-        });
-    }
+  findByUser(
+    userId: number,
+  ) {
+    return this.repo.find({
+      where: {
+        userId,
+      },
 
-    async findUserQuizAttempt(
-        userId: number,
-        quizId: number,
-    ) {
-        const attempt =
-            await this.repo.findOne({
-                where: {
-                    userId,
-                    quizId,
-                },
-            });
+      order: {
+        submittedAt:
+          "DESC",
+      },
+    });
+  }
 
-        return attempt || null;
-    }
+  findByQuiz(
+    quizId: number,
+  ) {
+    return this.repo.find({
+      where: {
+        quizId,
+      },
+    });
+  }
+
+  async findUserQuizAttempt(
+    userId: number,
+    quizId: number,
+  ) {
+    const attempt =
+      await this.repo.findOne({
+        where: {
+          userId,
+          quizId,
+        },
+      });
+
+    return attempt || null;
+  }
 }

@@ -29,7 +29,13 @@ export default function CreateQuiz() {
 
   const loadCourses = async () => {
     try {
-      const res = await fetch("http://localhost:3000/courses");
+      const user = JSON.parse(
+  localStorage.getItem("user") || "{}"
+);
+
+const res = await fetch(
+  `http://localhost:3000/courses/teacher/${user.id}`
+);
       const data = await res.json();
       setCourses(data);
     } catch (error) {
@@ -38,14 +44,34 @@ export default function CreateQuiz() {
   };
 
   const loadLessons = async () => {
-    try {
-      const res = await fetch("http://localhost:3000/lessons");
-      const data = await res.json();
-      setLessons(data);
-    } catch (error) {
-      console.error("Error loading lessons:", error);
+  try {
+    const user = JSON.parse(
+      localStorage.getItem("user") || "{}"
+    );
+
+    const courseRes = await fetch(
+      `http://localhost:3000/courses/teacher/${user.id}`
+    );
+
+    const teacherCourses = await courseRes.json();
+
+    let allLessons = [];
+
+    for (const course of teacherCourses) {
+      const res = await fetch(
+        `http://localhost:3000/lessons/course/${course.id}`
+      );
+
+      const lessons = await res.json();
+
+      allLessons.push(...lessons);
     }
-  };
+
+    setLessons(allLessons);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   const handleCreateQuiz = async (e) => {
     e.preventDefault();
@@ -59,11 +85,16 @@ export default function CreateQuiz() {
     setLoading(true);
 
     try {
-      const quiz = await quizService.createQuiz({
-        title: title.trim(), // Trims leading/trailing whitespace before sending
-        courseId: Number(courseId),
-        lessonId: Number(lessonId),
-      });
+      const user = JSON.parse(
+  localStorage.getItem("user") || "{}"
+);
+
+const quiz = await quizService.createQuiz({
+  title: title.trim(),
+  courseId: Number(courseId),
+  lessonId: Number(lessonId),
+  teacherId: user.id,
+});
 
       // Routes directly forward to question creation workflow
       router.push(`/teacher/create-question/${quiz.id}`);

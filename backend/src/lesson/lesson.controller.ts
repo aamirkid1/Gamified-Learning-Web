@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Body,
+  Param,
 } from '@nestjs/common';
 
 import { LessonService } from './lesson.service';
@@ -21,5 +22,14 @@ export class LessonController {
   @Get()
   findAll() {
     return this.lessonService.findAll();
+  }
+
+  @Get('course/:courseId')
+  findByCourse(
+    @Param('courseId') courseId: number,
+  ) {
+    return this.lessonService.findByCourse(
+      Number(courseId),
+    );
   }
 }

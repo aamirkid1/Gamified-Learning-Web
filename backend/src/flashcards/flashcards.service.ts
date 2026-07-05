@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
+
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 
@@ -9,30 +14,66 @@ import { Enrollment } from '../enrollment/enrollment.entity';
 
 import { PersonalDeck } from './personal_deck.entity';
 import { PersonalCard } from './personal_card.entity';
+import { Course } from '../course/course.entity';
 
 @Injectable()
 export class FlashcardsService {
   constructor(
-    @InjectRepository(FlashcardDeck)
-    private deckRepository: Repository<FlashcardDeck>,
+  @InjectRepository(FlashcardDeck)
+  private deckRepository: Repository<FlashcardDeck>,
 
-    @InjectRepository(FlashcardCard)
-    private cardRepository: Repository<FlashcardCard>,
+  @InjectRepository(FlashcardCard)
+  private cardRepository: Repository<FlashcardCard>,
 
-    @InjectRepository(Enrollment)
-    private enrollmentRepository: Repository<Enrollment>,
+  @InjectRepository(Enrollment)
+  private enrollmentRepository: Repository<Enrollment>,
 
-    @InjectRepository(PersonalDeck)
-    private personalDeckRepository: Repository<PersonalDeck>,
+  @InjectRepository(PersonalDeck)
+  private personalDeckRepository: Repository<PersonalDeck>,
 
-    @InjectRepository(PersonalCard)
-    private personalCardRepository: Repository<PersonalCard>,
-  ) {}
+  @InjectRepository(PersonalCard)
+  private personalCardRepository: Repository<PersonalCard>,
 
-  createDeck(deckData: Partial<FlashcardDeck>) {
-    const deck = this.deckRepository.create(deckData);
-    return this.deckRepository.save(deck);
+  @InjectRepository(Course)
+  private courseRepository: Repository<Course>,
+) {}
+
+  async createDeck(deckData: any) {
+  const course = await this.courseRepository.findOne({
+    where: {
+      id: Number(deckData.courseId),
+    },
+    relations: ["teacher"],
+  });
+
+  if (!course) {
+    throw new NotFoundException(
+      "Course not found",
+    );
   }
+
+  if (
+    course.teacher.id !==
+    Number(deckData.teacherId)
+  ) {
+    throw new ForbiddenException(
+      "You cannot create flashcards for another teacher's course.",
+    );
+  }
+
+  const deck =
+    this.deckRepository.create({
+      title: deckData.title,
+      description:
+        deckData.description,
+      courseId:
+        deckData.courseId,
+    });
+
+  return await this.deckRepository.save(
+    deck,
+  );
+}
 
   getAllDecks() {
     return this.deckRepository.find({
@@ -41,6 +82,33 @@ export class FlashcardsService {
       },
     });
   }
+
+  async getDecksByTeacher(
+  teacherId: number,
+) {
+  const courses =
+    await this.courseRepository.find({
+      where: {
+        teacher: {
+          id: teacherId,
+        },
+      },
+    });
+
+  const courseIds =
+    courses.map(
+      (course) => course.id,
+    );
+
+  return await this.deckRepository.find({
+    where: {
+      courseId: In(courseIds),
+    },
+    relations: {
+      course: true,
+    },
+  });
+}
 
   async deleteDeck(id: number) {
     await this.deckRepository.delete(id);

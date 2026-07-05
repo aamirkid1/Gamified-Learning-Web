@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+} from "typeorm";
+
+import { Course } from "../course/course.entity";
 
 @Entity()
 export class User {
@@ -30,4 +37,13 @@ export class User {
 
   @Column({ default: 1 })
   level!: number;
+
+  /*
+   * Courses created by this teacher
+   */
+  @OneToMany(
+    () => Course,
+    (course) => course.teacher,
+  )
+  courses!: Course[];
 }

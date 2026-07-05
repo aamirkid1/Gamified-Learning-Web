@@ -13,7 +13,13 @@ export default function TeacherDashboard() {
   });
 
   const loadStats = async () => {
-    const data = await dashboardService.getStats();
+    const user = JSON.parse(
+  localStorage.getItem("user")
+);
+
+const data = await dashboardService.getStats(
+  user.id
+);
     setStats(data);
   };
 

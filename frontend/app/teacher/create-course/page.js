@@ -36,24 +36,44 @@ export default function CreateCourse() {
         uploadData.imageUrl;
     }
 
-    await fetch("http://localhost:3000/courses", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title,
-        description,
-        thumbnail: imageUrl,
-      }),
-    });
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+if (!user.id) {
+  alert("Please login again.");
+  return;
+}
 
-    alert("Course Created Successfully");
+const response = await fetch("http://localhost:3000/courses", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    title,
+    description,
+    thumbnail: imageUrl,
+    teacherId: user.id,
+  }),
+});
 
-    setTitle("");
-    setDescription("");
-    setThumbnail(null);
-  };
+if (!response.ok) {
+  const error = await response.json();
+  alert(error.message || "Failed to create course");
+  return;
+}
+
+const data = await response.json();
+
+console.log("Course Created:", data);
+
+alert("Course Created Successfully");
+
+setTitle("");
+setDescription("");
+setThumbnail(null);
+
+};
+
+
 
   return (
     <div className="min-h-screen bg-[#f5f0eb] font-sans text-gray-800">

@@ -25,9 +25,13 @@ export default function TeacherFlashcardsPage() {
 
   const fetchDecks = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:3000/flashcards/decks"
-      );
+      const user = JSON.parse(
+  localStorage.getItem("user") || "{}"
+);
+
+const response = await fetch(
+  `http://localhost:3000/flashcards/decks/teacher/${user.id}`
+);
 
       const data = await response.json();
 
@@ -45,9 +49,13 @@ export default function TeacherFlashcardsPage() {
 
   const fetchCourses = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:3000/courses"
-      );
+      const user = JSON.parse(
+  localStorage.getItem("user") || "{}"
+);
+
+const response = await fetch(
+  `http://localhost:3000/courses/teacher/${user.id}`
+);
 
       const data = await response.json();
 
@@ -90,20 +98,25 @@ export default function TeacherFlashcardsPage() {
     }
 
     try {
-      const response = await fetch(
-        "http://localhost:3000/flashcards/decks",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            title: deckName,
-            description,
-            courseId: Number(course),
-          }),
-        }
-      );
+      const user = JSON.parse(
+  localStorage.getItem("user") || "{}"
+);
+
+const response = await fetch(
+  "http://localhost:3000/flashcards/decks",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      title: deckName,
+      description,
+      courseId: Number(course),
+      teacherId: user.id,
+    }),
+  }
+);
 
       const newDeck = await response.json();
 

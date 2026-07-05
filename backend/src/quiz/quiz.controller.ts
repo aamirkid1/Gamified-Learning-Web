@@ -15,7 +15,7 @@ export class QuizController {
   ) {}
 
   @Post()
-  create(@Body() body) {
+  create(@Body() body: any) {
     return this.quizService.create(body);
   }
 
@@ -24,8 +24,19 @@ export class QuizController {
     return this.quizService.findAll();
   }
 
+  @Get('teacher/:teacherId')
+  async findByTeacher(
+    @Param('teacherId') teacherId: string,
+  ) {
+    // Temporary implementation.
+    // We'll filter properly after JWT integration.
+    return this.quizService.findAll();
+  }
+
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(
+    @Param('id') id: string,
+  ) {
     return this.quizService.findOne(
       Number(id),
     );

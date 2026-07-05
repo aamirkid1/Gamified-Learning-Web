@@ -1,8 +1,10 @@
 const BASE_URL = "http://localhost:3000";
 
 const lessonService = {
-  async getLessons() {
-    const response = await fetch(`${BASE_URL}/lessons`);
+  async getLessons(courseId) {
+    const response = await fetch(
+      `${BASE_URL}/lessons/course/${courseId}`
+    );
 
     if (!response.ok) {
       throw new Error("Failed to fetch lessons");
@@ -21,7 +23,10 @@ const lessonService = {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to create lesson");
+      const error = await response.json();
+      throw new Error(
+        error.message || "Failed to create lesson"
+      );
     }
 
     return response.json();

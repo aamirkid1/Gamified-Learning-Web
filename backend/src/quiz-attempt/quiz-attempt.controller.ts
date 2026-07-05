@@ -15,10 +15,8 @@ export class QuizAttemptController {
   ) {}
 
   @Post()
-  create(@Body() body) {
-    return this.quizAttemptService.create(
-      body,
-    );
+  create(@Body() body: any) {
+    return this.quizAttemptService.create(body);
   }
 
   @Get()
@@ -26,9 +24,21 @@ export class QuizAttemptController {
     return this.quizAttemptService.findAll();
   }
 
+  // All pending answers (existing)
   @Get('pending')
   getPending() {
     return this.quizAttemptService.getPending();
+  }
+
+  // Teacher-specific pending answers (new)
+  @Get('pending/:teacherId')
+  getPendingByTeacher(
+    @Param('teacherId')
+    teacherId: string,
+  ) {
+    return this.quizAttemptService.getPendingByTeacher(
+      Number(teacherId),
+    );
   }
 
   @Get('user/:userId')
@@ -51,9 +61,7 @@ export class QuizAttemptController {
     );
   }
 
-  @Get(
-    'check/:userId/:quizId',
-  )
+  @Get('check/:userId/:quizId')
   checkAttempt(
     @Param('userId')
     userId: string,
@@ -73,7 +81,7 @@ export class QuizAttemptController {
     id: string,
 
     @Body()
-    body,
+    body: any,
   ) {
     return this.quizAttemptService.reviewAttempt(
       Number(id),

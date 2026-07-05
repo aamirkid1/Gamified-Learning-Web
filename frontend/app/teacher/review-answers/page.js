@@ -31,12 +31,18 @@ export default function ReviewAnswers() {
 
 
     const loadData = async () => {
-        const data =
-            await reviewAnswerService.getPending();
+    const user = JSON.parse(
+        localStorage.getItem("user") || "{}"
+    );
 
-        setAttempts(data);
+    const data =
+        await reviewAnswerService.getPending(
+            user.id
+        );
 
-        const questionMap = {};
+    setAttempts(data);
+
+    const questionMap = {};
 
         for (const attempt of data) {
             const answers =

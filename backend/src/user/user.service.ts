@@ -11,9 +11,14 @@ export class UserService {
     private repo: Repository<User>,
   ) {}
 
+  // =========================
+  // Register
+  // =========================
   async register(data: any) {
     if (data.password.length < 6) {
-      return { message: 'Password must be at least 6 characters' };
+      return {
+        message: 'Password must be at least 6 characters',
+      };
     }
 
     const existingUser = await this.repo.findOne({
@@ -21,15 +26,26 @@ export class UserService {
     });
 
     if (existingUser) {
-      return { message: 'Email already exists' };
+      return {
+        message: 'Email already exists',
+      };
     }
 
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const hashedPassword = await bcrypt.hash(
+      data.password,
+      10,
+    );
 
     const user = this.repo.create({
       name: data.name,
-      rollNo: data.role === 'student' ? data.rollNo : null,
-      studentId: data.role === 'student' ? data.studentId : null,
+      rollNo:
+        data.role === 'student'
+          ? data.rollNo
+          : null,
+      studentId:
+        data.role === 'student'
+          ? data.studentId
+          : null,
       email: data.email,
       password: hashedPassword,
       role: data.role,
@@ -38,13 +54,25 @@ export class UserService {
     return this.repo.save(user);
   }
 
-  async login(data: any) {
-    const user = await this.repo.findOne({
-      where: { email: data.email },
+  // =========================
+  // NEW METHOD
+  // =========================
+  async findByEmail(email: string) {
+    return this.repo.findOne({
+      where: { email },
     });
+  }
+
+  // =========================
+  // Login (Old Login)
+  // =========================
+  async login(data: any) {
+    const user = await this.findByEmail(data.email);
 
     if (!user) {
-      return { message: 'User not found' };
+      return {
+        message: 'User not found',
+      };
     }
 
     if (user.role !== data.role) {
@@ -60,7 +88,9 @@ export class UserService {
     );
 
     if (!isMatch) {
-      return { message: 'Invalid password' };
+      return {
+        message: 'Invalid password',
+      };
     }
 
     const { password, ...userData } = user;
