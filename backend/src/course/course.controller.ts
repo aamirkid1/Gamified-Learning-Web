@@ -24,6 +24,16 @@ export class CourseController {
     return this.courseService.findAll();
   }
 
+
+  @Get(":id")
+findOne(
+  @Param("id") id: string,
+) {
+  return this.courseService.findOne(
+    Number(id),
+  );
+}
+
   // Teacher dashboard uses this
   @Get("teacher/:teacherId")
   findByTeacher(

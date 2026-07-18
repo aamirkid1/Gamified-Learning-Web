@@ -49,6 +49,17 @@ export class EnrollmentController {
     );
   }
 
+
+
+  @Get("course/:courseId/count")
+getEnrollmentCount(
+  @Param("courseId") courseId: string,
+) {
+  return this.enrollmentService.getEnrollmentCountByCourse(
+    Number(courseId),
+  );
+}
+
   @Delete(':id')
   unenroll(
     @Param('id') id: number,

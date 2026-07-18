@@ -20,6 +20,14 @@ const enrollmentService = {
     const response = await fetch(`${API_URL}/student/${studentId}`);
     return response.json();
   },
+
+  async getEnrollmentCount(courseId) {
+    const response = await fetch(
+      `${API_URL}/course/${courseId}/count`
+    );
+
+    return response.json();
+  },
 };
 
 export default enrollmentService;

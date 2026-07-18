@@ -5,6 +5,12 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { FileText, Play, ArrowLeft, HelpCircle } from "lucide-react";
 import enrollmentService from "@/services/enrollmentService";
+import CourseHero from "@/components/course/CourseHero";
+import TeacherCard from "@/components/course/TeacherCard";
+import CourseCurriculum from "@/components/course/CourseCurriculum";
+import EnrollmentCard from "@/components/course/EnrollmentCard";
+import StickyEnrollmentCard from "@/components/course/StickyEnrollmentCard";
+import CourseOverview from "@/components/course/CourseOverview";
 
 export default function CourseDetails() {
   const params = useParams();
@@ -15,16 +21,20 @@ export default function CourseDetails() {
   const [user, setUser] = useState(null);
   const [isEnrolled, setIsEnrolled] = useState(false);
 
+const [course, setCourse] = useState(null);
+const [studentCount, setStudentCount] = useState(0);
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+  const storedUser = localStorage.getItem("user");
 
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+  if (storedUser) {
+    setUser(JSON.parse(storedUser));
+  }
 
-    loadLessons();
-    loadQuizzes();
-  }, []);
+  loadCourse();
+  loadLessons();
+  loadQuizzes();
+  loadStudentCount();
+}, []);
 
   useEffect(() => {
     if (!user) return;
@@ -56,6 +66,7 @@ export default function CourseDetails() {
       );
 
       setIsEnrolled(true);
+      loadStudentCount();
     } catch (error) {
       console.error(error);
     }
@@ -78,19 +89,52 @@ export default function CourseDetails() {
     }
   };
 
-  const loadQuizzes = async () => {
-    try {
-      const response = await fetch(
-        "http://localhost:3000/quizzes"
+ const loadCourse = async () => {
+  try {
+    const response = await fetch(
+      `http://localhost:3000/courses/${params.id}`
+    );
+
+    const data = await response.json();
+
+    setCourse(data);
+  } catch (error) {
+    console.error("Error loading course:", error);
+  }
+};
+
+const loadQuizzes = async () => {
+  try {
+    const response = await fetch(
+      "http://localhost:3000/quizzes"
+    );
+
+    const data = await response.json();
+
+    const filteredQuizzes = data.filter(
+      (quiz) => quiz.courseId === Number(params.id)
+    );
+
+    setQuizzes(filteredQuizzes);
+  } catch (error) {
+    console.error("Error loading quizzes:", error);
+  }
+};
+
+
+const loadStudentCount = async () => {
+  try {
+    const data =
+      await enrollmentService.getEnrollmentCount(
+        params.id
       );
 
-      const data = await response.json();
+    setStudentCount(data.count);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
-      setQuizzes(data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   return (
     <div className="relative space-y-8 font-sans">
@@ -125,6 +169,16 @@ export default function CourseDetails() {
 
       </div>
 
+      {course && (
+  <>
+    <CourseHero course={course} />
+
+    <TeacherCard teacher={course.teacher} />
+
+    <CourseOverview course={course} />
+  </>
+)}
+
       {/* TOP NAVIGATION BACK LINK */}
       <div className="flex items-center justify-between pb-4 border-b border-[#eaded4]">
         <Link
@@ -142,66 +196,25 @@ export default function CourseDetails() {
           Syllabus Track
         </span>
       </div>
-      {!isEnrolled && (
-        <div className="bg-white rounded-2xl border border-[#eaded4] p-6 shadow-md mb-6">
-          <h2 className="text-xl font-bold text-[#3b130d]">
-            You are not enrolled in this course.
-          </h2>
-
-          <p className="text-gray-500 mt-2">
-            Enroll to access lessons and quizzes.
-          </p>
-
-          <button
-            onClick={handleEnroll}
-            className="mt-4 bg-[#8b4513] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#6b1f0f]"
-          >
-            Enroll in Course
-          </button>
-        </div>
-      )}
-      {/* HEADER HERO AREA */}
-      <div
-        className="
-  relative
-  overflow-hidden
-  bg-white/80
-  backdrop-blur-md
-  rounded-3xl
-  p-8
-  border
-  border-[#eaded4]
-  shadow-lg
-  "
-      >
-
-        <div
-  className="
-  absolute
-  right-0
-  top-0
-  w-48
-  h-48
-  bg-[#8b4513]/10
-  blur-[80px]
-  rounded-full
-  "
+      
+      <CourseCurriculum
+  lessons={lessons}
+  isEnrolled={isEnrolled}
 />
-        <div className="absolute top-0 left-0 w-2 h-full bg-[#8b4513]" />
-        <div className="pl-3 space-y-1">
-          <h1 className="text-3xl font-black text-[#3b130d] tracking-tight">
-            Course Syllabus
-          </h1>
 
-          <p className="text-gray-500 text-sm font-medium">
-            Complete sequential modules to earn experience milestones and
-            prepare for arena duels.
-          </p>
-        </div>
-      </div>
+<div className="grid lg:grid-cols-3 gap-10 mt-10">
 
-      {/* SYLLABUS LESSONS TREE */}
-      {loading ? (
+  {/* LEFT */}
+
+  <div className="lg:col-span-2">
+
+    {/* LESSONS WILL STAY HERE */}
+
+      
+      {/* LESSONS */}
+
+{isEnrolled ? (
+  loading ? (
         <div className="text-center py-12 text-gray-400 font-medium text-sm animate-pulse">
           Loading timeline modules...
         </div>
@@ -417,8 +430,41 @@ transition-all
             );
           })}
 
-        </div>
-      )}
+               </div>
+      )
+) : (
+  <div className="mt-8 rounded-3xl border border-dashed border-[#d8c6b8] bg-[#f9f5f1] p-10 text-center">
+    <h3 className="text-2xl font-bold text-[#3b130d]">
+      Course Content Locked
+    </h3>
+
+    <p className="mt-3 text-gray-600">
+      Enroll in this course to access lessons, videos, quizzes and
+      flashcards.
+    </p>
+  </div>
+)}
+
+  </div>
+
+  {/* RIGHT SIDEBAR */}
+
+  <div>
+
+    <StickyEnrollmentCard
+  course={course}
+  lessons={lessons}
+  quizzes={quizzes}
+  studentCount={studentCount}
+  isEnrolled={isEnrolled}
+  handleEnroll={handleEnroll}
+/>
+
     </div>
+
+</div>
+
+</div>
+
   );
 }

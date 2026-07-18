@@ -49,4 +49,16 @@ export class EnrollmentService {
   async unenroll(id: number) {
     return this.enrollmentRepository.delete(id);
   }
+
+  async getEnrollmentCountByCourse(courseId: number) {
+    const count = await this.enrollmentRepository.count({
+      where: {
+        courseId,
+      },
+    });
+
+    return {
+      count,
+    };
+  }
 }

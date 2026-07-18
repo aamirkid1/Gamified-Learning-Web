@@ -46,6 +46,21 @@ export class CourseService {
   });
 }
 
+async findOne(id: number) {
+  const course = await this.courseRepository.findOne({
+    where: {
+      id,
+    },
+    relations: ["teacher"],
+  });
+
+  if (!course) {
+    throw new NotFoundException("Course not found");
+  }
+
+  return course;
+}
+
   async findByTeacher(teacherId: number) {
     return await this.courseRepository.find({
       where: {
