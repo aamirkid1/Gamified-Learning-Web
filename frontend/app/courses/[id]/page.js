@@ -3,7 +3,17 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { FileText, Play, ArrowLeft, HelpCircle } from "lucide-react";
+import {
+  FileText,
+  Play,
+  ArrowLeft,
+  HelpCircle,
+  Home,
+  ChevronRight,
+  Bookmark,
+  Share2,
+  MoreVertical,
+} from "lucide-react";
 import enrollmentService from "@/services/enrollmentService";
 import CourseHero from "@/components/course/CourseHero";
 import TeacherCard from "@/components/course/TeacherCard";
@@ -23,6 +33,11 @@ export default function CourseDetails() {
 
 const [course, setCourse] = useState(null);
 const [studentCount, setStudentCount] = useState(0);
+
+  // UI-only state for the premium action bar
+  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
+
   useEffect(() => {
   const storedUser = localStorage.getItem("user");
 
@@ -135,9 +150,58 @@ const loadStudentCount = async () => {
   }
 };
 
+  // ---- Premium action bar handlers (UI only, no backend calls) ----
+
+  const getShareUrl = () =>
+    typeof window !== "undefined" ? window.location.href : "";
+
+  const handleShare = async () => {
+    const shareData = {
+      title: course?.title || "Course",
+      text: "Check out this course",
+      url: getShareUrl(),
+    };
+
+    try {
+      if (typeof navigator !== "undefined" && navigator.share) {
+        await navigator.share(shareData);
+      } else if (typeof navigator !== "undefined" && navigator.clipboard) {
+        await navigator.clipboard.writeText(shareData.url);
+        alert("Course link copied!");
+      }
+    } catch (error) {
+      console.error("Error sharing course:", error);
+    }
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard) {
+        await navigator.clipboard.writeText(getShareUrl());
+        alert("Course link copied!");
+      }
+    } catch (error) {
+      console.error("Error copying link:", error);
+    } finally {
+      setShowMoreMenu(false);
+    }
+  };
+
+  const handleOpenNewTab = () => {
+    if (typeof window !== "undefined") {
+      window.open(getShareUrl(), "_blank");
+    }
+    setShowMoreMenu(false);
+  };
+
+  const handleReportCourse = () => {
+    // Placeholder action only — no backend wired up yet.
+    console.log("Report course clicked for course:", params.id);
+    setShowMoreMenu(false);
+  };
 
   return (
-    <div className="relative space-y-8 font-sans">
+    <div className="relative space-y-10 font-sans">
 
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
 
@@ -169,9 +233,233 @@ const loadStudentCount = async () => {
 
       </div>
 
+      {/* ============================================================ */}
+      {/* PREMIUM BREADCRUMB + ACTION BAR                               */}
+      {/* ============================================================ */}
+      <div className="space-y-4 mb-8">
+
+        {/* BREADCRUMB NAVIGATION */}
+        <nav className="flex items-center gap-1.5 text-sm text-gray-500 overflow-x-auto whitespace-nowrap">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-1 hover:text-[#8b4513] transition-colors duration-300"
+          >
+            <Home size={14} />
+            <span>Dashboard</span>
+          </Link>
+
+          <ChevronRight size={14} className="text-gray-300 flex-shrink-0" />
+
+          <Link
+            href="/courses"
+            className="hover:text-[#8b4513] transition-colors duration-300"
+          >
+            Courses
+          </Link>
+
+          <ChevronRight size={14} className="text-gray-300 flex-shrink-0" />
+
+          <span className="font-semibold text-[#3b130d] truncate max-w-[200px] sm:max-w-xs">
+            {course?.title || "Course"}
+          </span>
+        </nav>
+
+        {/* PREMIUM ACTION BAR */}
+        <div
+          className="
+sticky
+top-20
+z-40
+bg-white/70
+backdrop-blur-xl
+rounded-3xl
+shadow-xl
+border
+border-[#eaded4]
+px-6
+py-5
+flex
+flex-col
+md:flex-row
+md:items-center
+md:justify-between
+gap-4
+"
+        >
+          {/* PREMIUM BACK BUTTON */}
+          <Link
+            href="/courses"
+            className="
+group
+inline-flex
+items-center
+gap-2
+w-fit
+pl-4
+pr-5
+py-2.5
+rounded-full
+bg-gradient-to-r
+from-[#8b4513]
+to-[#6b1f0f]
+text-white
+font-semibold
+shadow-md
+hover:scale-105
+hover:shadow-xl
+transition-all
+duration-300
+"
+          >
+            <ArrowLeft
+              size={16}
+              className="transform group-hover:-translate-x-1 transition-transform duration-300"
+            />
+            <span>Back to Courses</span>
+          </Link>
+
+          {/* SAVE / SHARE / MORE */}
+          <div className="flex items-center gap-3 flex-wrap">
+
+            {/* WISHLIST BUTTON */}
+            <button
+              type="button"
+              onClick={() => setIsWishlisted((prev) => !prev)}
+              title={isWishlisted ? "Saved" : "Save course"}
+              className="
+w-11
+h-11
+rounded-2xl
+bg-white/70
+backdrop-blur-md
+border
+border-[#eaded4]
+shadow-sm
+flex
+items-center
+justify-center
+text-[#8b4513]
+hover:-translate-y-1
+hover:shadow-xl
+transition-all
+duration-300
+"
+            >
+              <Bookmark
+                size={18}
+                className={isWishlisted ? "fill-current" : ""}
+              />
+            </button>
+
+            {/* SHARE BUTTON */}
+            <button
+              type="button"
+              onClick={handleShare}
+              title="Share course"
+              className="
+w-11
+h-11
+rounded-2xl
+bg-white/70
+backdrop-blur-md
+border
+border-[#eaded4]
+shadow-sm
+flex
+items-center
+justify-center
+text-[#8b4513]
+hover:-translate-y-1
+hover:shadow-xl
+transition-all
+duration-300
+"
+            >
+              <Share2 size={18} />
+            </button>
+
+            {/* MORE BUTTON */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowMoreMenu((prev) => !prev)}
+                title="More options"
+                className="
+w-11
+h-11
+rounded-2xl
+bg-white/70
+backdrop-blur-md
+border
+border-[#eaded4]
+shadow-sm
+flex
+items-center
+justify-center
+text-[#8b4513]
+hover:-translate-y-1
+hover:shadow-xl
+transition-all
+duration-300
+"
+              >
+                <MoreVertical size={18} />
+              </button>
+
+              {showMoreMenu && (
+                <div
+                  className="
+absolute
+right-0
+mt-2
+w-52
+bg-white
+rounded-2xl
+shadow-xl
+border
+border-[#eaded4]
+py-2
+z-50
+"
+                >
+                  <button
+                    type="button"
+                    onClick={handleCopyLink}
+                    className="w-full text-left px-4 py-2.5 text-sm font-medium text-[#3b130d] hover:bg-[#f5f1ed] transition-colors duration-300"
+                  >
+                    Copy Link
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleOpenNewTab}
+                    className="w-full text-left px-4 py-2.5 text-sm font-medium text-[#3b130d] hover:bg-[#f5f1ed] transition-colors duration-300"
+                  >
+                    Open in New Tab
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleReportCourse}
+                    className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors duration-300"
+                  >
+                    Report Course
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {course && (
   <>
-    <CourseHero course={course} />
+    <CourseHero
+      course={course}
+      lessonsCount={lessons.length}
+      quizzesCount={quizzes.length}
+      studentCount={studentCount}
+    />
 
     <TeacherCard teacher={course.teacher} />
 
@@ -179,24 +467,6 @@ const loadStudentCount = async () => {
   </>
 )}
 
-      {/* TOP NAVIGATION BACK LINK */}
-      <div className="flex items-center justify-between pb-4 border-b border-[#eaded4]">
-        <Link
-          href="/courses"
-          className="inline-flex items-center gap-2 text-sm font-bold text-[#8b4513] hover:text-[#6b1f0f] transition-colors group"
-        >
-          <ArrowLeft
-            size={16}
-            className="transform group-hover:-translate-x-1 transition-transform"
-          />
-          <span>Back to Courses</span>
-        </Link>
-
-        <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
-          Syllabus Track
-        </span>
-      </div>
-      
       <CourseCurriculum
   lessons={lessons}
   isEnrolled={isEnrolled}

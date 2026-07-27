@@ -1,3 +1,105 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+/* ---------------------------------------------------
+   Phase 1 additions: mobile menu support
+--------------------------------------------------- */
+
+/* Belt-and-suspenders scroll lock (JS also toggles this on <body>) */
+body.no-scroll {
+  overflow: hidden;
+}
+
+/* Themed scrollbar for the sidebar navigation on desktop */
+aside nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+aside nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+aside nav::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+}
+
+aside nav::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+
+/* ---------------------------------------------------
+   Premium global polish: smooth scrolling, scrollbar,
+   selection color, and body background (brown theme)
+--------------------------------------------------- */
+
+:root {
+  --brand-brown-dark: #3b130d;
+  --brand-brown: #6b1f0f;
+  --brand-brown-mid: #8b4513;
+  --brand-brown-light: #a0522d;
+  --brand-bg: #f5f1ed;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--brand-bg);
+  background-image:
+    radial-gradient(circle at 0% 0%, rgba(139, 69, 19, 0.06), transparent 45%),
+    radial-gradient(circle at 100% 0%, rgba(160, 82, 45, 0.05), transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(107, 31, 15, 0.04), transparent 45%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Selection color across the app */
+::selection {
+  background-color: var(--brand-brown-mid);
+  color: #ffffff;
+}
+
+::-moz-selection {
+  background-color: var(--brand-brown-mid);
+  color: #ffffff;
+}
+
+/* Global premium scrollbar (page-level, distinct from the sidebar's) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--brand-brown-light) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(139, 69, 19, 0.35);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  transition: background-color 0.2s ease-in-out;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(139, 69, 19, 0.6);
+}
+
+/* Subtle focus ring, consistent with the brown theme */
+:focus-visible {
+  outline: 2px solid var(--brand-brown-mid);
+  outline-offset: 2px;
+}
