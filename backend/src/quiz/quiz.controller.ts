@@ -33,6 +33,24 @@ export class QuizController {
     return this.quizService.findAll();
   }
 
+  @Get("course/:courseId")
+findByCourse(
+  @Param("courseId") courseId: string,
+) {
+  return this.quizService.findByCourse(
+    Number(courseId),
+  );
+}
+
+@Get(":quizId/students")
+getQuizStudents(
+  @Param("quizId") quizId: string,
+) {
+  return this.quizService.getQuizStudents(
+    Number(quizId),
+  );
+}
+
   @Get(':id')
   findOne(
     @Param('id') id: string,

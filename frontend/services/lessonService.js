@@ -31,6 +31,18 @@ const lessonService = {
 
     return response.json();
   },
+
+  async getTeacherLessons(courseId) {
+  const response = await fetch(
+    `${BASE_URL}/lessons/course/${courseId}`
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch lessons");
+  }
+
+  return response.json();
+},
 };
 
 export default lessonService;

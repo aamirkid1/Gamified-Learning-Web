@@ -43,4 +43,13 @@ findOne(
       Number(teacherId),
     );
   }
+
+  @Get("details/:courseId")
+getCourseDetails(
+  @Param("courseId") courseId: string,
+) {
+  return this.courseService.getCourseDetails(
+    Number(courseId),
+  );
+}
 }

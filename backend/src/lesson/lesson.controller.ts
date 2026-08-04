@@ -44,4 +44,14 @@ findStudentLessons(
     Number(studentId),
   );
 }
+
+
+@Get(":lessonId/students")
+getLessonStudents(
+  @Param("lessonId") lessonId: string,
+) {
+  return this.lessonService.getLessonStudents(
+    Number(lessonId),
+  );
+}
 }

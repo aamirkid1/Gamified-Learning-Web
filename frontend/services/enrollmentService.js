@@ -17,7 +17,10 @@ const enrollmentService = {
   },
 
   async getStudentEnrollments(studentId) {
-    const response = await fetch(`${API_URL}/student/${studentId}`);
+    const response = await fetch(
+      `${API_URL}/student/${studentId}`
+    );
+
     return response.json();
   },
 
@@ -25,6 +28,19 @@ const enrollmentService = {
     const response = await fetch(
       `${API_URL}/course/${courseId}/count`
     );
+
+    return response.json();
+  },
+
+  // NEW
+  async getStudentsByCourse(courseId) {
+    const response = await fetch(
+      `${API_URL}/course/${courseId}/students`
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch students");
+    }
 
     return response.json();
   },

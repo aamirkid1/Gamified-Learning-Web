@@ -12,6 +12,8 @@ import { LessonProgressModule } from "../lesson-progress/lesson-progress.module"
 
 import { Quiz } from "../quiz/quiz.entity";
 import { QuizAttempt } from "../quiz-attempt/quiz-attempt.entity";
+import { Enrollment } from "../enrollment/enrollment.entity";
+import { User } from "../user/user.entity";
 
 @Module({
   imports: [
@@ -21,8 +23,9 @@ import { QuizAttempt } from "../quiz-attempt/quiz-attempt.entity";
   LessonProgress,
   Quiz,
   QuizAttempt,
+  Enrollment,
+  User,
 ]),
-
   LessonProgressModule,
 ],
   controllers: [LessonController],

@@ -180,7 +180,7 @@ xl:grid-cols-4
 gap-8">
 
             {/* Create Course Card */}
-            <Link href="/teacher/create-course" className="group">
+            <Link href="/teacher/courses" className="group">
               <div className="h-full bg-[#6f311c] rounded-2xl p-8 shadow-xl border border-[#8b4513]/60 hover:border-white/20 transition-all duration-300 hover:-translate-y-2
 hover:shadow-[0_15px_50px_rgba(255,255,255,0.08)] flex flex-col justify-between group-hover:shadow-2xl group-hover:bg-[#6f311c]/90">
                 <div>
@@ -188,7 +188,7 @@ hover:shadow-[0_15px_50px_rgba(255,255,255,0.08)] flex flex-col justify-between 
                     📚
                   </div>
                   <h3 className="text-xl font-bold mb-2 text-white group-hover:text-gray-100">
-                    Create Course
+                    My Courses
                   </h3>
                   <p className="text-gray-300/90 text-sm leading-relaxed">
                     Set up new curriculum tracks, configure student access, and organize core modules.

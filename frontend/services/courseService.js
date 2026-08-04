@@ -12,7 +12,7 @@ const courseService = {
     return response.json();
   },
 
-  // Single Course
+  // Student Course Details
   async getCourse(courseId) {
     const response = await fetch(
       `${BASE_URL}/courses/${courseId}`
@@ -33,6 +33,19 @@ const courseService = {
 
     if (!response.ok) {
       throw new Error("Failed to fetch teacher courses");
+    }
+
+    return response.json();
+  },
+
+  // Teacher Course Details
+  async getTeacherCourseDetails(courseId) {
+    const response = await fetch(
+      `${BASE_URL}/courses/details/${courseId}`
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch course details");
     }
 
     return response.json();

@@ -60,6 +60,15 @@ getEnrollmentCount(
   );
 }
 
+@Get("course/:courseId/students")
+getStudentsByCourse(
+  @Param("courseId") courseId: string,
+) {
+  return this.enrollmentService.getStudentsByCourse(
+    Number(courseId),
+  );
+}
+
   @Delete(':id')
   unenroll(
     @Param('id') id: number,

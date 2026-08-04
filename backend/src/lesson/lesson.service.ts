@@ -14,6 +14,8 @@ import { LessonProgressService } from "../lesson-progress/lesson-progress.servic
 
 import { QuizAttempt } from "../quiz-attempt/quiz-attempt.entity";
 import { Quiz } from "../quiz/quiz.entity";
+import { Enrollment } from "../enrollment/enrollment.entity";
+import { User } from "../user/user.entity";
 
 @Injectable()
 export class LessonService {
@@ -32,6 +34,12 @@ export class LessonService {
 
     @InjectRepository(Quiz)
     private quizRepository: Repository<Quiz>,
+
+    @InjectRepository(Enrollment)
+private enrollmentRepository: Repository<Enrollment>,
+
+@InjectRepository(User)
+private userRepository: Repository<User>,
 
     private lessonProgressService: LessonProgressService,
 
@@ -80,7 +88,9 @@ export class LessonService {
   }
 
   async findByCourse(courseId: number) {
-    return this.lessonRepository.find({
+
+  const lessons =
+    await this.lessonRepository.find({
       where: {
         courseId,
       },
@@ -88,7 +98,46 @@ export class LessonService {
         orderNumber: "ASC",
       },
     });
+
+  const totalStudents =
+  await this.enrollmentRepository.count({
+    where: {
+      courseId,
+    },
+  });
+
+  const result: any[] = [];
+
+  for (const lesson of lessons) {
+
+    const completedStudents =
+      await this.lessonProgressRepository.count({
+        where: {
+          lessonId: lesson.id,
+          completed: true,
+        },
+      });
+
+    result.push({
+
+      id: lesson.id,
+
+      title: lesson.title,
+
+      orderNumber: lesson.orderNumber,
+
+      completedStudents,
+
+      pendingStudents:
+totalStudents -
+completedStudents,
+
+    });
+
   }
+
+  return result;
+}
 
   async findByCourseForStudent(
     courseId: number,
@@ -178,4 +227,79 @@ export class LessonService {
       };
     });
   }
+
+  async getLessonStudents(lessonId: number) {
+
+  const lesson =
+    await this.lessonRepository.findOne({
+      where: {
+        id: lessonId,
+      },
+    });
+
+  if (!lesson) {
+    throw new NotFoundException(
+      "Lesson not found",
+    );
+  }
+
+  const enrollments =
+    await this.enrollmentRepository.find({
+      where: {
+        courseId: lesson.courseId,
+      },
+    });
+
+  const students: any[] = [];
+
+  for (const enrollment of enrollments) {
+
+    const student =
+      await this.userRepository.findOne({
+        where: {
+          id: enrollment.studentId,
+        },
+      });
+
+    if (!student) {
+      continue;
+    }
+
+    const progress =
+      await this.lessonProgressRepository.findOne({
+        where: {
+          lessonId,
+          studentId: student.id,
+        },
+      });
+
+    students.push({
+
+      id: student.id,
+
+      name: student.name,
+
+      rollNo: student.rollNo,
+
+      studentId: student.studentId,
+
+      email: student.email,
+
+      completed:
+        progress?.completed ?? false,
+
+      completedAt:
+        progress?.completedAt ?? null,
+
+      xpEarned:
+        progress?.completed
+          ? 50
+          : 0,
+
+    });
+
+  }
+
+  return students;
+}
 }
