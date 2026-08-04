@@ -10,13 +10,18 @@ import { LessonService } from './lesson.service';
 import { LessonProgress } from "../lesson-progress/lesson-progress.entity";
 import { LessonProgressModule } from "../lesson-progress/lesson-progress.module";
 
+import { Quiz } from "../quiz/quiz.entity";
+import { QuizAttempt } from "../quiz-attempt/quiz-attempt.entity";
+
 @Module({
   imports: [
   TypeOrmModule.forFeature([
-    Lesson,
-    Course,
-    LessonProgress,
-  ]),
+  Lesson,
+  Course,
+  LessonProgress,
+  Quiz,
+  QuizAttempt,
+]),
 
   LessonProgressModule,
 ],

@@ -3,13 +3,17 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
 import { LessonProgress } from "./lesson-progress.entity";
+import { User } from "../user/user.entity";
 
 @Injectable()
 export class LessonProgressService {
   constructor(
-    @InjectRepository(LessonProgress)
-    private lessonProgressRepository: Repository<LessonProgress>,
-  ) {}
+  @InjectRepository(LessonProgress)
+  private lessonProgressRepository: Repository<LessonProgress>,
+
+  @InjectRepository(User)
+  private userRepository: Repository<User>,
+) {}
 
   create(data: any) {
     const progress =
@@ -40,34 +44,67 @@ export class LessonProgressService {
   }
 
   async completeLesson(
-    studentId: number,
-    lessonId: number,
-  ) {
-    let progress =
-      await this.lessonProgressRepository.findOne({
-        where: {
-          studentId,
-          lessonId,
-        },
-      });
+  studentId: number,
+  lessonId: number,
+) {
+  let progress =
+    await this.lessonProgressRepository.findOne({
+      where: {
+        studentId,
+        lessonId,
+      },
+    });
 
-    if (!progress) {
-      progress =
-        this.lessonProgressRepository.create({
-          studentId,
-          lessonId,
-          completed: true,
-          completedAt: new Date(),
-        });
-    } else {
-      progress.completed = true;
-      progress.completedAt = new Date();
-    }
-
-    return this.lessonProgressRepository.save(
+  // Prevent claiming XP twice
+  if (progress?.completed) {
+    return {
+      success: true,
+      message: "Lesson already completed.",
       progress,
-    );
+    };
   }
+
+  if (!progress) {
+    progress =
+      this.lessonProgressRepository.create({
+        studentId,
+        lessonId,
+        completed: true,
+        completedAt: new Date(),
+      });
+    await this.lessonProgressRepository.save(progress);
+  } else {
+    progress.completed = true;
+    progress.completedAt = new Date();
+    await this.lessonProgressRepository.save(progress);
+  }
+
+  // Find student
+  const user =
+    await this.userRepository.findOne({
+      where: {
+        id: studentId,
+      },
+    });
+
+  if (user) {
+    // Award lesson XP
+    user.xp += 50;
+
+    // Simple level calculation
+    user.level =
+      Math.floor(user.xp / 100) + 1;
+
+    await this.userRepository.save(user);
+  }
+
+  return {
+    success: true,
+    xpAwarded: 50,
+    progress,
+    user,
+  };
+}
 
   async isLessonCompleted(
     studentId: number,

@@ -8,6 +8,7 @@ import {
 
 import { LessonProgressService } from "./lesson-progress.service";
 
+
 @Controller("lesson-progress")
 export class LessonProgressController {
   constructor(
@@ -18,6 +19,14 @@ export class LessonProgressController {
   create(@Body() body: any) {
     return this.lessonProgressService.create(body);
   }
+
+  @Post("complete")
+completeLesson(@Body() body: any) {
+  return this.lessonProgressService.completeLesson(
+    body.studentId,
+    body.lessonId,
+  );
+}
 
   @Get()
   findAll() {

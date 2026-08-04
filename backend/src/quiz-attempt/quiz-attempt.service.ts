@@ -36,7 +36,7 @@ private questionRepo: Repository<Question>,
     private userBadgeService: UserBadgeService,
 
     private badgeService: BadgeService,
-    private lessonProgressService: LessonProgressService,
+    //private lessonProgressService: LessonProgressService,
   ) {}
 
   private async evaluateBadges(user: User) {
@@ -71,51 +71,51 @@ private questionRepo: Repository<Question>,
     }
   }
 
-  private async checkLessonCompletion(
-  userId: number,
-  lessonId: number,
-) {
-  /*
-   * Get all required quizzes of this lesson
-   */
-  const quizzes =
-    await this.quizRepo.find({
-      where: {
-        lessonId,
-        isRequired: true,
-      },
-    });
+//   private async checkLessonCompletion(
+//   userId: number,
+//   lessonId: number,
+// ) {
+//   /*
+//    * Get all required quizzes of this lesson
+//    */
+//   const quizzes =
+//     await this.quizRepo.find({
+//       where: {
+//         lessonId,
+//         isRequired: true,
+//       },
+//     });
 
-  if (quizzes.length === 0) {
-    return;
-  }
+//   if (quizzes.length === 0) {
+//     return;
+//   }
 
-  /*
-   * Check if every required quiz is passed
-   */
-  for (const quiz of quizzes) {
-    const attempt =
-      await this.repo.findOne({
-        where: {
-          userId,
-          quizId: quiz.id,
-          passed: true,
-        },
-      });
+//   /*
+//    * Check if every required quiz is passed
+//    */
+//   for (const quiz of quizzes) {
+//     const attempt =
+//       await this.repo.findOne({
+//         where: {
+//           userId,
+//           quizId: quiz.id,
+//           passed: true,
+//         },
+//       });
 
-    if (!attempt) {
-      return;
-    }
-  }
+//     if (!attempt) {
+//       return;
+//     }
+//   }
 
-  /*
-   * All quizzes passed
-   */
-  await this.lessonProgressService.completeLesson(
-    userId,
-    lessonId,
-  );
-}
+//   /*
+//    * All quizzes passed
+//    */
+//   await this.lessonProgressService.completeLesson(
+//     userId,
+//     lessonId,
+//   );
+// }
 
   async create(data: any) {
     const existingAttempt =
@@ -335,12 +335,12 @@ attempt.reviewed = true;
       attempt,
     );
 
-    if (attempt.passed) {
-  await this.checkLessonCompletion(
-    attempt.userId,
-    quiz!.lessonId,
-  );
-}
+//     if (attempt.passed) {
+//   await this.checkLessonCompletion(
+//     attempt.userId,
+//     quiz!.lessonId,
+//   );
+// }
 
     const user =
       await this.userRepo.findOne({

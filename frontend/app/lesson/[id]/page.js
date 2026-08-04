@@ -24,10 +24,17 @@ import {
   Lock,
 } from "lucide-react";
 
+
+
 export default function LessonPage() {
   const params = useParams();
 const [lesson, setLesson] = useState(null);
 const [loading, setLoading] = useState(true);
+
+const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+const [showLockedModal, setShowLockedModal] = useState(false);
+
+const [earnedXP, setEarnedXP] = useState(0);
 
 const [lessonStatus, setLessonStatus] = useState({
   completed: false,
@@ -126,6 +133,64 @@ const [courseInfo, setCourseInfo] = useState(null);
     }
   };
 
+  const handleCompleteLesson = async () => {
+  try {
+    const user = JSON.parse(
+      localStorage.getItem("user")
+    );
+
+    const response = await fetch(
+      "http://localhost:3000/lesson-progress/complete",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          studentId: user.id,
+          lessonId: lesson.id,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+if (!response.ok) {
+  alert("Failed to complete lesson.");
+  return;
+}
+
+// Instead of alert()
+setEarnedXP(data.xpAwarded);
+setShowSuccessPopup(true);
+
+// Reload lesson data
+
+const storedUser = JSON.parse(
+  localStorage.getItem("user")
+);
+
+storedUser.xp = data.user.xp;
+storedUser.level = data.user.level;
+
+localStorage.setItem(
+  "user",
+  JSON.stringify(storedUser)
+);
+
+localStorage.setItem(
+  "user",
+  JSON.stringify(storedUser)
+);
+
+
+    await loadLesson();
+  } catch (error) {
+    console.error(error);
+    alert("Something went wrong.");
+  }
+};
+
   
   // Splits lecture text into sentences (falls back to the whole text) so each
   // one can receive its own subtle hover glow. Newlines are preserved inside
@@ -188,7 +253,7 @@ const [courseInfo, setCourseInfo] = useState(null);
   const xpReward = 50;
 
   return (
-    <div className="relative space-y-8 font-sans text-gray-800">
+<div className="relative space-y-8 font-sans text-gray-800">
 
       {/* AMBIENT BACKGROUND GLOW */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
@@ -263,9 +328,7 @@ space-y-3
             {nextLesson ? (
   nextLesson.locked ? (
     <button
-      onClick={() =>
-        alert("Complete and pass the current lesson quiz to unlock the next lesson.")
-      }
+  onClick={() => setShowLockedModal(true)}
       className="w-10 h-10 rounded-2xl bg-[#f5f1ed] border border-[#eaded4] flex items-center justify-center text-gray-300 cursor-not-allowed"
     >
       <ArrowRight size={16} />
@@ -458,9 +521,27 @@ hover:scale-105
                     <h4 className="text-lg font-bold text-[#3b130d]">Finished reading the lecture notes?</h4>
                     <p className="text-gray-500 text-xs font-medium">Mark this lesson complete to unlock your rewards instantly.</p>
                   </div>
-                  <div className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gray-100 text-gray-500 font-bold text-sm text-center">
-  Complete the quiz to unlock the next lesson
-</div>
+                  <button
+  onClick={handleCompleteLesson}
+  className="
+w-full
+sm:w-auto
+px-7
+py-3
+rounded-2xl
+bg-gradient-to-r
+from-[#8b4513]
+to-[#6b1f0f]
+text-white
+font-bold
+shadow-lg
+hover:scale-105
+transition-all
+duration-300
+"
+>
+  Mark Lesson Complete
+</button>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-dashed border-[#eaded4]">
@@ -491,9 +572,7 @@ hover:scale-105
                   {nextLesson ? (
   nextLesson.locked ? (
     <button
-      onClick={() =>
-        alert("Complete and pass the current lesson quiz to unlock the next lesson.")
-      }
+  onClick={() => setShowLockedModal(true)}
       className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gray-400 text-white font-bold cursor-not-allowed"
     >
       Next Lesson Locked
@@ -549,9 +628,7 @@ hover:scale-105
             {nextLesson ? (
   nextLesson.locked ? (
     <div
-      onClick={() =>
-        alert("Complete and pass the current lesson quiz to unlock the next lesson.")
-      }
+  onClick={() => setShowLockedModal(true)}
       className="cursor-not-allowed bg-gray-100 border border-[#eaded4] rounded-2xl p-5 flex items-center justify-end gap-4 text-right opacity-70"
     >
       <div>
@@ -687,8 +764,78 @@ hover:scale-105
           </div>
 
         </div>
+</div>
+
+{showLockedModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+
+    <div className="bg-white rounded-3xl p-8 w-[420px] shadow-2xl">
+
+      <div className="w-20 h-20 rounded-full bg-[#f5f1ed] flex items-center justify-center mx-auto">
+        <Lock size={38} className="text-[#8b4513]" />
+      </div>
+
+      <h2 className="mt-6 text-2xl font-black text-center text-[#3b130d]">
+        Next Lesson Locked
+      </h2>
+
+      <p className="mt-4 text-center text-gray-600 leading-7">
+        Complete the current lesson and pass its quiz
+        to unlock the next lesson.
+      </p>
+
+      <button
+        onClick={() => setShowLockedModal(false)}
+        className="mt-8 w-full bg-[#8b4513] hover:bg-[#6b1f0f] text-white font-bold py-3 rounded-xl transition"
+      >
+        Got it
+      </button>
+
+    </div>
+
+  </div>
+)}
+   
+
+    {showSuccessPopup && (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+
+        <div className="bg-white rounded-3xl p-8 w-[420px] text-center shadow-2xl">
+
+          <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+            <span className="text-5xl">🎉</span>
+          </div>
+
+          <h2 className="mt-6 text-3xl font-black text-[#3b130d]">
+            Lesson Completed
+          </h2>
+
+          <p className="mt-3 text-gray-600">
+            Your lesson has been completed successfully.
+          </p>
+
+          <div className="mt-6 rounded-2xl bg-green-50 border border-green-200 p-5">
+            <p className="text-2xl font-black text-green-700">
+              +{earnedXP} XP
+            </p>
+
+            <p className="mt-2 text-gray-600">
+              Your reward has been added to your account.
+            </p>
+          </div>
+
+          <button
+            onClick={() => setShowSuccessPopup(false)}
+            className="mt-8 w-full py-3 rounded-2xl bg-gradient-to-r from-[#8b4513] to-[#a0522d] text-white font-bold"
+          >
+            Continue →
+          </button>
+
+        </div>
 
       </div>
-    </div>
-  );
+    )}
+
+</div>
+);
 }

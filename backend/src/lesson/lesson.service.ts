@@ -12,6 +12,9 @@ import { Course } from "../course/course.entity";
 import { LessonProgress } from "../lesson-progress/lesson-progress.entity";
 import { LessonProgressService } from "../lesson-progress/lesson-progress.service";
 
+import { QuizAttempt } from "../quiz-attempt/quiz-attempt.entity";
+import { Quiz } from "../quiz/quiz.entity";
+
 @Injectable()
 export class LessonService {
   constructor(
@@ -24,8 +27,16 @@ export class LessonService {
     @InjectRepository(LessonProgress)
     private lessonProgressRepository: Repository<LessonProgress>,
 
+    @InjectRepository(QuizAttempt)
+    private quizAttemptRepository: Repository<QuizAttempt>,
+
+    @InjectRepository(Quiz)
+    private quizRepository: Repository<Quiz>,
+
     private lessonProgressService: LessonProgressService,
-  ) {}
+
+
+  ) { }
 
   async create(data: any) {
     const course = await this.courseRepository.findOne({
@@ -93,12 +104,9 @@ export class LessonService {
         },
       });
 
-    console.log("================================");
-    console.log("Course ID:", courseId);
-    console.log("Student ID:", studentId);
-    console.log("Lessons from DB:", lessons);
-    console.log("================================");
 
+
+    // Lesson completion (for UI only)
     const progress =
       await this.lessonProgressRepository.find({
         where: {
@@ -106,17 +114,26 @@ export class LessonService {
         },
       });
 
-    console.log("Lesson Progress:", progress);
-
     const completedLessons =
       progress
         .filter((p) => p.completed)
         .map((p) => p.lessonId);
 
-    console.log(
-      "Completed Lesson IDs:",
-      completedLessons,
-    );
+    // Quiz attempts that were PASSED
+    const passedAttempts =
+      await this.quizAttemptRepository.find({
+        where: {
+          userId: studentId,
+          passed: true,
+        },
+      });
+
+    const quizzes =
+      await this.quizRepository.find({
+        where: {
+          courseId,
+        },
+      });
 
     return lessons.map((lesson, index) => {
       const completed =
@@ -131,10 +148,27 @@ export class LessonService {
         const previousLesson =
           lessons[index - 1];
 
-        locked =
-          !completedLessons.includes(
-            previousLesson.id,
+        // Find the quiz that belongs to the previous lesson
+        const previousLessonQuizzes =
+          quizzes.filter(
+            (quiz) =>
+              quiz.lessonId === previousLesson.id &&
+              quiz.isRequired
           );
+
+        if (previousLessonQuizzes.length === 0) {
+          locked = true;
+        } else {
+          const allPassed =
+            previousLessonQuizzes.every((quiz) =>
+              passedAttempts.some(
+                (attempt) =>
+                  attempt.quizId === quiz.id
+              )
+            );
+
+          locked = !allPassed;
+        }
       }
 
       return {
