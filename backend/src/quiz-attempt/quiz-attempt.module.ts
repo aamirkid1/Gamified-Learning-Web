@@ -11,19 +11,23 @@ import { UserBadgeModule } from '../user-badge/user-badge.module';
 import { BadgeModule } from '../badge/badge.module';
 import { Course } from "../course/course.entity";
 import { Quiz } from "../quiz/quiz.entity";
+import { Question } from "../question/question.entity";
+import { LessonProgressModule } from "../lesson-progress/lesson-progress.module";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
+  TypeOrmModule.forFeature([
     QuizAttempt,
     User,
     Quiz,
     Course,
-]),
+    Question,
+  ]),
 
-    UserBadgeModule,
-    BadgeModule,
-  ],
+  UserBadgeModule,
+  BadgeModule,
+  LessonProgressModule,
+],
 
   controllers: [
     QuizAttemptController,

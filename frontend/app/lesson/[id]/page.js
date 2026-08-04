@@ -26,14 +26,16 @@ import {
 
 export default function LessonPage() {
   const params = useParams();
-  const [lesson, setLesson] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isCompleted, setIsCompleted] = useState(false);
+const [lesson, setLesson] = useState(null);
+const [loading, setLoading] = useState(true);
 
-  // Additional state to power the premium redesign — derived from real data only.
-  const [courseLessons, setCourseLessons] = useState([]);
-  const [courseInfo, setCourseInfo] = useState(null);
+const [lessonStatus, setLessonStatus] = useState({
+  completed: false,
+  locked: false,
+});
 
+const [courseLessons, setCourseLessons] = useState([]);
+const [courseInfo, setCourseInfo] = useState(null);
   useEffect(() => {
     loadLesson();
   }, []);
@@ -45,26 +47,72 @@ export default function LessonPage() {
   }, [lesson?.courseId]);
 
   const loadLesson = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/lessons");
-      const data = await response.json();
+  try {
+    const user = JSON.parse(
+      localStorage.getItem("user")
+    );
 
-      const foundLesson = data.find((l) => l.id === Number(params.id));
-      setLesson(foundLesson);
+    /*
+     * First load the current lesson
+     */
+    const lessonResponse = await fetch(
+      "http://localhost:3000/lessons"
+    );
 
-      if (foundLesson) {
-        const sameCourseLessons = data
-          .filter((l) => l.courseId === foundLesson.courseId)
-          .sort((a, b) => a.id - b.id);
+    const allLessons =
+      await lessonResponse.json();
 
-        setCourseLessons(sameCourseLessons);
-      }
-    } catch (error) {
-      console.error("Error loading lesson material:", error);
-    } finally {
+    const foundLesson =
+      allLessons.find(
+        (l) => l.id === Number(params.id)
+      );
+
+    if (!foundLesson) {
       setLoading(false);
+      return;
     }
-  };
+
+    setLesson(foundLesson);
+
+    /*
+     * Now load lesson progression
+     */
+    const progressResponse =
+      await fetch(
+        `http://localhost:3000/lessons/course/${foundLesson.courseId}/student/${user.id}`
+      );
+
+    const lessonProgress =
+      await progressResponse.json();
+
+    setCourseLessons(
+      lessonProgress,
+    );
+
+    const currentLesson =
+      lessonProgress.find(
+        (lesson) =>
+          lesson.id === foundLesson.id
+      );
+
+    if (currentLesson) {
+      setLessonStatus({
+        completed:
+          currentLesson.completed,
+
+        locked:
+          currentLesson.locked,
+      });
+    }
+  } catch (error) {
+    console.error(
+      "Error loading lesson:",
+      error,
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   const loadCourseInfo = async () => {
     try {
@@ -78,13 +126,7 @@ export default function LessonPage() {
     }
   };
 
-  const handleCompleteLesson = () => {
-    if (!isCompleted) {
-      setIsCompleted(true);
-      alert("🎉 Milestone Unlocked! You earned +50 XP!");
-    }
-  };
-
+  
   // Splits lecture text into sentences (falls back to the whole text) so each
   // one can receive its own subtle hover glow. Newlines are preserved inside
   // the matched chunks so whitespace-pre-line still renders them correctly.
@@ -219,18 +261,29 @@ space-y-3
             </span>
 
             {nextLesson ? (
-              <Link
-                href={`/lesson/${nextLesson.id}`}
-                title="Next Lesson"
-                className="w-10 h-10 rounded-2xl bg-white/70 border border-[#eaded4] shadow-sm flex items-center justify-center text-[#8b4513] hover:-translate-y-0.5 hover:shadow-md transition-all duration-300"
-              >
-                <ArrowRight size={16} />
-              </Link>
-            ) : (
-              <span className="w-10 h-10 rounded-2xl bg-[#f5f1ed] border border-[#eaded4] flex items-center justify-center text-gray-300 cursor-not-allowed">
-                <ArrowRight size={16} />
-              </span>
-            )}
+  nextLesson.locked ? (
+    <button
+      onClick={() =>
+        alert("Complete and pass the current lesson quiz to unlock the next lesson.")
+      }
+      className="w-10 h-10 rounded-2xl bg-[#f5f1ed] border border-[#eaded4] flex items-center justify-center text-gray-300 cursor-not-allowed"
+    >
+      <ArrowRight size={16} />
+    </button>
+  ) : (
+    <Link
+      href={`/lesson/${nextLesson.id}`}
+      title="Next Lesson"
+      className="w-10 h-10 rounded-2xl bg-white/70 border border-[#eaded4] shadow-sm flex items-center justify-center text-[#8b4513] hover:-translate-y-0.5 hover:shadow-md transition-all duration-300"
+    >
+      <ArrowRight size={16} />
+    </Link>
+  )
+) : (
+  <span className="w-10 h-10 rounded-2xl bg-[#f5f1ed] border border-[#eaded4] flex items-center justify-center text-gray-300 cursor-not-allowed">
+    <ArrowRight size={16} />
+  </span>
+)}
           </div>
         </div>
       </div>
@@ -264,11 +317,12 @@ space-y-3
               Beginner
             </div>
 
-            {isCompleted && (
-              <span className="inline-flex items-center gap-1.5 bg-emerald-400/15 text-emerald-200 text-xs font-bold px-4 py-1.5 rounded-full border border-emerald-300/30 backdrop-blur-md shadow-sm">
-                <CheckCircle2 size={14} className="fill-emerald-300/20" /> Completed
-              </span>
-            )}
+           {lessonStatus.completed && (
+  <span className="inline-flex items-center gap-1.5 bg-emerald-400/15 text-emerald-200 text-xs font-bold px-4 py-1.5 rounded-full border border-emerald-300/30 backdrop-blur-md shadow-sm">
+    <CheckCircle2 size={14} />
+    Completed
+  </span>
+)}
           </div>
 
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight max-w-3xl">
@@ -397,20 +451,16 @@ hover:scale-105
 
           {/* GAMEPLAY COMPLETION / REWARD CARD */}
           <div className="relative overflow-hidden rounded-3xl shadow-xl border border-[#eaded4] transition-all duration-300 hover:shadow-2xl">
-            {!isCompleted ? (
+            {!lessonStatus?.completed ? (
               <div className="bg-white/70 backdrop-blur-xl p-6 md:p-8 space-y-5">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="space-y-1 text-center sm:text-left">
                     <h4 className="text-lg font-bold text-[#3b130d]">Finished reading the lecture notes?</h4>
                     <p className="text-gray-500 text-xs font-medium">Mark this lesson complete to unlock your rewards instantly.</p>
                   </div>
-                  <button
-                    onClick={handleCompleteLesson}
-                    className="w-full sm:w-auto px-6 py-3 rounded-2xl font-bold text-sm tracking-wide transition-all duration-300 shadow-md flex items-center justify-center gap-2 bg-gradient-to-r from-[#8b4513] to-[#6b1f0f] hover:scale-105 text-white hover:shadow-xl active:scale-100"
-                  >
-                    <CheckCircle2 size={16} />
-                    Mark as Completed (+{xpReward} XP)
-                  </button>
+                  <div className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gray-100 text-gray-500 font-bold text-sm text-center">
+  Complete the quiz to unlock the next lesson
+</div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-dashed border-[#eaded4]">
@@ -439,21 +489,31 @@ hover:scale-105
                   </div>
 
                   {nextLesson ? (
-                    <Link
-                      href={`/lesson/${nextLesson.id}`}
-                      className="w-full sm:w-auto px-6 py-3 rounded-2xl font-bold text-sm tracking-wide transition-all duration-300 shadow-md flex items-center justify-center gap-2 bg-white text-[#6b1f0f] hover:scale-105 hover:shadow-xl"
-                    >
-                      Next Lesson
-                      <ArrowRight size={16} />
-                    </Link>
-                  ) : (
-                    <Link
-                      href={`/courses/${lesson.courseId || ""}`}
-                      className="w-full sm:w-auto px-6 py-3 rounded-2xl font-bold text-sm tracking-wide transition-all duration-300 shadow-md flex items-center justify-center gap-2 bg-white text-[#6b1f0f] hover:scale-105 hover:shadow-xl"
-                    >
-                      Back to Course
-                    </Link>
-                  )}
+  nextLesson.locked ? (
+    <button
+      onClick={() =>
+        alert("Complete and pass the current lesson quiz to unlock the next lesson.")
+      }
+      className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gray-400 text-white font-bold cursor-not-allowed"
+    >
+      Next Lesson Locked
+    </button>
+  ) : (
+    <Link
+      href={`/lesson/${nextLesson.id}`}
+      className="w-full sm:w-auto px-6 py-3 rounded-2xl font-bold text-sm bg-white text-[#6b1f0f]"
+    >
+      Next Lesson
+    </Link>
+  )
+) : (
+  <Link
+    href={`/courses/${lesson.courseId}`}
+    className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-white text-[#6b1f0f] font-bold"
+  >
+    Back to Course
+  </Link>
+)}
                 </div>
               </div>
             )}
@@ -487,29 +547,68 @@ hover:scale-105
             )}
 
             {nextLesson ? (
-              <Link
-                href={`/lesson/${nextLesson.id}`}
-                className="group bg-white/70 backdrop-blur-xl border border-[#eaded4] rounded-2xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-end gap-4 text-right"
-              >
-                <div className="min-w-0">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Next Lesson</p>
-                  <h5 className="text-sm font-bold text-[#3b130d] truncate">{nextLesson.title}</h5>
-                </div>
-                <div className="w-11 h-11 rounded-xl bg-[#f5f1ed] border border-[#eaded4] flex items-center justify-center text-[#8b4513] group-hover:bg-[#8b4513] group-hover:text-white transition-colors duration-300 flex-shrink-0">
-                  <ArrowRight size={18} />
-                </div>
-              </Link>
-            ) : (
-              <div className="bg-white/50 border border-dashed border-gray-200 rounded-2xl p-5 flex items-center justify-end gap-4 opacity-70 text-right">
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Next Lesson</p>
-                  <h5 className="text-sm font-bold text-gray-400">This is the last lesson</h5>
-                </div>
-                <div className="w-11 h-11 rounded-xl bg-[#f5f1ed] border border-[#eaded4] flex items-center justify-center text-gray-300 flex-shrink-0">
-                  <ArrowRight size={18} />
-                </div>
-              </div>
-            )}
+  nextLesson.locked ? (
+    <div
+      onClick={() =>
+        alert("Complete and pass the current lesson quiz to unlock the next lesson.")
+      }
+      className="cursor-not-allowed bg-gray-100 border border-[#eaded4] rounded-2xl p-5 flex items-center justify-end gap-4 text-right opacity-70"
+    >
+      <div>
+        <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+          Next Lesson
+        </p>
+
+        <h5 className="text-sm font-bold text-gray-400">
+          {nextLesson.title}
+        </h5>
+
+        <p className="text-xs text-red-500">
+          Locked
+        </p>
+      </div>
+
+      <div className="w-11 h-11 rounded-xl bg-[#f5f1ed] border border-[#eaded4] flex items-center justify-center text-gray-400">
+        <Lock size={18} />
+      </div>
+    </div>
+  ) : (
+    <Link
+      href={`/lesson/${nextLesson.id}`}
+      className="group bg-white/70 backdrop-blur-xl border border-[#eaded4] rounded-2xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-end gap-4 text-right"
+    >
+      <div>
+        <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+          Next Lesson
+        </p>
+
+        <h5 className="text-sm font-bold text-[#3b130d]">
+          {nextLesson.title}
+        </h5>
+      </div>
+
+      <div className="w-11 h-11 rounded-xl bg-[#f5f1ed] border border-[#eaded4] flex items-center justify-center text-[#8b4513]">
+        <ArrowRight size={18} />
+      </div>
+    </Link>
+  )
+) : (
+  <div className="bg-white/50 border border-dashed border-gray-200 rounded-2xl p-5 flex items-center justify-end gap-4 opacity-70 text-right">
+    <div>
+      <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+        Next Lesson
+      </p>
+
+      <h5 className="text-sm font-bold text-gray-400">
+        This is the last lesson
+      </h5>
+    </div>
+
+    <div className="w-11 h-11 rounded-xl bg-[#f5f1ed] border border-[#eaded4] flex items-center justify-center text-gray-300">
+      <ArrowRight size={18} />
+    </div>
+  </div>
+)}
           </div>
 
         </div>

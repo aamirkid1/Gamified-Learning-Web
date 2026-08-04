@@ -17,7 +17,6 @@ export default function QuizPage() {
     const [submitted, setSubmitted] =
         useState(false);
 
-    //const [score, setScore] = useState(0);
     const [score, setScore] = useState(0);
 
     const [
@@ -57,28 +56,6 @@ export default function QuizPage() {
                 user.id,
                 params.quizId
             );
-
-        // if (attempt) {
-        //     setAlreadyAttempted(true);
-
-        //     setScore(attempt.score);
-
-        //     setSubmitted(true);
-        // }
-
-        // if (attempt) {
-        //     setAlreadyAttempted(true);
-
-        //     setScore(attempt.score);
-
-        //     setSavedAnswers(
-        //         JSON.parse(
-        //             attempt.answers
-        //         )
-        //     );
-
-        //     setSubmitted(true);
-        // }
 
         if (attempt) {
             setAlreadyAttempted(true);
@@ -168,29 +145,6 @@ export default function QuizPage() {
 
         const xpEarned = total;
 
-        // await quizAttemptSubmitService.submitAttempt(
-        //     {
-        //         userId: user.id,
-
-        //         quizId:
-        //             Number(
-        //                 params.quizId
-        //             ),
-
-        //         score: total,
-
-        //         xpEarned,
-
-        //         answers:
-        //             JSON.stringify(
-        //                 answers
-        //             ),
-        //     }
-        // );
-
-
-
-        // setScore(total);
         const result =
             await quizAttemptSubmitService.submitAttempt(
                 {
@@ -231,7 +185,6 @@ export default function QuizPage() {
                 JSON.stringify(user)
             );
         }
-        // setSubmitted(true);
 
         setScore(total);
 
@@ -263,381 +216,306 @@ export default function QuizPage() {
             ? score.reviewed
             : false;
 
+    const totalMarks =
+        typeof score === "object"
+            ? score.totalMarks || 0
+            : 0;
+
+    const percentage =
+        typeof score === "object"
+            ? score.percentage || 0
+            : 0;
+
+    const passed =
+        typeof score === "object"
+            ? score.passed
+            : false;
+
+    const passingPercentage =
+        quiz?.passingPercentage || 40;
+
     if (!quiz) {
         return (
-            <div className="p-8">
-                Loading...
+            <div className="min-h-screen flex items-center justify-center bg-[#f8f4ef]">
+                <div className="flex items-center gap-3 text-[#6b1f0f] font-semibold">
+                    <span className="h-5 w-5 rounded-full border-2 border-[#6b1f0f] border-t-transparent animate-spin" />
+                    Loading...
+                </div>
             </div>
         );
     }
 
-    return (
-        <div className="min-h-screen bg-[#f8f4ef] p-8">
-            <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl border border-[#eaded4] p-8">
+    const shortQuestions = questions.filter(
+        (q) => q.type === "short"
+    );
 
-                <h1 className="text-4xl font-bold text-[#6b1f0f] mb-8">
-                    {quiz.title}
-                </h1>
+    const hasShortQuestions =
+        shortQuestions.length > 0;
+
+    return (
+        <div className="min-h-screen bg-[#f8f4ef] p-4 sm:p-6 md:p-8">
+            <div className="max-w-4xl mx-auto">
+
+                {/* Hero banner - matches the course page gradient theme */}
+                <div className="relative overflow-hidden bg-gradient-to-br from-[#6b1f0f] via-[#7c2812] to-[#9a4a22] rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 mb-5 sm:mb-6 shadow-xl">
+
+                    <div className="pointer-events-none absolute -top-16 -right-16 h-56 w-56 rounded-full bg-white/5" />
+                    <div className="pointer-events-none absolute -bottom-20 -left-10 h-48 w-48 rounded-full bg-white/5" />
+
+                    <span className="relative inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white text-xs sm:text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
+                        📝 {submitted ? "Quiz Result" : "Quiz"}
+                    </span>
+
+                    <h1 className="relative text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-2 break-words">
+                        {quiz.title}
+                    </h1>
+
+                    <p className="relative text-white/70 text-sm sm:text-base mb-6">
+                        {questions.length} question{questions.length !== 1 ? "s" : ""}
+                        {submitted && reviewCompleted && (
+                            <>
+                                {" "}· Passing score {passingPercentage}%
+                            </>
+                        )}
+                    </p>
+
+                    {submitted && (
+                        <div className="relative flex flex-wrap items-center gap-3">
+
+                            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2">
+                                <span className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/15 text-sm">
+                                    ✅
+                                </span>
+                                <div className="leading-tight">
+                                    <p className="text-[10px] uppercase tracking-wide text-white/60">MCQ Score</p>
+                                    <p className="text-white font-bold text-sm sm:text-base">{mcqScore}</p>
+                                </div>
+                            </div>
+
+                            {hasShortQuestions && (
+                                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2">
+                                    <span className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/15 text-sm">
+                                        {reviewCompleted ? "🧾" : "⏳"}
+                                    </span>
+                                    <div className="leading-tight">
+                                        <p className="text-[10px] uppercase tracking-wide text-white/60">Short Answer</p>
+                                        <p className="text-white font-bold text-sm sm:text-base">
+                                            {reviewCompleted ? shortAnswerScore : "Pending"}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {reviewCompleted && (
+                                <>
+                                    <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2">
+                                        <span className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/15 text-sm">
+                                            🎯
+                                        </span>
+                                        <div className="leading-tight">
+                                            <p className="text-[10px] uppercase tracking-wide text-white/60">Total</p>
+                                            <p className="text-white font-bold text-sm sm:text-base">{totalScore} / {totalMarks}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2">
+                                        <span className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/15 text-sm">
+                                            📊
+                                        </span>
+                                        <div className="leading-tight">
+                                            <p className="text-[10px] uppercase tracking-wide text-white/60">Percentage</p>
+                                            <p className="text-white font-bold text-sm sm:text-base">{percentage.toFixed(2)}%</p>
+                                        </div>
+                                    </div>
+
+                                    <span
+                                        className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm sm:text-base font-bold shadow-lg ${
+                                            passed
+                                                ? "bg-green-500 text-white"
+                                                : "bg-red-500 text-white"
+                                        }`}
+                                    >
+                                        {passed ? "PASS ✅" : "FAIL ❌"}
+                                    </span>
+                                </>
+                            )}
+
+                        </div>
+                    )}
+
+                </div>
 
                 {alreadyAttempted && (
-                    <div className="mb-6 bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl">
+                    <div className="mb-5 sm:mb-6 flex items-center gap-3 bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-2xl text-sm sm:text-base">
+                        <span className="h-8 w-8 flex-shrink-0 flex items-center justify-center rounded-lg bg-amber-100">⚠️</span>
                         You have already attempted this quiz.
                     </div>
                 )}
+
+                {/* Main content card */}
+                <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-[#eaded4] p-4 sm:p-6 md:p-8">
 
                 {!submitted ? (
                     <>
                         {questions.map((q, index) => (
                             <div
                                 key={q.id}
-                                className="mb-8 p-6 border rounded-2xl"
+                                className="mb-6 sm:mb-8 p-4 sm:p-6 border border-[#eaded4] rounded-2xl hover:border-[#e0c9b8] transition"
                             >
-                                <h2 className="text-xl font-semibold mb-4">
-                                    Q{index + 1}. {q.question}
-                                </h2>
+                                <div className="flex items-start gap-3 mb-4">
+                                    <span className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-lg bg-[#fdf1e8] text-[#8b4513] font-bold text-sm">
+                                        {index + 1}
+                                    </span>
+                                    <div className="flex-1 min-w-0">
+                                        <h2 className="text-base sm:text-xl font-semibold text-[#3a1f14] break-words">
+                                            {q.question}
+                                        </h2>
+                                        <span className="inline-block mt-2 text-[10px] sm:text-xs font-semibold uppercase tracking-wide bg-[#f3e5da] text-[#8b4513] px-2.5 py-1 rounded-full">
+                                            {q.type === "mcq" ? "Multiple Choice" : "Short Answer"}
+                                        </span>
+                                    </div>
+                                </div>
 
                                 {q.type === "mcq" && (
-                                    <div className="space-y-3">
+                                    <div className="space-y-2.5 sm:pl-11">
 
-                                        <label className="block">
-                                            <input
-                                                type="checkbox"
-                                                checked={
-                                                    answers[q.id]?.includes(
-                                                        "A"
-                                                    ) || false
-                                                }
-                                                onChange={() =>
-                                                    handleMCQ(
-                                                        q.id,
-                                                        "A"
-                                                    )
-                                                }
-                                            />
-                                            {" "}
-                                            {q.optionA}
-                                        </label>
+                                        {[
+                                            { key: "A", text: q.optionA },
+                                            { key: "B", text: q.optionB },
+                                            { key: "C", text: q.optionC },
+                                            { key: "D", text: q.optionD },
+                                        ].map((option) => {
+                                            const isChecked =
+                                                answers[q.id]?.includes(option.key) || false;
 
-                                        <label className="block">
-                                            <input
-                                                type="checkbox"
-                                                checked={
-                                                    answers[q.id]?.includes(
-                                                        "B"
-                                                    ) || false
-                                                }
-                                                onChange={() =>
-                                                    handleMCQ(
-                                                        q.id,
-                                                        "B"
-                                                    )
-                                                }
-                                            />
-                                            {" "}
-                                            {q.optionB}
-                                        </label>
-
-                                        <label className="block">
-                                            <input
-                                                type="checkbox"
-                                                checked={
-                                                    answers[q.id]?.includes(
-                                                        "C"
-                                                    ) || false
-                                                }
-                                                onChange={() =>
-                                                    handleMCQ(
-                                                        q.id,
-                                                        "C"
-                                                    )
-                                                }
-                                            />
-                                            {" "}
-                                            {q.optionC}
-                                        </label>
-
-                                        <label className="block">
-                                            <input
-                                                type="checkbox"
-                                                checked={
-                                                    answers[q.id]?.includes(
-                                                        "D"
-                                                    ) || false
-                                                }
-                                                onChange={() =>
-                                                    handleMCQ(
-                                                        q.id,
-                                                        "D"
-                                                    )
-                                                }
-                                            />
-                                            {" "}
-                                            {q.optionD}
-                                        </label>
+                                            return (
+                                                <label
+                                                    key={option.key}
+                                                    className={`flex items-start gap-2 cursor-pointer p-3 rounded-xl border transition ${
+                                                        isChecked
+                                                            ? "bg-[#fdf3ec] border-[#8b4513]"
+                                                            : "bg-white border-[#eaded4] hover:bg-[#faf6f1]"
+                                                    }`}
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        className="mt-1 h-4 w-4 flex-shrink-0 accent-[#8b4513]"
+                                                        checked={isChecked}
+                                                        onChange={() =>
+                                                            handleMCQ(q.id, option.key)
+                                                        }
+                                                    />
+                                                    <span className="text-sm sm:text-base break-words text-[#3a1f14]">
+                                                        {option.text}
+                                                    </span>
+                                                </label>
+                                            );
+                                        })}
 
                                     </div>
                                 )}
 
-                                {/* {q.type ===
-                                    "short-answer" && (
+                                {q.type === "short" && (
+                                    <div className="sm:pl-11">
                                         <textarea
-                                            className="w-full border p-3 rounded-xl"
+                                            className="w-full border border-[#eaded4] p-3 rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#8b4513]/40 focus:border-[#8b4513]"
                                             rows={4}
+                                            placeholder="Write your answer here..."
                                             onChange={(e) =>
                                                 setAnswers({
                                                     ...answers,
-                                                    [q.id]:
-                                                        e.target.value,
+                                                    [q.id]: e.target.value,
                                                 })
                                             }
                                         />
-                                    )} */}
-
-                                {q.type === "short" && (
-                                    <textarea
-                                        className="w-full border p-3 rounded-xl"
-                                        rows={4}
-                                        placeholder="Write your answer here..."
-                                        onChange={(e) =>
-                                            setAnswers({
-                                                ...answers,
-                                                [q.id]: e.target.value,
-                                            })
-                                        }
-                                    />
+                                    </div>
                                 )}
                             </div>
                         ))}
 
                         <button
                             onClick={handleSubmit}
-                            className="bg-[#8b4513] text-white px-8 py-3 rounded-xl font-semibold hover:opacity-90"
+                            className="w-full sm:w-auto bg-gradient-to-r from-[#6b1f0f] to-[#8b4513] text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl hover:opacity-95 active:scale-[0.99] transition"
                         >
                             Submit Quiz
                         </button>
                     </>
-                    // ) : (
-                    //     <div className="text-center py-10">
-
-                    //         <h2 className="text-4xl font-bold text-green-600 mb-4">
-                    //             Quiz Submitted
-                    //         </h2>
-
-                    //         <p className="text-2xl">
-                    //             Score:
-                    //             {" "}
-                    //             <span className="font-bold">
-                    //                 {score}
-                    //             </span>
-                    //         </p>
-
-                    //     </div>
-                    // )}
-
                 ) : (
                     <div>
 
-                        <h2 className="text-5xl font-bold text-[#6b1f0f] mb-6">
-                            Assessment Submitted
-                        </h2>
+                        {hasShortQuestions && !reviewCompleted && (
 
+                            <div className="bg-amber-50 border border-amber-300 rounded-2xl p-4 sm:p-6 mb-6">
 
-                        {(() => {
+                                <div className="flex items-center gap-3 mb-3">
+                                    <span className="h-9 w-9 flex items-center justify-center rounded-lg bg-amber-100 text-lg">⏳</span>
+                                    <h3 className="text-lg sm:text-2xl font-bold text-amber-700">
+                                        Short Answers Under Review
+                                    </h3>
+                                </div>
 
-                            const shortQuestions =
-                                questions.filter(
-                                    (q) =>
-                                        q.type === "short"
-                                );
+                                <p className="text-sm sm:text-base text-gray-700 mb-4">
+                                    The following questions are waiting for teacher evaluation:
+                                </p>
 
-                            const hasShortQuestions =
-                                shortQuestions.length > 0;
+                                <div className="space-y-3">
 
-                            return (
-                                <>
+                                    {shortQuestions.map(
+                                        (q, index) => (
 
+                                            <div
+                                                key={q.id}
+                                                className="bg-white border border-amber-200 rounded-xl p-4"
+                                            >
 
+                                                <p className="font-semibold text-[#6b1f0f] text-sm sm:text-base">
+                                                    Question #{index + 1}
+                                                </p>
 
+                                                <p className="text-gray-600 mt-1 text-sm sm:text-base break-words">
+                                                    {q.question}
+                                                </p>
 
+                                            </div>
 
-
-                                    {/* {
-                                score === 0 ? (
-
-                                    <div className="mb-8">
-
-                                        <div className="bg-amber-50 border border-amber-300 rounded-2xl p-6">
-
-                                            <h3 className="text-2xl font-bold text-amber-700 mb-2">
-                                                ⏳ Under Review
-                                            </h3>
-
-                                            <p className="text-gray-700">
-                                                Your short-answer response has been submitted successfully.
-                                            </p>
-
-                                            <p className="text-gray-700 mt-2">
-                                                A teacher will review your answer and award XP.
-                                            </p>
-
-                                        </div>
-
-                                    </div>
-
-                                ) : (
-
-                                <div className="mb-8">
-
-                                    <div className="bg-green-50 border border-green-300 rounded-2xl p-6">
-
-                                        <h3 className="text-2xl font-bold text-green-700 mb-2">
-                                            ✅ Review Complete
-                                        </h3>
-
-                                        <p className="text-xl">
-                                            Score:
-                                            <span className="font-bold ml-2">
-                                                {score}
-                                            </span>
-                                        </p>
-
-                                        <p className="text-xl text-[#8b4513] font-semibold mt-3">
-                                            XP Earned:
-                                            <span className="ml-2">
-                                                {score}
-                                            </span>
-                                        </p>
-
-                                    </div>
+                                        )
+                                    )}
 
                                 </div>
 
-                            )
-                            } */}
+                                <p className="mt-4 text-sm sm:text-base text-gray-700">
+                                    Additional XP will be awarded after teacher review.
+                                </p>
 
-                                    <div className="mb-8">
+                            </div>
 
-                                        <div className="bg-green-50 border border-green-300 rounded-2xl p-6 mb-5">
+                        )}
 
-                                            <h3 className="text-2xl font-bold text-green-700 mb-3">
-                                                ✅ Auto Evaluation Complete
-                                            </h3>
+                        {reviewCompleted && !passed && (
 
-                                            <p className="text-xl">
-                                                {/* MCQ Score:
-                                                <span className="font-bold ml-2">
-                                                    {score}
-                                                </span> */}
+                            <div className="mb-6">
 
-                                                MCQ Score:
-                                                <span className="font-bold ml-2">
-                                                    {mcqScore}
-                                                </span>
-                                            </p>
+                                <button
+                                    className="w-full sm:w-auto bg-gradient-to-r from-red-600 to-red-500 hover:opacity-95 text-white px-8 py-3 rounded-full font-semibold shadow-lg transition"
+                                    onClick={() => {
 
-                                            <p className="text-xl text-[#8b4513] font-semibold mt-3">
-                                                XP Earned:
-                                                <span className="ml-2">
-                                                    {mcqScore}
-                                                </span>
-                                            </p>
+                                        alert(
+                                            "Reappear feature will be enabled in the next phase."
+                                        );
 
-                                        </div>
+                                    }}
+                                >
+                                    🔁 Reappear Exam
+                                </button>
 
-                                        {hasShortQuestions && !reviewCompleted && (
+                            </div>
 
-                                            <div className="bg-amber-50 border border-amber-300 rounded-2xl p-6">
+                        )}
 
-                                                <h3 className="text-2xl font-bold text-amber-700 mb-3">
-                                                    ⏳ Short Answers Under Review
-                                                </h3>
+                        <h3 className="text-lg sm:text-xl font-bold text-[#6b1f0f] mb-4">
+                            Answer Review
+                        </h3>
 
-                                                <p className="text-gray-700 mb-4">
-                                                    The following questions are waiting for teacher evaluation:
-                                                </p>
-
-                                                <div className="space-y-3">
-
-                                                    {shortQuestions.map(
-                                                        (q, index) => (
-
-                                                            <div
-                                                                key={q.id}
-                                                                className="bg-white border rounded-xl p-4"
-                                                            >
-
-                                                                <p className="font-semibold text-[#6b1f0f]">
-                                                                    Question #{index + 1}
-                                                                </p>
-
-                                                                <p className="text-gray-600 mt-1">
-                                                                    {q.question}
-                                                                </p>
-
-                                                            </div>
-
-                                                        )
-                                                    )}
-
-                                                </div>
-
-                                                <p className="mt-4 text-gray-700">
-                                                    Additional XP will be awarded after teacher review.
-                                                </p>
-
-                                            </div>
-
-                                        )}
-
-                                        {hasShortQuestions && reviewCompleted && (
-
-                                            <div className="bg-blue-50 border border-blue-300 rounded-2xl p-6">
-
-                                                <h3 className="text-2xl font-bold text-blue-700 mb-4">
-                                                    ✅ Short Answer Review Complete
-                                                </h3>
-
-                                                <div className="space-y-3">
-
-                                                    <p className="text-xl">
-                                                        MCQ XP:
-                                                        <span className="font-bold ml-2">
-                                                            {mcqScore}
-                                                        </span>
-                                                    </p>
-
-                                                    <p className="text-xl">
-                                                        Short Answer XP:
-                                                        <span className="font-bold ml-2">
-                                                            {shortAnswerScore}
-                                                        </span>
-                                                    </p>
-
-                                                    <div className="border-t pt-4">
-
-                                                        <p className="text-3xl font-bold text-[#8b4513]">
-                                                            Total XP Earned:
-                                                            <span className="ml-3">
-                                                                {totalScore}
-                                                            </span>
-                                                        </p>
-
-                                                    </div>
-
-                                                </div>
-
-                                            </div>
-
-                                        )}
-
-                                    </div>
-
-                                </>
-                            );
-                        })()}
-
-                        {/* {questions.map(
-                            (q, index) => { */}
                         {
                             questions
                                 .filter((q) => q.type === "mcq")
@@ -654,74 +532,87 @@ export default function QuizPage() {
                                     return (
                                         <div
                                             key={q.id}
-                                            className="border rounded-2xl p-5 mb-5"
+                                            className="border border-[#eaded4] rounded-2xl p-4 sm:p-5 mb-5"
                                         >
-                                            <h3 className="font-bold mb-3">
-                                                Q{index + 1}.{" "}
-                                                {q.question}
-                                            </h3>
+                                            <div className="flex items-start gap-3 mb-3">
+                                                <span className="flex-shrink-0 h-7 w-7 flex items-center justify-center rounded-lg bg-[#fdf1e8] text-[#8b4513] font-bold text-xs">
+                                                    {index + 1}
+                                                </span>
+                                                <h3 className="font-bold text-sm sm:text-base break-words text-[#3a1f14]">
+                                                    {q.question}
+                                                </h3>
+                                            </div>
 
-                                            <p className="text-sm text-gray-500 mb-4">
-                                                Correct Answer: {q.correctAnswers}
+                                            <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:pl-10">
+                                                Correct Answer: <span className="font-semibold text-green-700">{q.correctAnswers}</span>
                                             </p>
 
-                                            {[
-                                                {
-                                                    key: "A",
-                                                    text: q.optionA,
-                                                },
-                                                {
-                                                    key: "B",
-                                                    text: q.optionB,
-                                                },
-                                                {
-                                                    key: "C",
-                                                    text: q.optionC,
-                                                },
-                                                {
-                                                    key: "D",
-                                                    text: q.optionD,
-                                                },
-                                            ].map(
-                                                (
-                                                    option
-                                                ) => {
-                                                    let bg =
-                                                        "";
+                                            <div className="sm:pl-10 space-y-2">
+                                                {[
+                                                    {
+                                                        key: "A",
+                                                        text: q.optionA,
+                                                    },
+                                                    {
+                                                        key: "B",
+                                                        text: q.optionB,
+                                                    },
+                                                    {
+                                                        key: "C",
+                                                        text: q.optionC,
+                                                    },
+                                                    {
+                                                        key: "D",
+                                                        text: q.optionD,
+                                                    },
+                                                ].map(
+                                                    (
+                                                        option
+                                                    ) => {
+                                                        let cls =
+                                                            "bg-white border-[#eaded4]";
 
-                                                    if (
-                                                        correct.includes(
-                                                            option.key
-                                                        )
-                                                    ) {
-                                                        bg =
-                                                            "bg-green-100 border-green-500";
-                                                    }
-
-                                                    if (
-                                                        selected.includes(
-                                                            option.key
-                                                        ) &&
-                                                        !correct.includes(
-                                                            option.key
-                                                        )
-                                                    ) {
-                                                        bg =
-                                                            "bg-red-100 border-red-500";
-                                                    }
-
-                                                    return (
-                                                        <div
-                                                            key={
+                                                        if (
+                                                            correct.includes(
                                                                 option.key
-                                                            }
-                                                            className={`border rounded-lg p-2 mb-2 ${bg}`}
-                                                        >
-                                                            {option.text}
-                                                        </div>
-                                                    );
-                                                }
-                                            )}
+                                                            )
+                                                        ) {
+                                                            cls =
+                                                                "bg-green-50 border-green-400";
+                                                        }
+
+                                                        if (
+                                                            selected.includes(
+                                                                option.key
+                                                            ) &&
+                                                            !correct.includes(
+                                                                option.key
+                                                            )
+                                                        ) {
+                                                            cls =
+                                                                "bg-red-50 border-red-400";
+                                                        }
+
+                                                        return (
+                                                            <div
+                                                                key={
+                                                                    option.key
+                                                                }
+                                                                className={`flex items-center gap-2 border rounded-xl p-2.5 text-sm sm:text-base break-words ${cls}`}
+                                                            >
+                                                                <span className="font-semibold text-[#8b4513]">{option.key}.</span>
+                                                                <span className="text-[#3a1f14]">{option.text}</span>
+                                                                {correct.includes(option.key) && (
+                                                                    <span className="ml-auto text-green-600">✓</span>
+                                                                )}
+                                                                {selected.includes(option.key) && !correct.includes(option.key) && (
+                                                                    <span className="ml-auto text-red-600">✕</span>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    }
+                                                )}
+                                            </div>
                                         </div>
                                     );
                                 }
@@ -730,6 +621,8 @@ export default function QuizPage() {
 
                     </div >
                 )}
+
+                </div>
 
             </div>
         </div>

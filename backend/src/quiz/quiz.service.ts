@@ -42,10 +42,16 @@ export class QuizService {
     }
 
     const quiz = this.repo.create({
-      title: data.title,
-      courseId: data.courseId,
-      lessonId: data.lessonId,
-    });
+  title: data.title,
+  courseId: data.courseId,
+  lessonId: data.lessonId,
+
+  passingPercentage:
+    data.passingPercentage ?? 40,
+
+  isRequired:
+    data.isRequired ?? true,
+});
 
     return await this.repo.save(quiz);
   }

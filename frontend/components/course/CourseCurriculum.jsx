@@ -58,17 +58,26 @@ export default function CourseCurriculum({
 
             </div>
 
-            {isEnrolled ? (
-              <BookOpen
-                size={24}
-                className="text-green-600"
-              />
-            ) : (
-              <Lock
-                size={24}
-                className="text-gray-400"
-              />
-            )}
+            {!isEnrolled ? (
+  <Lock
+    size={24}
+    className="text-gray-400"
+  />
+) : lesson.completed ? (
+  <div className="flex items-center gap-2 text-green-600 font-bold">
+    ✓ Completed
+  </div>
+) : lesson.locked ? (
+  <div className="flex items-center gap-2 text-gray-400 font-bold">
+    <Lock size={18} />
+    Locked
+  </div>
+) : (
+  <div className="flex items-center gap-2 text-[#8b4513] font-bold">
+    <BookOpen size={18} />
+    Continue
+  </div>
+)}
 
           </div>
         ))}

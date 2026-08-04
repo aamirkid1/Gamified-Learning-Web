@@ -72,21 +72,25 @@ export default function ReviewAnswers() {
 
 
 
-    const submitReview = async (id) => {
-        const score =
-            Number(scores[id] || 0);
+    const submitReview = async (attemptId, shortAnswers) => {
 
-        await reviewAnswerService.review(
-            id,
-            score
+    let totalScore = 0;
+
+    for (const [questionId] of shortAnswers) {
+        totalScore += Number(
+            scores[`${attemptId}-${questionId}`] || 0
         );
+    }
 
-        alert(
-            "Review submitted successfully"
-        );
+    await reviewAnswerService.review(
+        attemptId,
+        totalScore
+    );
 
-        loadData();
-    };
+    alert("Review submitted successfully");
+
+    loadData();
+};
 
     return (
         <div className="min-h-screen bg-[#f6f2ee] p-8">
@@ -225,6 +229,8 @@ export default function ReviewAnswers() {
                                                         }
                                                     </p>
 
+                                                    
+
                                                     <p className="text-gray-600 mb-2">
                                                         Student
                                                         Answer
@@ -243,36 +249,92 @@ export default function ReviewAnswers() {
 
                                     </div>
 
-                                    <div className="mt-8 flex flex-wrap gap-4 items-center">
+                                    <div className="mt-8 space-y-5">
 
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            max="100"
-                                            placeholder="Enter Score"
-                                            className="border border-[#d8c6b9] rounded-xl px-4 py-3 w-40 focus:outline-none focus:ring-2 focus:ring-[#8b4513]"
-                                            onChange={(e) =>
-                                                setScores({
-                                                    ...scores,
-                                                    [attempt.id]:
-                                                        e.target
-                                                            .value,
-                                                })
-                                            }
-                                        />
+    {shortAnswers.map(
+        ([questionId]) => (
 
-                                        <button
-                                            onClick={() =>
-                                                submitReview(
-                                                    attempt.id
-                                                )
-                                            }
-                                            className="bg-[#8b4513] hover:bg-[#6b1f0f] text-white px-6 py-3 rounded-xl font-semibold transition"
-                                        >
-                                            Submit Review
-                                        </button>
+            <div
+                key={questionId}
+                className="flex items-center gap-4"
+            >
 
-                                    </div>
+                <label className="font-semibold w-52">
+
+                    Marks for Question
+
+                </label>
+
+                <input
+                    type="number"
+
+                    min={0}
+
+                    max={
+                        questions[
+                            questionId
+                        ]?.marks
+                    }
+
+                    placeholder="Marks"
+
+                    className="border rounded-xl px-4 py-3 w-40"
+
+                    onChange={(e) => {
+
+    const value = Number(e.target.value);
+
+    const max =
+        questions[questionId]?.marks || 0;
+
+    if (value > max) {
+        alert(
+            `Maximum marks for this question is ${max}`
+        );
+        return;
+    }
+
+    setScores({
+        ...scores,
+        [`${attempt.id}-${questionId}`]: value,
+    });
+
+}}
+
+                />
+
+                <span className="text-gray-500">
+
+                    / {questions[
+                        questionId
+                    ]?.marks}
+
+                </span>
+
+            </div>
+
+        )
+
+    )}
+
+    <button
+
+        onClick={() =>
+    submitReview(
+        attempt.id,
+        shortAnswers
+    )
+}
+
+        className="bg-[#8b4513] text-white px-6 py-3 rounded-xl"
+
+    >
+
+        Submit Review
+
+    </button>
+
+</div>
 
                                 </div>
                             );

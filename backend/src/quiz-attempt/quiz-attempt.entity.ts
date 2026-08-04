@@ -46,6 +46,22 @@ mcqScore!: number;
 })
 shortAnswerScore!: number;
 
+@Column({
+  default: 0,
+})
+totalMarks!: number;
+
+@Column({
+  type: "float",
+  default: 0,
+})
+percentage!: number;
+
+@Column({
+  default: false,
+})
+passed!: boolean;
+
   @Column({
     type: 'text',
   })

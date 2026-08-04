@@ -49,12 +49,7 @@ export default function StudentFlashcardsPage() {
   const [showAnswer, setShowAnswer] =
     useState(false);
 
-  /*useEffect(() => {
-    fetch("http://localhost:3000/flashcards/decks")
-        .then((res) => res.json())
-        .then((data) => setCourseDecks(data))
-        .catch(console.error);
-  }, []);*/
+
   useEffect(() => {
     const user = JSON.parse(
       localStorage.getItem("user")
@@ -125,61 +120,7 @@ export default function StudentFlashcardsPage() {
     }
   };
 
-  /*const handleAddCard = () => {
-    if (!question.trim() || !answer.trim()) {
-      alert("Please enter both question and answer");
-      return;
-    }
 
-    let updatedDecks;
-
-    if (editingCardId) {
-      updatedDecks = personalDecks.map((deck) =>
-        deck.id === selectedDeck.id
-          ? {
-              ...deck,
-              cards: deck.cards.map((card) =>
-                card.id === editingCardId
-                  ? {
-                      ...card,
-                      question,
-                      answer,
-                    }
-                  : card
-              ),
-            }
-          : deck
-      );
-    } else {
-      const newCard = {
-        id: Date.now(),
-        question,
-        answer,
-      };
-
-      updatedDecks = personalDecks.map((deck) =>
-        deck.id === selectedDeck.id
-          ? {
-              ...deck,
-              cards: [...deck.cards, newCard],
-            }
-          : deck
-      );
-    }
-
-    setPersonalDecks(updatedDecks);
-
-    const updatedSelectedDeck =
-      updatedDecks.find(
-        (deck) => deck.id === selectedDeck.id
-      );
-
-    setSelectedDeck(updatedSelectedDeck);
-
-    setQuestion("");
-    setAnswer("");
-    setEditingCardId(null);
-  };*/
   const handleAddCard = async () => {
     if (!question.trim() || !answer.trim()) {
       alert("Please enter both question and answer");
@@ -235,27 +176,7 @@ export default function StudentFlashcardsPage() {
     }
   };
 
-  /*const handleDeleteCard = (cardId) => {
-    const updatedDecks = personalDecks.map((deck) =>
-      deck.id === selectedDeck.id
-        ? {
-            ...deck,
-            cards: deck.cards.filter(
-              (card) => card.id !== cardId
-            ),
-          }
-        : deck
-    );
-
-    setPersonalDecks(updatedDecks);
-
-    const updatedSelectedDeck =
-      updatedDecks.find(
-        (deck) => deck.id === selectedDeck.id
-      );
-
-    setSelectedDeck(updatedSelectedDeck);
-  };*/
+ 
   const handleDeleteCard = async (cardId) => {
     try {
       await fetch(

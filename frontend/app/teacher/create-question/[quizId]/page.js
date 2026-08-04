@@ -24,6 +24,8 @@ export default function CreateQuestion() {
   const [optionC, setOptionC] = useState("");
   const [optionD, setOptionD] = useState("");
   const [correctAnswers, setCorrectAnswers] = useState("");
+
+  const [marks, setMarks] = useState(10);
   
   const [loading, setLoading] = useState(false);
   const [showSuccessCard, setShowSuccessCard] = useState(false);
@@ -35,6 +37,7 @@ export default function CreateQuestion() {
     setOptionC("");
     setOptionD("");
     setCorrectAnswers("");
+    setMarks(10);
     setShowSuccessCard(false);
   };
 
@@ -52,19 +55,33 @@ export default function CreateQuestion() {
       return;
     }
 
+    if (marks < 1) {
+  alert("Marks must be at least 1.");
+  return;
+}
+
     setLoading(true);
 
     try {
       await questionService.createQuestion({
-        quizId: Number(params.quizId),
-        question: question.trim(),
-        type,
-        optionA: type === "mcq" ? optionA.trim() : "",
-        optionB: type === "mcq" ? optionB.trim() : "",
-        optionC: type === "mcq" ? optionC.trim() : "",
-        optionD: type === "mcq" ? optionD.trim() : "",
-        correctAnswers: correctAnswers.trim(),
-      });
+  quizId: Number(params.quizId),
+
+  question: question.trim(),
+
+  type,
+
+  optionA: type === "mcq" ? optionA.trim() : "",
+
+  optionB: type === "mcq" ? optionB.trim() : "",
+
+  optionC: type === "mcq" ? optionC.trim() : "",
+
+  optionD: type === "mcq" ? optionD.trim() : "",
+
+  correctAnswers: correctAnswers.trim(),
+
+  marks,
+});
 
       // Show the post-save interactive options flow card
       setShowSuccessCard(true);
@@ -134,6 +151,29 @@ export default function CreateQuestion() {
                   <option value="short">Short Answer Form</option>
                 </select>
               </div>
+
+              {/* Question Marks */}
+<div>
+  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+    Marks
+  </label>
+
+  <input
+    type="number"
+    min={1}
+    max={100}
+    value={marks}
+    onChange={(e) =>
+      setMarks(Number(e.target.value))
+    }
+    className="w-full border-2 border-gray-200 rounded-2xl p-4 focus:outline-none focus:border-[#6b1f0f] focus:ring-4 focus:ring-[#6b1f0f]/10 transition-all duration-300 bg-gray-50/50 focus:bg-white"
+    disabled={loading}
+  />
+
+  <p className="text-xs text-gray-500 mt-2">
+    Maximum marks awarded for this question.
+  </p>
+</div>
 
               {/* MCQ Options Conditional Branch block */}
               {type === "mcq" && (

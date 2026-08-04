@@ -23,4 +23,9 @@ export class Lesson {
 
   @Column()
   courseId!: number;
+
+  @Column({
+  default: 1,
+})
+orderNumber!: number;
 }

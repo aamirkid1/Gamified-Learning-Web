@@ -12,11 +12,28 @@ export class QuestionService {
   ) {}
 
   create(data: any) {
-    const question =
-      this.repo.create(data);
+  const question = this.repo.create({
+    quizId: data.quizId,
 
-    return this.repo.save(question);
-  }
+    question: data.question,
+
+    type: data.type,
+
+    optionA: data.optionA,
+
+    optionB: data.optionB,
+
+    optionC: data.optionC,
+
+    optionD: data.optionD,
+
+    correctAnswers: data.correctAnswers,
+
+    marks: data.marks ?? 10,
+  });
+
+  return this.repo.save(question);
+}
 
   findAll() {
     return this.repo.find();

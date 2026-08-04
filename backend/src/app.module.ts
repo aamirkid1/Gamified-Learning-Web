@@ -19,6 +19,8 @@ import { FlashcardsModule } from './flashcards/flashcards.module';
 
 import { EnrollmentModule } from './enrollment/enrollment.module';
 
+import { LessonProgressModule } from "./lesson-progress/lesson-progress.module";
+
 @Module({
   imports: [
 
@@ -51,6 +53,7 @@ import { EnrollmentModule } from './enrollment/enrollment.module';
     UserBadgeModule,
     FlashcardsModule,
     EnrollmentModule,
+    LessonProgressModule,
   ],
 })
 export class AppModule { }

@@ -12,6 +12,8 @@ import { Course } from "../course/course.entity";
 
 import { UserBadgeService } from "../user-badge/user-badge.service";
 import { BadgeService } from "../badge/badge.service";
+import { Question } from "../question/question.entity";
+import { LessonProgressService } from "../lesson-progress/lesson-progress.service";
 
 @Injectable()
 export class QuizAttemptService {
@@ -28,9 +30,13 @@ export class QuizAttemptService {
     @InjectRepository(Course)
     private courseRepo: Repository<Course>,
 
+    @InjectRepository(Question)
+private questionRepo: Repository<Question>,
+
     private userBadgeService: UserBadgeService,
 
     private badgeService: BadgeService,
+    private lessonProgressService: LessonProgressService,
   ) {}
 
   private async evaluateBadges(user: User) {
@@ -64,6 +70,52 @@ export class QuizAttemptService {
       );
     }
   }
+
+  private async checkLessonCompletion(
+  userId: number,
+  lessonId: number,
+) {
+  /*
+   * Get all required quizzes of this lesson
+   */
+  const quizzes =
+    await this.quizRepo.find({
+      where: {
+        lessonId,
+        isRequired: true,
+      },
+    });
+
+  if (quizzes.length === 0) {
+    return;
+  }
+
+  /*
+   * Check if every required quiz is passed
+   */
+  for (const quiz of quizzes) {
+    const attempt =
+      await this.repo.findOne({
+        where: {
+          userId,
+          quizId: quiz.id,
+          passed: true,
+        },
+      });
+
+    if (!attempt) {
+      return;
+    }
+  }
+
+  /*
+   * All quizzes passed
+   */
+  await this.lessonProgressService.completeLesson(
+    userId,
+    lessonId,
+  );
+}
 
   async create(data: any) {
     const existingAttempt =
@@ -230,20 +282,65 @@ export class QuizAttemptService {
 
     attempt.teacherScore = score;
 
-    attempt.shortAnswerScore =
-      score;
+attempt.shortAnswerScore = score;
 
-    attempt.score =
-      attempt.mcqScore + score;
+attempt.score =
+  attempt.mcqScore + score;
 
-    attempt.xpEarned =
-      attempt.mcqScore + score;
+/*
+ * Calculate total quiz marks
+ */
+const questions =
+  await this.questionRepo.find({
+    where: {
+      quizId: attempt.quizId,
+    },
+  });
 
-    attempt.reviewed = true;
+const totalMarks = questions.reduce(
+  (sum, question) => sum + question.marks,
+  0,
+);
+
+attempt.totalMarks = totalMarks;
+
+/*
+ * Calculate percentage
+ */
+attempt.percentage =
+  totalMarks > 0
+    ? (attempt.score / totalMarks) * 100
+    : 0;
+
+/*
+ * Get passing percentage
+ */
+const quiz =
+  await this.quizRepo.findOne({
+    where: {
+      id: attempt.quizId,
+    },
+  });
+
+attempt.passed =
+  attempt.percentage >=
+  (quiz?.passingPercentage ?? 40);
+
+attempt.xpEarned =
+  attempt.score;
+
+attempt.reviewed = true;
 
     await this.repo.save(
       attempt,
     );
+
+    if (attempt.passed) {
+  await this.checkLessonCompletion(
+    attempt.userId,
+    quiz!.lessonId,
+  );
+}
 
     const user =
       await this.userRepo.findOne({

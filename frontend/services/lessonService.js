@@ -1,9 +1,9 @@
 const BASE_URL = "http://localhost:3000";
 
 const lessonService = {
-  async getLessons(courseId) {
+  async getLessons(courseId, studentId) {
     const response = await fetch(
-      `${BASE_URL}/lessons/course/${courseId}`
+      `${BASE_URL}/lessons/course/${courseId}/student/${studentId}`
     );
 
     if (!response.ok) {

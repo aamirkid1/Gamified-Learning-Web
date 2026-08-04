@@ -17,10 +17,17 @@ export default function CreateQuiz() {
   const [courses, setCourses] = useState([]);
   const [lessons, setLessons] = useState([]);
   
-  const [title, setTitle] = useState("");
-  const [courseId, setCourseId] = useState("");
-  const [lessonId, setLessonId] = useState("");
-  const [loading, setLoading] = useState(false);
+const [title, setTitle] = useState("");
+const [courseId, setCourseId] = useState("");
+const [lessonId, setLessonId] = useState("");
+
+const [passingPercentage, setPassingPercentage] =
+  useState(40);
+
+const [isRequired, setIsRequired] =
+  useState(true);
+
+const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadCourses();
@@ -82,6 +89,16 @@ const res = await fetch(
       return;
     }
 
+    if (
+  passingPercentage < 1 ||
+  passingPercentage > 100
+) {
+  alert(
+    "Passing percentage must be between 1 and 100."
+  );
+  return;
+}
+
     setLoading(true);
 
     try {
@@ -91,9 +108,16 @@ const res = await fetch(
 
 const quiz = await quizService.createQuiz({
   title: title.trim(),
+
   courseId: Number(courseId),
+
   lessonId: Number(lessonId),
+
   teacherId: user.id,
+
+  passingPercentage,
+
+  isRequired,
 });
 
       // Routes directly forward to question creation workflow
@@ -209,6 +233,82 @@ const quiz = await quizService.createQuiz({
               )}
             </select>
           </div>
+
+
+          {/* Passing Percentage */}
+<div>
+  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+    <Trophy className="w-4 h-4 text-[#6b1f0f]" />
+    Passing Percentage
+  </label>
+
+  <input
+    type="number"
+    min={1}
+    max={100}
+    value={passingPercentage}
+    onChange={(e) =>
+      setPassingPercentage(
+        Number(e.target.value)
+      )
+    }
+    className="w-full border-2 border-gray-200 rounded-2xl p-4 focus:outline-none focus:border-[#6b1f0f] focus:ring-4 focus:ring-[#6b1f0f]/10 transition-all duration-300 bg-gray-50/50 focus:bg-white"
+  />
+
+  <p className="text-xs text-gray-500 mt-2">
+    Default passing percentage is 40%.
+  </p>
+</div>
+
+
+{/* Required Quiz */}
+<div className="flex items-center justify-between border-2 border-gray-200 rounded-2xl p-4">
+
+  <div>
+    <h3 className="font-semibold text-gray-800">
+      Required Quiz
+    </h3>
+
+    <p className="text-sm text-gray-500">
+      Student must pass this quiz to complete the lesson.
+    </p>
+  </div>
+
+  <input
+    type="checkbox"
+    checked={isRequired}
+    onChange={(e) =>
+      setIsRequired(e.target.checked)
+    }
+    className="w-5 h-5 accent-[#6b1f0f]"
+  />
+
+</div>
+
+
+{/* Required Quiz */}
+<div className="flex items-center justify-between border-2 border-gray-200 rounded-2xl p-4">
+
+  <div>
+    <h3 className="font-semibold text-gray-800">
+      Required Quiz
+    </h3>
+
+    <p className="text-sm text-gray-500">
+      Student must pass this quiz to complete the lesson.
+    </p>
+  </div>
+
+  <input
+    type="checkbox"
+    checked={isRequired}
+    onChange={(e) =>
+      setIsRequired(e.target.checked)
+    }
+    className="w-5 h-5 accent-[#6b1f0f]"
+  />
+
+</div>
 
           {/* Submit Button */}
           <button

@@ -1,7 +1,7 @@
 const BASE_URL = "http://localhost:3000";
 
 const courseService = {
-  // Used by students/public pages
+  // Student Courses
   async getCourses() {
     const response = await fetch(`${BASE_URL}/courses`);
 
@@ -12,7 +12,20 @@ const courseService = {
     return response.json();
   },
 
-  // Used by teachers
+  // Single Course
+  async getCourse(courseId) {
+    const response = await fetch(
+      `${BASE_URL}/courses/${courseId}`
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch course");
+    }
+
+    return response.json();
+  },
+
+  // Teacher Courses
   async getTeacherCourses(teacherId) {
     const response = await fetch(
       `${BASE_URL}/courses/teacher/${teacherId}`

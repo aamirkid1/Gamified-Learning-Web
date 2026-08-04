@@ -13,4 +13,14 @@ export class Quiz {
 
   @Column()
   courseId!: number;
+
+  @Column({
+  default: 40,
+})
+passingPercentage!: number;
+
+@Column({
+  default: true,
+})
+isRequired!: boolean;
 }

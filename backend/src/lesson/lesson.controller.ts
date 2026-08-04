@@ -32,4 +32,16 @@ export class LessonController {
       Number(courseId),
     );
   }
+
+  @Get("course/:courseId/student/:studentId")
+findStudentLessons(
+  @Param("courseId") courseId: string,
+
+  @Param("studentId") studentId: string,
+) {
+  return this.lessonService.findByCourseForStudent(
+    Number(courseId),
+    Number(studentId),
+  );
+}
 }
