@@ -13,6 +13,9 @@ import { Course } from "../course/course.entity";
 import { Quiz } from "../quiz/quiz.entity";
 import { Question } from "../question/question.entity";
 import { LessonProgressModule } from "../lesson-progress/lesson-progress.module";
+import { Lesson } from "../lesson/lesson.entity";
+import { CourseProgressModule } from "../course-progress/course-progress.module";
+
 
 @Module({
   imports: [
@@ -22,11 +25,13 @@ import { LessonProgressModule } from "../lesson-progress/lesson-progress.module"
     Quiz,
     Course,
     Question,
+    Lesson,
   ]),
 
   UserBadgeModule,
   BadgeModule,
   LessonProgressModule,
+  CourseProgressModule,
 ],
 
   controllers: [
