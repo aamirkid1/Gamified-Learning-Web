@@ -36,10 +36,10 @@ export class LessonService {
     private quizRepository: Repository<Quiz>,
 
     @InjectRepository(Enrollment)
-private enrollmentRepository: Repository<Enrollment>,
+    private enrollmentRepository: Repository<Enrollment>,
 
-@InjectRepository(User)
-private userRepository: Repository<User>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
 
     private lessonProgressService: LessonProgressService,
 
@@ -88,7 +88,19 @@ private userRepository: Repository<User>,
   }
 
   async findByCourse(courseId: number) {
+    return this.lessonRepository.find({
+      where: {
+        courseId,
+      },
+      order: {
+        orderNumber: "ASC",
+      },
+    });
+  }
 
+  async findTeacherLessonAnalytics(
+  courseId: number,
+) {
   const lessons =
     await this.lessonRepository.find({
       where: {
@@ -100,11 +112,11 @@ private userRepository: Repository<User>,
     });
 
   const totalStudents =
-  await this.enrollmentRepository.count({
-    where: {
-      courseId,
-    },
-  });
+    await this.enrollmentRepository.count({
+      where: {
+        courseId,
+      },
+    });
 
   const result: any[] = [];
 
@@ -124,13 +136,14 @@ private userRepository: Repository<User>,
 
       title: lesson.title,
 
+      courseId: lesson.courseId,
+
       orderNumber: lesson.orderNumber,
 
       completedStudents,
 
       pendingStudents:
-totalStudents -
-completedStudents,
+        totalStudents - completedStudents,
 
     });
 
@@ -230,76 +243,76 @@ completedStudents,
 
   async getLessonStudents(lessonId: number) {
 
-  const lesson =
-    await this.lessonRepository.findOne({
-      where: {
-        id: lessonId,
-      },
-    });
-
-  if (!lesson) {
-    throw new NotFoundException(
-      "Lesson not found",
-    );
-  }
-
-  const enrollments =
-    await this.enrollmentRepository.find({
-      where: {
-        courseId: lesson.courseId,
-      },
-    });
-
-  const students: any[] = [];
-
-  for (const enrollment of enrollments) {
-
-    const student =
-      await this.userRepository.findOne({
+    const lesson =
+      await this.lessonRepository.findOne({
         where: {
-          id: enrollment.studentId,
+          id: lessonId,
         },
       });
 
-    if (!student) {
-      continue;
+    if (!lesson) {
+      throw new NotFoundException(
+        "Lesson not found",
+      );
     }
 
-    const progress =
-      await this.lessonProgressRepository.findOne({
+    const enrollments =
+      await this.enrollmentRepository.find({
         where: {
-          lessonId,
-          studentId: student.id,
+          courseId: lesson.courseId,
         },
       });
 
-    students.push({
+    const students: any[] = [];
 
-      id: student.id,
+    for (const enrollment of enrollments) {
 
-      name: student.name,
+      const student =
+        await this.userRepository.findOne({
+          where: {
+            id: enrollment.studentId,
+          },
+        });
 
-      rollNo: student.rollNo,
+      if (!student) {
+        continue;
+      }
 
-      studentId: student.studentId,
+      const progress =
+        await this.lessonProgressRepository.findOne({
+          where: {
+            lessonId,
+            studentId: student.id,
+          },
+        });
 
-      email: student.email,
+      students.push({
 
-      completed:
-        progress?.completed ?? false,
+        id: student.id,
 
-      completedAt:
-        progress?.completedAt ?? null,
+        name: student.name,
 
-      xpEarned:
-        progress?.completed
-          ? 50
-          : 0,
+        rollNo: student.rollNo,
 
-    });
+        studentId: student.studentId,
 
+        email: student.email,
+
+        completed:
+          progress?.completed ?? false,
+
+        completedAt:
+          progress?.completedAt ?? null,
+
+        xpEarned:
+          progress?.completed
+            ? 50
+            : 0,
+
+      });
+
+    }
+
+    return students;
   }
-
-  return students;
-}
 }

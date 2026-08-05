@@ -33,16 +33,28 @@ const lessonService = {
   },
 
   async getTeacherLessons(courseId) {
-  const response = await fetch(
-    `${BASE_URL}/lessons/course/${courseId}`
-  );
+    const response = await fetch(
+      `${BASE_URL}/lessons/course/${courseId}`
+    );
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch lessons");
-  }
+    if (!response.ok) {
+      throw new Error("Failed to fetch lessons");
+    }
 
-  return response.json();
-},
+    return response.json();
+  },
+
+  async getTeacherLessonAnalytics(courseId) {
+    const response = await fetch(
+      `${BASE_URL}/lessons/course/${courseId}/analytics`
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch lesson analytics");
+    }
+
+    return response.json();
+  },
 };
 
 export default lessonService;

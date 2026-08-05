@@ -46,7 +46,7 @@ export default function TeacherCourseDetails() {
             setStudents(studentData);
 
             const lessonData =
-                await lessonService.getTeacherLessons(courseId);
+                await lessonService.getTeacherLessonAnalytics(courseId);
 
             setLessons(lessonData);
 

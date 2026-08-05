@@ -33,6 +33,16 @@ export class LessonController {
     );
   }
 
+  @Get("course/:courseId/analytics")
+findTeacherLessonAnalytics(
+  @Param("courseId")
+  courseId: string,
+) {
+  return this.lessonService.findTeacherLessonAnalytics(
+    Number(courseId),
+  );
+}
+
   @Get("course/:courseId/student/:studentId")
 findStudentLessons(
   @Param("courseId") courseId: string,
