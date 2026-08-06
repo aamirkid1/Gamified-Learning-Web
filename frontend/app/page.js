@@ -110,8 +110,8 @@ items-center
             }}
           >
             <Link
-              href="#"
-              className="
+    href="/about"
+    className="
       relative
       after:absolute
       after:left-0
@@ -124,9 +124,9 @@ items-center
       hover:after:w-full
       hover:text-[#8b4513]
     "
-            >
-              About us
-            </Link>
+  >
+    About us
+  </Link>
           </motion.div>
 
           <motion.div
