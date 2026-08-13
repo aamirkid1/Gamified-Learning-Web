@@ -1,13 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   motion,
   useReducedMotion,
   useMotionValue,
   useMotionValueEvent,
-  useSpring,
   animate,
 } from "framer-motion";
 import {
@@ -18,10 +17,6 @@ import {
   Layers,
   LogOut,
   ArrowUpRight,
-  ChevronLeft,
-  ChevronRight,
-  RotateCcw,
-  Sparkles,
 } from "lucide-react";
 import dashboardService from "@/services/dashboardService";
 
@@ -88,200 +83,6 @@ function AnimatedStat({ value }) {
   return <>{display}</>;
 }
 
-// Compact, Premium 3D Carousel Component
-function Circular3DCarousel({ actions, prefersReducedMotion }) {
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const total = actions.length;
-  const angleStep = 360 / total;
-
-  // Orbit radius
-  const [radius, setRadius] = useState(260);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 640) {
-        setRadius(180);
-      } else if (window.innerWidth < 1024) {
-        setRadius(220);
-      } else {
-        setRadius(270);
-      }
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const handleNext = () => setSelectedIndex((prev) => prev + 1);
-  const handlePrev = () => setSelectedIndex((prev) => prev - 1);
-
-  // Rotation spring physics
-  const currentAngle = -selectedIndex * angleStep;
-  const springAngle = useSpring(currentAngle, { stiffness: 150, damping: 20 });
-
-  useEffect(() => {
-    springAngle.set(currentAngle);
-  }, [currentAngle, springAngle]);
-
-  // Drag interaction controls
-  const dragStartX = useRef(0);
-  const [isDragging, setIsDragging] = useState(false);
-
-  const handlePointerDown = (e) => {
-    setIsDragging(true);
-    dragStartX.current = e.clientX || (e.touches && e.touches[0].clientX) || 0;
-  };
-
-  const handlePointerUp = (e) => {
-    if (!isDragging) return;
-    setIsDragging(false);
-    const endX = e.clientX || (e.changedTouches && e.changedTouches[0].clientX) || 0;
-    const diff = endX - dragStartX.current;
-
-    if (diff < -35) {
-      handleNext();
-    } else if (diff > 35) {
-      handlePrev();
-    }
-  };
-
-  return (
-    <div className="relative w-full py-2 flex flex-col items-center select-none overflow-visible">
-      {/* 3D Ring Container */}
-      <div
-        className="relative w-full h-[270px] sm:h-[290px] flex items-center justify-center cursor-grab active:cursor-grabbing"
-        style={{ perspective: "1000px" }}
-        onPointerDown={handlePointerDown}
-        onPointerUp={handlePointerUp}
-      >
-        <motion.div
-          className="relative w-[220px] sm:w-[250px] h-[210px] sm:h-[230px]"
-          style={{
-            transformStyle: "preserve-3d",
-            rotateX: 6, // Subtle 3D tilt for depth without text distortion
-            rotateY: springAngle,
-          }}
-        >
-          {actions.map((action, index) => {
-            const cardAngle = index * angleStep;
-            
-            // Calculate front-facing card position
-            const rawDiff = (cardAngle + currentAngle) % 360;
-            const normalizedDiff = (rawDiff + 540) % 360 - 180;
-            const isFront = Math.abs(normalizedDiff) < 30;
-
-            const Icon = action.icon;
-
-            return (
-              <div
-                key={action.href}
-                className="absolute inset-0 transition-all duration-300"
-                style={{
-                  transformStyle: "preserve-3d",
-                  transform: `rotateY(${cardAngle}deg) translateZ(${radius}px)`,
-                  opacity: isFront ? 1 : Math.abs(normalizedDiff) > 90 ? 0.25 : 0.55,
-                  pointerEvents: isFront ? "auto" : "none",
-                  backfaceVisibility: "hidden",
-                }}
-              >
-                <Link
-                  href={action.href}
-                  className="group block h-full rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0a976]"
-                >
-                  <motion.div
-                    animate={{
-                      scale: isFront ? 1.04 : 0.85,
-                      y: isFront ? -4 : 0,
-                    }}
-                    transition={{ duration: 0.3 }}
-                    className={`h-full rounded-2xl p-4 sm:p-5 border flex flex-col justify-between transition-all duration-300 shadow-2xl relative overflow-hidden backdrop-blur-xl ${
-                      isFront
-                        ? "bg-gradient-to-br from-[#531d10]/95 via-[#3d140a]/95 to-[#2a0c06]/95 border-[#e0a976]/60 shadow-[0_15px_40px_rgba(224,169,118,0.2)]"
-                        : "bg-[#331109]/90 border-[#8b4513]/40"
-                    }`}
-                  >
-                    {/* Glossy Top Edge Highlight */}
-                    {isFront && (
-                      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#e0a976]/80 to-transparent" />
-                    )}
-
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-[#e0a976]/20 to-[#5a1a08]/80 rounded-xl flex items-center justify-center border border-[#e0a976]/30 shadow-md">
-                          <Icon className="w-5 h-5 text-[#e0a976]" />
-                        </div>
-                        {isFront && (
-                          <div className="flex items-center gap-1 text-[10px] font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-[#e0a976]/15 text-[#fce4c8] border border-[#e0a976]/30">
-                            <Sparkles className="w-3 h-3 text-[#e0a976]" />
-                            <span>ACTIVE</span>
-                          </div>
-                        )}
-                      </div>
-
-                      <h3 className="text-base sm:text-lg font-extrabold mb-1 text-white group-hover:text-[#fce4c8] transition-colors">
-                        {action.title}
-                      </h3>
-                      <p className="text-gray-300/85 text-xs leading-relaxed line-clamp-2">
-                        {action.body}
-                      </p>
-                    </div>
-
-                    {/* Premium CTA Button */}
-                    <div className={`mt-3 w-full py-2 rounded-xl font-bold tracking-wide text-center text-xs transition-all flex items-center justify-center gap-1 shadow-md ${
-                      isFront
-                        ? "bg-gradient-to-r from-[#e0a976] to-[#b8763f] text-[#2a0c06] hover:brightness-110 shadow-[0_4px_15px_rgba(224,169,118,0.3)]"
-                        : "bg-[#2b0d09] text-[#e0a976] border border-[#e0a976]/20"
-                    }`}>
-                      <span>{action.cta}</span>
-                      <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
-                    </div>
-                  </motion.div>
-                </Link>
-              </div>
-            );
-          })}
-        </motion.div>
-      </div>
-
-      {/* Rotation Controls */}
-      <div className="flex items-center gap-4 mt-1 z-10">
-        <button
-          onClick={handlePrev}
-          className="p-2.5 rounded-full bg-[#531d10] border border-[#e0a976]/40 text-[#e0a976] hover:bg-[#6f311c] hover:scale-105 active:scale-95 transition-all shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0a976] cursor-pointer"
-          aria-label="Previous card"
-        >
-          <ChevronLeft className="w-4 h-4" />
-        </button>
-
-        {/* Dynamic Ring Indicators */}
-        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#2a0c06]/80 rounded-full border border-[#e0a976]/20 backdrop-blur-md">
-          {actions.map((_, idx) => {
-            const activeIdx = ((selectedIndex % total) + total) % total;
-            return (
-              <button
-                key={idx}
-                onClick={() => setSelectedIndex(idx)}
-                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                  activeIdx === idx ? "w-5 bg-[#e0a976]" : "w-1.5 bg-white/20 hover:bg-white/40"
-                }`}
-                aria-label={`Go to slide ${idx + 1}`}
-              />
-            );
-          })}
-        </div>
-
-        <button
-          onClick={handleNext}
-          className="p-2.5 rounded-full bg-[#531d10] border border-[#e0a976]/40 text-[#e0a976] hover:bg-[#6f311c] hover:scale-105 active:scale-95 transition-all shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0a976] cursor-pointer"
-          aria-label="Next card"
-        >
-          <ChevronRight className="w-4 h-4" />
-        </button>
-      </div>
-    </div>
-  );
-}
-
 export default function TeacherDashboard() {
   const [stats, setStats] = useState({
     totalCourses: 0,
@@ -331,18 +132,18 @@ export default function TeacherDashboard() {
     hidden: {},
     visible: {
       transition: {
-        staggerChildren: prefersReducedMotion ? 0 : 0.08,
-        delayChildren: prefersReducedMotion ? 0 : 0.1,
+        staggerChildren: prefersReducedMotion ? 0 : 0.07,
+        delayChildren: prefersReducedMotion ? 0 : 0.05,
       },
     },
   };
 
   const gridItem = {
-    hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 24 },
+    hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 20 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.45, ease: "easeOut" },
+      transition: { duration: 0.4, ease: "easeOut" },
     },
   };
 
@@ -364,7 +165,7 @@ export default function TeacherDashboard() {
           initial="hidden"
           animate="visible"
           variants={fadeSlideUp}
-          className="relative max-w-6xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+          className="relative max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4"
         >
           <div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white">
@@ -401,15 +202,15 @@ export default function TeacherDashboard() {
       </header>
 
       {/* Main Container */}
-      <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-12 py-8 sm:py-10 space-y-10">
-        {/* Quick Actions 3D Ring Section */}
+      <main className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-8 sm:py-10 space-y-12">
+        {/* Quick Actions Grid Section */}
         <section>
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-60px" }}
             variants={fadeSlideUp}
-            className="flex items-center justify-between mb-1"
+            className="flex items-center justify-between mb-6"
           >
             <div className="flex items-center gap-3">
               <div className="h-6 w-1 bg-[#e0a976] rounded-full" />
@@ -417,16 +218,60 @@ export default function TeacherDashboard() {
                 Quick Actions
               </h2>
             </div>
-            <span className="text-xs text-[#e0a976]/90 flex items-center gap-1 font-semibold">
-              <RotateCcw className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: "12s" }} />
-              Drag or use arrows to rotate
+            <span className="text-xs text-[#e0a976]/80 font-medium hidden sm:inline-block">
+              Select an action to begin managing your workflow
             </span>
           </motion.div>
 
-          <Circular3DCarousel
-            actions={QUICK_ACTIONS}
-            prefersReducedMotion={prefersReducedMotion}
-          />
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            variants={gridContainer}
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-5"
+          >
+            {QUICK_ACTIONS.map((action) => {
+              const Icon = action.icon;
+              return (
+                <motion.div key={action.href} variants={gridItem}>
+                  <Link
+                    href={action.href}
+                    className="group block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0a976] rounded-2xl"
+                  >
+                    <div className="relative h-full bg-gradient-to-br from-[#3d140a]/90 via-[#2a0c06]/95 to-[#1d0703]/90 border border-[#e0a976]/25 group-hover:border-[#e0a976]/60 rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 backdrop-blur-xl shadow-xl group-hover:shadow-[0_12px_30px_rgba(224,169,118,0.15)] group-hover:-translate-y-1 overflow-hidden">
+                      {/* Top Edge Gradient Glow on Hover */}
+                      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#e0a976]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                      <div>
+                        {/* Icon Header */}
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="w-11 h-11 bg-gradient-to-br from-[#e0a976]/20 to-[#5a1a08]/80 rounded-xl flex items-center justify-center border border-[#e0a976]/30 shadow-md group-hover:scale-105 transition-transform duration-300">
+                            <Icon className="w-5.5 h-5.5 text-[#e0a976]" />
+                          </div>
+                          <div className="w-7 h-7 rounded-full bg-[#e0a976]/10 flex items-center justify-center text-[#e0a976] opacity-60 group-hover:opacity-100 group-hover:bg-[#e0a976]/20 transition-all">
+                            <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
+                          </div>
+                        </div>
+
+                        {/* Title & Description */}
+                        <h3 className="text-base font-bold text-white group-hover:text-[#fce4c8] transition-colors mb-1.5">
+                          {action.title}
+                        </h3>
+                        <p className="text-gray-300/80 text-xs leading-relaxed line-clamp-3 mb-4">
+                          {action.body}
+                        </p>
+                      </div>
+
+                      {/* CTA Button Accent */}
+                      <div className="mt-2 w-full py-2 px-3 rounded-xl bg-[#210904] group-hover:bg-gradient-to-r group-hover:from-[#e0a976] group-hover:to-[#b8763f] text-[#e0a976] group-hover:text-[#2a0c06] text-xs font-bold transition-all duration-300 flex items-center justify-center gap-1.5 border border-[#e0a976]/20 group-hover:border-transparent shadow-sm">
+                        <span>{action.cta}</span>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </motion.div>
         </section>
 
         {/* Overview Performance Stats Section */}
