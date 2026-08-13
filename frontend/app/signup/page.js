@@ -4,9 +4,18 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import authService from "@/services/authService";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  useReducedMotion,
+  useMotionValue,
+  useSpring,
+} from "framer-motion";
 import { GraduationCap, Eye, EyeOff, AlertCircle } from "lucide-react";
 import confetti from "canvas-confetti";
+
+// Static array defined outside component render cycle
+const PARTICLES = Array.from({ length: 8 });
 
 export default function SignupPage() {
   const router = useRouter();
@@ -26,16 +35,25 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Start centered so the glow is already visible on load instead of
-  // snapping in from the top-left corner on the first mouse move.
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  // DIRECT MOTION VALUES (Bypasses React re-renders completely on mouse move)
+  const mouseX = useMotionValue(-350);
+  const mouseY = useMotionValue(-350);
+
+  const springX = useSpring(mouseX, { stiffness: 70, damping: 30, restDelta: 0.001 });
+  const springY = useSpring(mouseY, { stiffness: 70, damping: 30, restDelta: 0.001 });
 
   useEffect(() => {
-    setMousePosition({
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2,
-    });
-  }, []);
+    if (typeof window !== "undefined") {
+      mouseX.set(window.innerWidth / 2 - 350);
+      mouseY.set(window.innerHeight / 2 - 350);
+    }
+  }, [mouseX, mouseY]);
+
+  const handleMouseMove = (e) => {
+    if (prefersReducedMotion) return;
+    mouseX.set(e.clientX - 350);
+    mouseY.set(e.clientY - 350);
+  };
 
   const handleSignup = async () => {
     if (isLoading) return;
@@ -70,42 +88,32 @@ export default function SignupPage() {
 
   return (
     <div
-      onMouseMove={(e) => {
-        if (prefersReducedMotion) return;
-        setMousePosition({ x: e.clientX, y: e.clientY });
-      }}
+      onMouseMove={handleMouseMove}
       className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-[#2b0c07] via-[#3b130d] to-[#5c2412] overflow-hidden py-12 px-4 sm:px-6 lg:px-8"
     >
-      {/* MOUSE-FOLLOWING PREMIUM GLOW */}
+      {/* HARDWARE-ACCELERATED RADIAL GLOW (No heavy blur filter) */}
       {!prefersReducedMotion && (
         <motion.div
-          animate={{
-            x: mousePosition.x - 350,
-            y: mousePosition.y - 350,
+          style={{
+            x: springX,
+            y: springY,
           }}
-          transition={{
-            type: "spring",
-            damping: 30,
-            stiffness: 70,
-            restDelta: 0.001,
-          }}
-          className="absolute w-[700px] h-[700px] bg-[#8b4513] opacity-25 blur-[150px] rounded-full pointer-events-none left-0 top-0 z-0"
+          className="absolute w-[700px] h-[700px] pointer-events-none left-0 top-0 z-0 transform-gpu rounded-full bg-[radial-gradient(circle_at_center,_rgba(139,69,19,0.35)_0%,_transparent_70%)]"
         />
       )}
 
       {/* MULTI-PARTICLE SPARKLE FIELD */}
       {!prefersReducedMotion && (
         <div className="absolute inset-0 pointer-events-none hidden md:block overflow-hidden">
-          {[...Array(8)].map((_, i) => (
+          {PARTICLES.map((_, i) => (
             <motion.div
               key={i}
               initial={{
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
+                top: `${10 + i * 11}%`,
+                left: `${15 + i * 9}%`,
               }}
               animate={{
                 y: [0, -40, 0],
-                x: [0, Math.random() * 20 - 10, 0],
                 opacity: [0.15, 0.6, 0.15],
               }}
               transition={{
@@ -113,7 +121,7 @@ export default function SignupPage() {
                 repeat: Infinity,
                 ease: "easeInOut",
               }}
-              className="absolute w-2 h-2 rounded-full bg-[#d7a46b] blur-[1px]"
+              className="absolute w-2 h-2 rounded-full bg-[#d7a46b] blur-[1px] transform-gpu"
             />
           ))}
         </div>
@@ -145,7 +153,7 @@ export default function SignupPage() {
           <motion.div
             animate={prefersReducedMotion ? {} : { y: [0, -12, 0] }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            className="w-full aspect-square max-w-[320px] xl:max-w-[360px] mx-auto lg:mx-0 bg-gradient-to-tr from-[#431b11]/40 to-[#8b4513]/10 rounded-2xl border border-white/5 backdrop-blur-md relative flex items-center justify-center shadow-inner"
+            className="w-full aspect-square max-w-[320px] xl:max-w-[360px] mx-auto lg:mx-0 bg-gradient-to-tr from-[#431b11]/40 to-[#8b4513]/10 rounded-2xl border border-white/5 backdrop-blur-md relative flex items-center justify-center shadow-inner transform-gpu"
           >
             <GraduationCap size={140} className="text-[#d7a46b]/20 absolute" />
             <div className="absolute w-40 h-40 bg-[#8b4513] opacity-30 blur-3xl rounded-full" />
@@ -158,7 +166,7 @@ export default function SignupPage() {
             initial={{ opacity: 0, y: 40, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="relative bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl max-w-[500px] w-full p-6 sm:p-8 rounded-2xl hover:shadow-[0_0_60px_rgba(139,69,19,0.35)] transition-shadow duration-500 overflow-hidden"
+            className="relative bg-white/5 backdrop-blur-md border border-white/10 shadow-2xl max-w-[500px] w-full p-6 sm:p-8 rounded-2xl hover:shadow-[0_0_60px_rgba(139,69,19,0.35)] transition-shadow duration-500 overflow-hidden transform-gpu"
           >
             {/* ANIMATED BORDER PULSE GLOW */}
             {!prefersReducedMotion && (
@@ -177,7 +185,7 @@ export default function SignupPage() {
                   : { y: [0, -8, 0], rotate: [0, 4, 0, -4, 0] }
               }
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              className="flex justify-center mb-4"
+              className="flex justify-center mb-4 transform-gpu"
             >
               <div className="bg-[#8b4513] p-4 rounded-full shadow-lg border border-white/10">
                 <GraduationCap size={32} className="text-white" />
@@ -201,7 +209,7 @@ export default function SignupPage() {
               </div>
             </div>
 
-            {/* INLINE ERROR — replaces alert() */}
+            {/* INLINE ERROR */}
             <AnimatePresence>
               {errorMessage && (
                 <motion.div
@@ -223,7 +231,7 @@ export default function SignupPage() {
             <div className="mb-4">
               <select
                 disabled={isLoading}
-                className="w-full p-3 bg-black/25 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#d7a46b] focus:scale-[1.01] focus-visible:ring-2 focus-visible:ring-[#d7a46b]/60 hover:border-[#d7a46b]/50 focus:shadow-lg focus:shadow-[#8b4513]/30 transition-all disabled:opacity-60"
+                className="w-full p-3 bg-black/25 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#d7a46b] focus-visible:ring-2 focus-visible:ring-[#d7a46b]/60 hover:border-[#d7a46b]/50 transition-all disabled:opacity-60"
                 value={form.role}
                 onChange={(e) => setForm({ ...form, role: e.target.value })}
               >
@@ -242,13 +250,13 @@ export default function SignupPage() {
                 placeholder="Full Name"
                 disabled={isLoading}
                 onKeyDown={handleKeyDown}
-                className="w-full p-3 bg-black/25 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#d7a46b] focus:scale-[1.01] focus-visible:ring-2 focus-visible:ring-[#d7a46b]/60 hover:border-[#d7a46b]/50 focus:shadow-lg focus:shadow-[#8b4513]/30 transition-all disabled:opacity-60"
+                className="w-full p-3 bg-black/25 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#d7a46b] focus-visible:ring-2 focus-visible:ring-[#d7a46b]/60 hover:border-[#d7a46b]/50 transition-all disabled:opacity-60"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
               />
             </div>
 
-            {/* CONDITIONAL STUDENT FIELDS — animated in/out instead of popping */}
+            {/* CONDITIONAL STUDENT FIELDS */}
             <AnimatePresence initial={false}>
               {form.role === "student" && (
                 <motion.div
@@ -263,7 +271,7 @@ export default function SignupPage() {
                       placeholder="Roll Number"
                       disabled={isLoading}
                       onKeyDown={handleKeyDown}
-                      className="w-full p-3 bg-black/25 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#d7a46b] focus:scale-[1.01] focus-visible:ring-2 focus-visible:ring-[#d7a46b]/60 hover:border-[#d7a46b]/50 focus:shadow-lg focus:shadow-[#8b4513]/30 transition-all disabled:opacity-60"
+                      className="w-full p-3 bg-black/25 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#d7a46b] focus-visible:ring-2 focus-visible:ring-[#d7a46b]/60 hover:border-[#d7a46b]/50 transition-all disabled:opacity-60"
                       value={form.rollNo}
                       onChange={(e) => setForm({ ...form, rollNo: e.target.value })}
                     />
@@ -274,7 +282,7 @@ export default function SignupPage() {
                       placeholder="Student ID"
                       disabled={isLoading}
                       onKeyDown={handleKeyDown}
-                      className="w-full p-3 bg-black/25 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#d7a46b] focus:scale-[1.01] focus-visible:ring-2 focus-visible:ring-[#d7a46b]/60 hover:border-[#d7a46b]/50 focus:shadow-lg focus:shadow-[#8b4513]/30 transition-all disabled:opacity-60"
+                      className="w-full p-3 bg-black/25 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#d7a46b] focus-visible:ring-2 focus-visible:ring-[#d7a46b]/60 hover:border-[#d7a46b]/50 transition-all disabled:opacity-60"
                       value={form.studentId}
                       onChange={(e) => setForm({ ...form, studentId: e.target.value })}
                     />
@@ -290,13 +298,13 @@ export default function SignupPage() {
                 placeholder="Email Address"
                 disabled={isLoading}
                 onKeyDown={handleKeyDown}
-                className="w-full p-3 bg-black/25 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#d7a46b] focus:scale-[1.01] focus-visible:ring-2 focus-visible:ring-[#d7a46b]/60 hover:border-[#d7a46b]/50 focus:shadow-lg focus:shadow-[#8b4513]/30 transition-all disabled:opacity-60"
+                className="w-full p-3 bg-black/25 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#d7a46b] focus-visible:ring-2 focus-visible:ring-[#d7a46b]/60 hover:border-[#d7a46b]/50 transition-all disabled:opacity-60"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
               />
             </div>
 
-            {/* PASSWORD — with show/hide toggle */}
+            {/* PASSWORD */}
             <div className="mb-6">
               <div className="relative">
                 <input
@@ -304,7 +312,7 @@ export default function SignupPage() {
                   placeholder="Password"
                   disabled={isLoading}
                   onKeyDown={handleKeyDown}
-                  className="w-full p-3 pr-11 bg-black/25 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#d7a46b] focus:scale-[1.01] focus-visible:ring-2 focus-visible:ring-[#d7a46b]/60 hover:border-[#d7a46b]/50 focus:shadow-lg focus:shadow-[#8b4513]/30 transition-all disabled:opacity-60"
+                  className="w-full p-3 pr-11 bg-black/25 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#d7a46b] focus-visible:ring-2 focus-visible:ring-[#d7a46b]/60 hover:border-[#d7a46b]/50 transition-all disabled:opacity-60"
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                 />
@@ -326,7 +334,7 @@ export default function SignupPage() {
               whileTap={isLoading ? {} : { scale: 0.98 }}
               onClick={handleSignup}
               disabled={isLoading}
-              className="group relative overflow-hidden w-full bg-[#431b11] text-white py-3.5 rounded-lg text-lg sm:text-xl font-semibold shadow-md hover:bg-[#522216] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d7a46b]/70 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="group relative overflow-hidden w-full bg-[#431b11] text-white py-3.5 rounded-lg text-lg sm:text-xl font-semibold shadow-md hover:bg-[#522216] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d7a46b]/70 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 transform-gpu"
             >
               <span className="absolute top-0 left-[-100%] w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:left-[100%] transition-all duration-1000 ease-in-out" />
 
@@ -377,7 +385,7 @@ export default function SignupPage() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.45, ease: "easeOut" }}
-              className="relative overflow-hidden bg-white rounded-3xl shadow-2xl w-full max-w-lg p-6 sm:p-10 text-center"
+              className="relative overflow-hidden bg-white rounded-3xl shadow-2xl w-full max-w-lg p-6 sm:p-10 text-center transform-gpu"
             >
               {/* Floating Background Glow */}
               <div className="absolute -top-20 -right-20 w-56 h-56 bg-[#8b4513]/10 rounded-full blur-3xl" />
@@ -391,7 +399,7 @@ export default function SignupPage() {
                     : { rotate: [0, 12, -12, 0], scale: [1, 1.12, 1] }
                 }
                 transition={{ duration: 1, repeat: Infinity }}
-                className="text-5xl sm:text-7xl"
+                className="text-5xl sm:text-7xl transform-gpu"
               >
                 🎉
               </motion.div>
@@ -422,7 +430,7 @@ export default function SignupPage() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => router.push("/login")}
-                className="mt-10 bg-[#8b4513] hover:bg-[#6b1f0f] text-white px-8 sm:px-10 py-3.5 sm:py-4 rounded-xl text-base sm:text-lg font-semibold shadow-lg transition-colors"
+                className="mt-10 bg-[#8b4513] hover:bg-[#6b1f0f] text-white px-8 sm:px-10 py-3.5 sm:py-4 rounded-xl text-base sm:text-lg font-semibold shadow-lg transition-colors transform-gpu"
               >
                 Start Learning →
               </motion.button>

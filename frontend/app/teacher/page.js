@@ -148,53 +148,59 @@ export default function TeacherDashboard() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#2a0c06] text-white font-sans selection:bg-[#e0a976] selection:text-[#2a0c06] overflow-x-hidden">
+    <div className="relative min-h-screen bg-[#3b130d] text-white font-sans selection:bg-[#6f311c] overflow-x-hidden">
+      {/* Dynamic Background Glow Orbs */}
       {!prefersReducedMotion && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 right-6 sm:right-20 w-64 h-64 sm:w-[400px] sm:h-[400px] bg-[#a0522d]/15 blur-[150px] rounded-full" />
-          <div className="absolute bottom-20 left-6 sm:left-20 w-48 h-48 sm:w-[300px] sm:h-[300px] bg-[#e0a976]/10 blur-[120px] rounded-full" />
+          <div className="absolute top-20 right-6 sm:right-20 w-64 h-64 sm:w-[400px] sm:h-[400px] bg-[#a0522d]/10 blur-[150px] rounded-full" />
+          <div className="absolute bottom-20 left-6 sm:left-20 w-48 h-48 sm:w-[300px] sm:h-[300px] bg-[#8b4513]/10 blur-[120px] rounded-full" />
         </div>
       )}
 
-      {/* Top Gold Accent Bar */}
-      <div className="h-1.5 bg-gradient-to-r from-[#6b1f0f] via-[#e0a976] to-[#6b1f0f] w-full" />
+      {/* Top Accent Strip */}
+      <div className="h-2 bg-[#6b1f0f] w-full" />
 
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#3d140a]/90 backdrop-blur-xl px-4 sm:px-6 md:px-12 py-5 sm:py-6 shadow-2xl border-b border-[#e0a976]/20 relative">
+      <header className="sticky top-0 z-50 bg-[#8b4513]/90 backdrop-blur-xl px-4 sm:px-6 md:px-12 py-5 sm:py-6 shadow-xl border-b border-[#6b1f0f]/40 relative">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute right-20 top-0 w-72 h-72 bg-white/10 blur-[120px] rounded-full" />
+        </div>
+
         <motion.div
           initial="hidden"
           animate="visible"
           variants={fadeSlideUp}
-          className="relative max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+          className="relative max-w-6xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4"
         >
           <div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
               Teacher Dashboard
             </h1>
-            <p className="text-[#d8c3be] text-xs sm:text-sm md:text-base mt-1 font-medium">
+            <p className="text-gray-300 text-xs sm:text-sm md:text-base mt-1 font-medium">
               Manage courses, lessons, and track student assessments.
             </p>
           </div>
+
           <div className="flex items-center gap-3 flex-wrap">
-            <div className="flex items-center gap-2 bg-[#2a0c06]/60 px-3.5 sm:px-4 py-2 rounded-xl border border-[#e0a976]/20 backdrop-blur-sm">
+            <div className="flex items-center gap-2 bg-[#3b130d]/40 px-3.5 sm:px-4 py-2 rounded-xl border border-white/10 backdrop-blur-sm">
               <span className="relative flex h-2.5 w-2.5">
                 {!prefersReducedMotion && (
                   <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
                 )}
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
               </span>
-              <span className="text-[11px] sm:text-xs font-bold tracking-wide text-gray-200 uppercase">
+              <span className="text-[11px] sm:text-xs font-semibold tracking-wide text-gray-200 uppercase">
                 Instructor Portal
               </span>
             </div>
 
             <motion.button
               onClick={handleLogout}
-              whileHover={prefersReducedMotion ? undefined : { scale: 1.04 }}
+              whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
               whileTap={prefersReducedMotion ? undefined : { scale: 0.97 }}
-              className="flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl bg-[#5a1205] border border-[#a0522d] text-white text-sm font-semibold shadow-lg hover:bg-[#7a1a08] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0a976] cursor-pointer"
+              className="flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl bg-[#5a1205] border border-[#a0522d] text-white text-sm font-semibold shadow-lg hover:bg-[#7a1a08] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b4513] cursor-pointer"
             >
-              <LogOut className="w-4 h-4 text-[#e0a976]" />
+              <LogOut className="w-4 h-4 text-gray-200" />
               Logout
             </motion.button>
           </div>
@@ -202,7 +208,7 @@ export default function TeacherDashboard() {
       </header>
 
       {/* Main Container */}
-      <main className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-8 sm:py-10 space-y-12">
+      <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-12 py-8 sm:py-10 lg:py-12 space-y-12 sm:space-y-16">
         {/* Quick Actions Grid Section */}
         <section>
           <motion.div
@@ -210,15 +216,15 @@ export default function TeacherDashboard() {
             whileInView="visible"
             viewport={{ once: true, margin: "-60px" }}
             variants={fadeSlideUp}
-            className="flex items-center justify-between mb-6"
+            className="flex items-center justify-between mb-6 sm:mb-8"
           >
             <div className="flex items-center gap-3">
-              <div className="h-6 w-1 bg-[#e0a976] rounded-full" />
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+              <div className="h-6 w-1 bg-[#8b4513] rounded-full" />
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-100">
                 Quick Actions
               </h2>
             </div>
-            <span className="text-xs text-[#e0a976]/80 font-medium hidden sm:inline-block">
+            <span className="text-xs text-gray-300/80 font-medium hidden sm:inline-block">
               Select an action to begin managing your workflow
             </span>
           </motion.div>
@@ -236,34 +242,34 @@ export default function TeacherDashboard() {
                 <motion.div key={action.href} variants={gridItem}>
                   <Link
                     href={action.href}
-                    className="group block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0a976] rounded-2xl"
+                    className="group block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8b4513] rounded-2xl"
                   >
-                    <div className="relative h-full bg-gradient-to-br from-[#3d140a]/90 via-[#2a0c06]/95 to-[#1d0703]/90 border border-[#e0a976]/25 group-hover:border-[#e0a976]/60 rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 backdrop-blur-xl shadow-xl group-hover:shadow-[0_12px_30px_rgba(224,169,118,0.15)] group-hover:-translate-y-1 overflow-hidden">
-                      {/* Top Edge Gradient Glow on Hover */}
-                      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#e0a976]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="relative h-full bg-[#6f311c] border border-[#8b4513]/60 group-hover:border-white/20 rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 backdrop-blur-xl shadow-xl group-hover:shadow-[0_15px_50px_rgba(255,255,255,0.08)] group-hover:-translate-y-1.5 group-hover:bg-[#6f311c]/90 overflow-hidden">
+                      {/* Top Edge Highlight */}
+                      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                       <div>
                         {/* Icon Header */}
                         <div className="flex items-center justify-between mb-4">
-                          <div className="w-11 h-11 bg-gradient-to-br from-[#e0a976]/20 to-[#5a1a08]/80 rounded-xl flex items-center justify-center border border-[#e0a976]/30 shadow-md group-hover:scale-105 transition-transform duration-300">
-                            <Icon className="w-5.5 h-5.5 text-[#e0a976]" />
+                          <div className="w-11 h-11 bg-[#3b130d]/60 rounded-xl flex items-center justify-center border border-white/5 shadow-inner group-hover:scale-110 transition-transform duration-300">
+                            <Icon className="w-5.5 h-5.5 text-gray-100" />
                           </div>
-                          <div className="w-7 h-7 rounded-full bg-[#e0a976]/10 flex items-center justify-center text-[#e0a976] opacity-60 group-hover:opacity-100 group-hover:bg-[#e0a976]/20 transition-all">
+                          <div className="w-7 h-7 rounded-full bg-white/5 flex items-center justify-center text-gray-300 opacity-60 group-hover:opacity-100 group-hover:bg-white/10 transition-all">
                             <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
                           </div>
                         </div>
 
                         {/* Title & Description */}
-                        <h3 className="text-base font-bold text-white group-hover:text-[#fce4c8] transition-colors mb-1.5">
+                        <h3 className="text-base font-bold text-white group-hover:text-gray-100 transition-colors mb-1.5">
                           {action.title}
                         </h3>
-                        <p className="text-gray-300/80 text-xs leading-relaxed line-clamp-3 mb-4">
+                        <p className="text-gray-300/90 text-xs leading-relaxed line-clamp-3 mb-4">
                           {action.body}
                         </p>
                       </div>
 
-                      {/* CTA Button Accent */}
-                      <div className="mt-2 w-full py-2 px-3 rounded-xl bg-[#210904] group-hover:bg-gradient-to-r group-hover:from-[#e0a976] group-hover:to-[#b8763f] text-[#e0a976] group-hover:text-[#2a0c06] text-xs font-bold transition-all duration-300 flex items-center justify-center gap-1.5 border border-[#e0a976]/20 group-hover:border-transparent shadow-sm">
+                      {/* CTA Button */}
+                      <div className="mt-2 w-full py-2.5 px-3 rounded-xl bg-[#431b11] group-hover:bg-[#35140d] text-white text-xs font-semibold tracking-wide transition-all duration-300 flex items-center justify-center gap-1.5 border border-transparent group-hover:border-white/10 shadow-md">
                         <span>{action.cta}</span>
                       </div>
                     </div>
@@ -281,10 +287,10 @@ export default function TeacherDashboard() {
             whileInView="visible"
             viewport={{ once: true, margin: "-60px" }}
             variants={fadeSlideUp}
-            className="flex items-center gap-3 mb-6"
+            className="flex items-center gap-3 mb-6 sm:mb-8"
           >
-            <div className="h-6 w-1 bg-[#e0a976] rounded-full" />
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+            <div className="h-6 w-1 bg-[#8b4513] rounded-full" />
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-100">
               Overview Performance
             </h2>
           </motion.div>
@@ -302,19 +308,19 @@ export default function TeacherDashboard() {
                 variants={gridItem}
                 whileHover={prefersReducedMotion ? undefined : { y: -4 }}
                 transition={{ duration: 0.25, ease: "easeOut" }}
-                className="relative overflow-hidden bg-gradient-to-br from-[#3d140a] to-[#2a0c06] p-5 sm:p-6 rounded-2xl shadow-xl border border-[#e0a976]/30 hover:border-[#e0a976]/60 transition-all duration-300 group"
+                className="relative overflow-hidden bg-gradient-to-br from-[#6f311c] to-[#592413] p-5 sm:p-6 rounded-2xl shadow-lg border border-[#8b4513]/40 hover:shadow-xl transition-all duration-300 group"
               >
-                <span className="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-[#e0a976] to-[#a0522d]" />
+                <span className="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-[#8b4513] to-[#5a1205]" />
                 <div className="flex items-center justify-between gap-4 pl-2">
                   <div className="min-w-0">
-                    <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#e0a976]/80 mb-1 truncate">
+                    <p className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-gray-400 mb-1 truncate">
                       {label}
                     </p>
                     <p className="text-2xl sm:text-3xl font-black tracking-tight text-white">
                       <AnimatedStat value={value} />
                     </p>
                   </div>
-                  <div className="w-11 h-11 sm:w-12 sm:h-12 shrink-0 bg-[#e0a976]/10 border border-[#e0a976]/20 rounded-xl flex items-center justify-center text-[#e0a976] shadow-inner group-hover:scale-110 transition-transform">
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 shrink-0 bg-[#3b130d]/50 border border-white/10 rounded-xl flex items-center justify-center text-white shadow-inner group-hover:scale-110 transition-transform">
                     <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                 </div>

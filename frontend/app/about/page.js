@@ -1,7 +1,7 @@
 "use client";
+
 import Image from "next/image";
 import Link from "next/link";
-
 import { useEffect, useRef, useState } from "react";
 import {
   motion,
@@ -10,7 +10,7 @@ import {
   useSpring,
   useTransform,
   useReducedMotion,
-  useInView,
+  useMotionValue,
 } from "framer-motion";
 import {
   Rocket,
@@ -20,12 +20,6 @@ import {
   Users,
   BadgeCheck,
   Boxes,
-  Cpu,
-  Database,
-  ShieldCheck,
-  Layers,
-  GithubIcon,
-  LinkedinIcon,
   Mail,
   Phone,
   MapPin,
@@ -35,26 +29,9 @@ import {
   ChevronLeft,
   ChevronRight,
   PlayCircle,
-  BarChart3,
   Flame,
-  Zap,
-  Crown,
-  Medal,
   RotateCcw,
 } from "lucide-react";
-
-/* -------------------------------------------------------------------- */
-/*  Fonts — move to root layout for production                          */
-/* -------------------------------------------------------------------- */
-function FontLoader() {
-  return (
-    <style>{`
-      @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-      .font-heading { font-family: 'Sora', sans-serif; }
-      .font-body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    `}</style>
-  );
-}
 
 /* -------------------------------------------------------------------- */
 /*  Data                                                                */
@@ -70,41 +47,36 @@ const WHY_CARDS = [
 ];
 
 const TIMELINE = [
-  "Teacher Creates Course", "Student Enrolls", "Studies Lessons", "Attempts Quiz",
-  "Earns XP", "Unlocks Badges", "Completes Course", "Gets Certificate",
+  "Teacher Creates Course",
+  "Student Enrolls",
+  "Studies Lessons",
+  "Attempts Quiz",
+  "Earns XP",
+  "Unlocks Badges",
+  "Completes Course",
+  "Gets Certificate",
 ];
 
 const STUDENT_FEATURES = [
-  "Watch Lessons", "Complete Quizzes", "Track Progress", "Earn XP",
-  "Unlock Badges", "Receive Certificates", "Compete on Leaderboard", "Review Flashcards",
+  "Watch Lessons",
+  "Complete Quizzes",
+  "Track Progress",
+  "Earn XP",
+  "Unlock Badges",
+  "Receive Certificates",
+  "Compete on Leaderboard",
+  "Review Flashcards",
 ];
 
 const TEACHER_FEATURES = [
-  "Create Courses", "Upload Lessons", "Create Quizzes", "Manage Flashcards",
-  "Track Student Progress", "Customize Certificates", "Review Student Performance", "Monitor Enrollments",
-];
-
-const GAMIFICATION = [
-  { icon: Flame, title: "XP", body: "Earn experience after every activity." },
-  { icon: BarChart3, title: "Levels", body: "Progress through multiple levels." },
-  { icon: Award, title: "Achievements", body: "Unlock exclusive badges." },
-  { icon: Trophy, title: "Leaderboards", body: "Compete with classmates." },
-];
-
-const STACK = [
-  { group: "Frontend", icon: Layers, items: ["Next.js", "React", "Tailwind CSS"] },
-  { group: "Backend", icon: Cpu, items: ["Node.js", "Express.js"] },
-  { group: "Database", icon: Database, items: ["MongoDB"] },
-  { group: "Authentication", icon: ShieldCheck, items: ["JWT"] },
-  { group: "Libraries", icon: Boxes, items: ["Framer Motion", "Lucide React", "Axios"] },
-];
-
-const STATS = [
-  { label: "Courses", value: 20, suffix: "+", icon: Layers },
-  { label: "Lessons", value: 150, suffix: "+", icon: PlayCircle },
-  { label: "Quiz Attempts", value: 1000, suffix: "+", icon: Sparkles },
-  { label: "Students", value: 500, suffix: "+", icon: Users },
-  { label: "XP Earned", value: 2500, suffix: "+", icon: Zap },
+  "Create Courses",
+  "Upload Lessons",
+  "Create Quizzes",
+  "Manage Flashcards",
+  "Track Student Progress",
+  "Customize Certificates",
+  "Review Student Performance",
+  "Monitor Enrollments",
 ];
 
 const TEAM = [
@@ -125,112 +97,127 @@ const TEAM = [
 const FAQS = [
   {
     q: "What is GLP?",
-    a: "GLP (Gamified Learning Platform) is an interactive e-learning platform..."
+    a: "GLP (Gamified Learning Platform) is an interactive e-learning platform...",
   },
   {
     q: "Who can use this platform?",
-    a: "The platform supports both students and instructors..."
+    a: "The platform supports both students and instructors...",
   },
   {
     q: "How do students enroll in a course?",
-    a: "Students can browse available courses..."
+    a: "Students can browse available courses...",
   },
   {
     q: "How do students earn XP?",
-    a: "XP is awarded for completing lessons..."
+    a: "XP is awarded for completing lessons...",
   },
   {
     q: "How does progress tracking work?",
-    a: "The platform automatically tracks lesson completion..."
+    a: "The platform automatically tracks lesson completion...",
   },
   {
     q: "How do leaderboards work?",
-    a: "Leaderboards rank students according to XP earned..."
+    a: "Leaderboards rank students according to XP earned...",
   },
   {
     q: "Can teachers monitor student performance?",
-    a: "Yes. Instructors can view enrolled students..."
+    a: "Yes. Instructors can view enrolled students...",
   },
   {
     q: "Does the platform support flashcards?",
-    a: "Yes. Flashcards help students revise important concepts..."
+    a: "Yes. Flashcards help students revise important concepts...",
   },
   {
     q: "Is learning progress saved automatically?",
-    a: "Yes. Every completed lesson, quiz, XP and badge is saved automatically."
+    a: "Yes. Every completed lesson, quiz, XP and badge is saved automatically.",
   },
   {
     q: "Why was this platform developed?",
-    a: "This Gamified Learning Platform was developed as part of a software engineering internship to demonstrate a modern full-stack LMS enhanced with gamification."
+    a: "This Gamified Learning Platform was developed as part of a software engineering internship to demonstrate a modern full-stack LMS enhanced with gamification.",
   },
   {
     q: "Which skills were demonstrated in this internship?",
-    a: "The project demonstrates full-stack development, REST APIs, authentication, dashboards, role-based access control, database design, progress tracking and responsive UI."
+    a: "The project demonstrates full-stack development, REST APIs, authentication, dashboards, role-based access control, database design, progress tracking and responsive UI.",
   },
   {
     q: "What technologies were used in this internship project?",
-    a: "The platform was built using Next.js, React, Tailwind CSS, NestJS, PostgreSQL, TypeORM and JWT Authentication."
-  }
+    a: "The platform was built using Next.js, React, Tailwind CSS, NestJS, PostgreSQL, TypeORM and JWT Authentication.",
+  },
 ];
 
 /* -------------------------------------------------------------------- */
-/*  Primitives                                                           */
+/*  Primitives & Helpers                                                */
 /* -------------------------------------------------------------------- */
 
 const fadeUp = {
   hidden: { opacity: 0, y: 26 },
   show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
 };
-const staggerParent = { hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.04 } } };
+
+const staggerParent = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.08, delayChildren: 0.04 } },
+};
 
 function Reveal({ children, className = "", from = "up", delay = 0 }) {
   const reduce = useReducedMotion();
   const variants = reduce
     ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
     : {
-      hidden: { opacity: 0, y: from === "up" ? 30 : from === "down" ? -30 : 0, x: from === "left" ? -36 : from === "right" ? 36 : 0 },
-      show: { opacity: 1, y: 0, x: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1], delay } },
-    };
+        hidden: {
+          opacity: 0,
+          y: from === "up" ? 30 : from === "down" ? -30 : 0,
+          x: from === "left" ? -36 : from === "right" ? 36 : 0,
+        },
+        show: { opacity: 1, y: 0, x: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1], delay } },
+      };
+
   return (
-    <motion.div className={className} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} variants={variants}>
+    <motion.div
+      className={className}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.25 }}
+      variants={variants}
+    >
       {children}
     </motion.div>
   );
 }
 
-function CountUp({ value, suffix = "", duration = 1.3 }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, amount: 0.6 });
-  const reduce = useReducedMotion();
-  const [display, setDisplay] = useState(reduce ? value : 0);
+/** Isolated level badge to prevent top-level scroll re-renders */
+function ScrollLevelBadge({ scrollYProgress }) {
+  const level = useTransform(scrollYProgress, (v) => Math.min(15, Math.max(1, Math.floor(v * 15) + 1)));
+  const [levelDisplay, setLevelDisplay] = useState(1);
+
   useEffect(() => {
-    if (!inView || reduce) return;
-    let raf;
-    const start = performance.now();
-    const tick = (now) => {
-      const t = Math.min((now - start) / (duration * 1000), 1);
-      setDisplay(Math.round((1 - Math.pow(1 - t, 3)) * value));
-      if (t < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [inView, reduce, value, duration]);
-  return <span ref={ref} className="font-heading tabular-nums">{display}{suffix}</span>;
+    return level.on("change", (v) => setLevelDisplay(v));
+  }, [level]);
+
+  return (
+    <div className="absolute right-3 top-2.5 hidden items-center gap-1 rounded-full bg-[#3B1410] px-2.5 py-1 text-[11px] font-heading font-bold text-white sm:flex">
+      <Flame size={11} className="text-[#E3A860]" /> Lv {levelDisplay}
+    </div>
+  );
 }
 
-/** CTA button — gradient-gold on dark sections, solid oxblood on light ones (matches the real app). */
 function Button({ children, tone = "light", variant = "solid", className = "", ...props }) {
   const reduce = useReducedMotion();
-  const base = "inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold font-body transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2";
+  const base =
+    "inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold font-body transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2";
   let styles = "";
   if (tone === "dark" && variant === "solid") {
-    styles = "bg-gradient-to-br from-[#F0C285] via-[#E3A860] to-[#B5702F] text-[#2B0F0B] shadow-[0_8px_24px_-8px_rgba(227,168,96,0.55)] hover:brightness-105 focus-visible:ring-[#E3A860] focus-visible:ring-offset-[#240D08]";
+    styles =
+      "bg-gradient-to-br from-[#F0C285] via-[#E3A860] to-[#B5702F] text-[#2B0F0B] shadow-[0_8px_24px_-8px_rgba(227,168,96,0.55)] hover:brightness-105 focus-visible:ring-[#E3A860] focus-visible:ring-offset-[#240D08]";
   } else if (tone === "dark" && variant === "ghost") {
-    styles = "border border-white/20 bg-white/5 text-white hover:border-[#E3A860]/60 focus-visible:ring-[#E3A860] focus-visible:ring-offset-[#240D08]";
+    styles =
+      "border border-white/20 bg-white/5 text-white hover:border-[#E3A860]/60 focus-visible:ring-[#E3A860] focus-visible:ring-offset-[#240D08]";
   } else if (variant === "solid") {
-    styles = "bg-[#5C2418] text-[#FBF5EF] hover:bg-[#4A1B14] focus-visible:ring-[#5C2418] focus-visible:ring-offset-[#FBF5EF]";
+    styles =
+      "bg-[#5C2418] text-[#FBF5EF] hover:bg-[#4A1B14] focus-visible:ring-[#5C2418] focus-visible:ring-offset-[#FBF5EF]";
   } else {
-    styles = "border border-[#5C2418]/25 text-[#5C2418] hover:bg-[#5C2418]/5 focus-visible:ring-[#5C2418] focus-visible:ring-offset-[#FBF5EF]";
+    styles =
+      "border border-[#5C2418]/25 text-[#5C2418] hover:bg-[#5C2418]/5 focus-visible:ring-[#5C2418] focus-visible:ring-offset-[#FBF5EF]";
   }
   return (
     <motion.button
@@ -244,11 +231,11 @@ function Button({ children, tone = "light", variant = "solid", className = "", .
   );
 }
 
-/** Pill badge — outlined-on-dark / soft-fill-on-light, exactly like "XP · Achievements · Leaderboards". */
 function Pill({ icon: Icon, children, tone = "light" }) {
-  const styles = tone === "dark"
-    ? "border border-[#E3A860]/35 bg-white/5 text-[#F3D9B1]"
-    : "bg-[#F7E4D0] text-[#5C2418] border border-[#5C2418]/10";
+  const styles =
+    tone === "dark"
+      ? "border border-[#E3A860]/35 bg-white/5 text-[#F3D9B1]"
+      : "bg-[#F7E4D0] text-[#5C2418] border border-[#5C2418]/10";
   return (
     <span className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold font-body ${styles}`}>
       {Icon && <Icon size={13} />}
@@ -257,27 +244,15 @@ function Pill({ icon: Icon, children, tone = "light" }) {
   );
 }
 
-/** Section header — small gradient bar + eyebrow + bold heading, matching "| Quick Actions". */
 function SectionHead({ eyebrow, title, tone = "light", center = true }) {
   return (
     <div className={center ? "text-center" : ""}>
-      <div
-        className={`inline-flex items-center gap-3 ${center ? "justify-center" : ""}`}
-      >
+      <div className={`inline-flex items-center gap-3 ${center ? "justify-center" : ""}`}>
         <span className="h-7 w-[5px] rounded-full bg-gradient-to-b from-[#F3C27A] via-[#E3A860] to-[#6B2A1F]" />
         <span
-          className={`
-            font-heading
-            text-lg
-            sm:text-xl
-            font-bold
-            uppercase
-            tracking-[0.22em]
-            ${tone === "dark"
-              ? "text-[#F0C285]"
-              : "text-[#B5702F]"
-            }
-          `}
+          className={`font-heading text-lg sm:text-xl font-bold uppercase tracking-[0.22em] ${
+            tone === "dark" ? "text-[#F0C285]" : "text-[#B5702F]"
+          }`}
         >
           {eyebrow}
         </span>
@@ -285,19 +260,9 @@ function SectionHead({ eyebrow, title, tone = "light", center = true }) {
 
       {title && (
         <h2
-          className={`
-            font-heading
-            mt-5
-            text-5xl
-            sm:text-6xl
-            font-extrabold
-            leading-[1.05]
-            tracking-tight
-            ${tone === "dark"
-              ? "text-white"
-              : "text-[#2B160E]"
-            }
-          `}
+          className={`font-heading mt-5 text-5xl sm:text-6xl font-extrabold leading-[1.05] tracking-tight ${
+            tone === "dark" ? "text-white" : "text-[#2B160E]"
+          }`}
         >
           {title}
         </h2>
@@ -306,8 +271,7 @@ function SectionHead({ eyebrow, title, tone = "light", center = true }) {
   );
 }
 
-/** Ambient floating dots for dark panels — matches the login screen's drifting orange particles. */
-function ParticleField({ count = 10 }) {
+function ParticleField({ count = 8 }) {
   const reduce = useReducedMotion();
   if (reduce) return null;
   const dots = Array.from({ length: count }, (_, i) => ({
@@ -317,12 +281,13 @@ function ParticleField({ count = 10 }) {
     delay: (i % 5) * 0.6,
     duration: 5 + (i % 4),
   }));
+
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
       {dots.map((d, i) => (
         <motion.span
           key={i}
-          className="absolute rounded-full bg-[#E3A860]/40 blur-[1px]"
+          className="absolute rounded-full bg-[#E3A860]/40 blur-[1px] transform-gpu"
           style={{ left: `${d.left}%`, top: `${d.top}%`, width: d.size, height: d.size }}
           animate={{ y: [0, -16, 0], opacity: [0.25, 0.6, 0.25] }}
           transition={{ duration: d.duration, delay: d.delay, repeat: Infinity, ease: "easeInOut" }}
@@ -332,7 +297,6 @@ function ParticleField({ count = 10 }) {
   );
 }
 
-/** Dark gradient panel wrapper — the maroon-gradient surface used by login/teacher-dashboard. */
 function DarkPanel({ children, className = "" }) {
   return (
     <section
@@ -345,11 +309,8 @@ function DarkPanel({ children, className = "" }) {
   );
 }
 
-/** Achievement medallion — gold-ring circular icon reused for every icon on the page. */
 function Medallion({ icon: Icon, size = 64, tone = "dark" }) {
-  const ring = tone === "dark"
-    ? "from-[#F0C285] to-[#6B2A1F]"
-    : "from-[#E3A860] to-[#B5702F]";
+  const ring = tone === "dark" ? "from-[#F0C285] to-[#6B2A1F]" : "from-[#E3A860] to-[#B5702F]";
   const inner = tone === "dark" ? "#3B1410" : "#FBF5EF";
   const iconColor = tone === "dark" ? "#F3D9B1" : "#6B2A1F";
   return (
@@ -363,22 +324,10 @@ function Medallion({ icon: Icon, size = 64, tone = "dark" }) {
   );
 }
 
-/** Thick rounded progress track — matches the "Experience Points" bar on the student dashboard. */
-function ProgressTrack({ progress, tone = "light" }) {
-  return (
-    <div className={`h-2.5 w-full rounded-full ${tone === "dark" ? "bg-white/10" : "bg-[#F1E4D8]"}`}>
-      <motion.div
-        className="h-full rounded-full bg-gradient-to-r from-[#E3A860] to-[#6B2A1F]"
-        style={{ scaleX: progress, transformOrigin: "left" }}
-      />
-    </div>
-  );
-}
+/* -------------------------------------------------------------------- */
+/*  Carousel 3D Component                                                */
+/* -------------------------------------------------------------------- */
 
-/* -------------------------------------------------------------------- */
-/*  Signature #1 — drag-to-rotate 3D carousel                           */
-/*  (rebuilt off the teacher dashboard's "Drag or use arrows to rotate") */
-/* -------------------------------------------------------------------- */
 function Carousel3D({ items }) {
   const [active, setActive] = useState(0);
   const [radius, setRadius] = useState(230);
@@ -391,13 +340,9 @@ function Carousel3D({ items }) {
 
   useEffect(() => {
     const update = () => {
-      if (window.innerWidth < 640) {
-        setRadius(130);
-      } else if (window.innerWidth < 1024) {
-        setRadius(180);
-      } else {
-        setRadius(230);
-      }
+      if (window.innerWidth < 640) setRadius(130);
+      else if (window.innerWidth < 1024) setRadius(180);
+      else setRadius(230);
     };
     update();
     window.addEventListener("resize", update);
@@ -406,7 +351,6 @@ function Carousel3D({ items }) {
 
   const go = (dir) => setActive((a) => a + dir);
 
-  // Rotation spring physics driving the 3D ring rotation
   const currentAngle = -active * angleStep;
   const springAngle = useSpring(currentAngle, { stiffness: 150, damping: 20 });
 
@@ -426,16 +370,12 @@ function Carousel3D({ items }) {
     const endX = e.clientX || (e.changedTouches && e.changedTouches[0].clientX) || 0;
     const diff = endX - dragStartX.current;
 
-    if (diff < -35) {
-      go(1);
-    } else if (diff > 35) {
-      go(-1);
-    }
+    if (diff < -35) go(1);
+    else if (diff > 35) go(-1);
   };
 
   return (
     <div className="mx-auto max-w-4xl select-none">
-      {/* 3D Revolving Ring Container */}
       <div
         className="relative flex h-[300px] items-center justify-center sm:h-[340px] cursor-grab active:cursor-grabbing"
         style={{ perspective: 1000 }}
@@ -443,7 +383,7 @@ function Carousel3D({ items }) {
         onPointerUp={handlePointerUp}
       >
         <motion.div
-          className="relative w-64 h-[220px] sm:w-72 sm:h-[240px]"
+          className="relative w-64 h-[220px] sm:w-72 sm:h-[240px] transform-gpu"
           style={{
             transformStyle: "preserve-3d",
             rotateX: reduce ? 0 : 6,
@@ -462,31 +402,20 @@ function Carousel3D({ items }) {
                 className="absolute inset-0 transition-all duration-300"
                 style={{
                   transformStyle: "preserve-3d",
-                  transform: reduce
-                    ? undefined
-                    : `rotateY(${cardAngle}deg) translateZ(${radius}px)`,
+                  transform: reduce ? undefined : `rotateY(${cardAngle}deg) translateZ(${radius}px)`,
                   opacity: reduce
-                    ? isActive
-                      ? 1
-                      : 0.35
-                    : isActive
-                      ? 1
-                      : Math.abs(normalizedDiff) > 90
-                        ? 0.25
-                        : 0.55,
+                    ? isActive ? 1 : 0.35
+                    : isActive ? 1 : Math.abs(normalizedDiff) > 90 ? 0.25 : 0.55,
                   pointerEvents: isActive ? "auto" : "none",
                   backfaceVisibility: "hidden",
                 }}
               >
                 <motion.div
-                  animate={{
-                    scale: isActive ? 1 : 0.85,
-                    y: isActive ? -4 : 0,
-                  }}
+                  animate={{ scale: isActive ? 1 : 0.85, y: isActive ? -4 : 0 }}
                   transition={{ duration: 0.3 }}
                   className="h-full w-full"
                 >
-                  <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-6 text-center backdrop-blur-md shadow-[0_20px_50px_-20px_rgba(0,0,0,0.5)]">
+                  <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-6 text-center shadow-[0_20px_50px_-20px_rgba(0,0,0,0.5)]">
                     {isActive && <Pill icon={Sparkles} tone="dark">Core Feature</Pill>}
                     <div className="mt-4 flex justify-center">
                       <Medallion icon={Icon} size={56} tone="dark" />
@@ -520,7 +449,9 @@ function Carousel3D({ items }) {
                 key={item.title}
                 onClick={() => setActive(i)}
                 aria-label={`Go to ${item.title}`}
-                className={`h-1.5 rounded-full transition-all ${i === activeIdx ? "w-6 bg-gradient-to-r from-[#E3A860] to-[#6B2A1F]" : "w-1.5 bg-white/20"}`}
+                className={`h-1.5 rounded-full transition-all ${
+                  i === activeIdx ? "w-6 bg-gradient-to-r from-[#E3A860] to-[#6B2A1F]" : "w-1.5 bg-white/20"
+                }`}
               />
             );
           })}
@@ -545,7 +476,7 @@ function Carousel3D({ items }) {
 }
 
 /* -------------------------------------------------------------------- */
-/*  Main component                                                      */
+/*  Main Page Component                                                 */
 /* -------------------------------------------------------------------- */
 
 export default function AboutPage() {
@@ -553,143 +484,73 @@ export default function AboutPage() {
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end end"] });
   const xpWidth = useSpring(scrollYProgress, { stiffness: 90, damping: 24, mass: 0.4 });
-  const level = useTransform(scrollYProgress, (v) => Math.min(15, Math.max(1, Math.floor(v * 15) + 1)));
-  const [levelDisplay, setLevelDisplay] = useState(1);
   const [openFaq, setOpenFaq] = useState(null);
-
-  useEffect(() => level.on("change", (v) => setLevelDisplay(v)), [level]);
 
   return (
     <div ref={containerRef} className="font-body" style={{ background: "#FBF5EF", color: "#2B160E" }}>
-      <FontLoader />
-
-      {/* Thin oxblood top strip — matches the landing page exactly */}
+      {/* Top oxblood strip */}
       <div className="h-1.5 w-full bg-[#5C2418]" />
 
-      {/* Header — same nav shape as the real site */}
+      {/* Header */}
       <header className="sticky top-0 z-50 border-b border-[#2B160E]/8 bg-[#FBF5EF]/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 sm:px-10">
-          <Link
-            href="/"
-            className="font-heading text-xl font-extrabold text-[#6B2A1F]"
-          >
+          <Link href="/" className="font-heading text-xl font-extrabold text-[#6B2A1F]">
             GLP
           </Link>
           <nav className="hidden md:flex gap-8 text-sm font-semibold items-center">
             <motion.div whileHover={{ y: -3 }}>
-              <Link
-                href="/about"
-                className="relative text-[#6B2A1F]
-      after:absolute
-      after:left-0
-      after:-bottom-1
-      after:w-full
-      after:h-[2px]
-      after:bg-[#8b4513]"
-              >
+              <Link href="/about" className="relative text-[#6B2A1F] after:absolute after:left-0 after:-bottom-1 after:w-full after:h-[2px] after:bg-[#8b4513]">
                 About us
               </Link>
             </motion.div>
 
             <motion.div whileHover={{ y: -3 }}>
-              <Link
-                href="/courses"
-                className="
-      relative
-      after:absolute
-      after:left-0
-      after:-bottom-1
-      after:w-0
-      after:h-[2px]
-      after:bg-[#8b4513]
-      after:transition-all
-      after:duration-300
-      hover:after:w-full
-      hover:text-[#8b4513]
-      "
-              >
+              <Link href="/courses" className="relative after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-[2px] after:bg-[#8b4513] after:transition-all after:duration-300 hover:after:w-full hover:text-[#8b4513]">
                 Courses
               </Link>
             </motion.div>
 
             <motion.div whileHover={{ y: -3 }}>
-              <Link
-                href="/leaderboard"
-                className="
-      relative
-      after:absolute
-      after:left-0
-      after:-bottom-1
-      after:w-0
-      after:h-[2px]
-      after:bg-[#8b4513]
-      after:transition-all
-      after:duration-300
-      hover:after:w-full
-      hover:text-[#8b4513]
-      "
-              >
+              <Link href="/leaderboard" className="relative after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-[2px] after:bg-[#8b4513] after:transition-all after:duration-300 hover:after:w-full hover:text-[#8b4513]">
                 Leaderboards
               </Link>
             </motion.div>
 
             <motion.div whileHover={{ y: -3 }}>
-              <Link
-                href="#contact"
-                className="
-      relative
-      after:absolute
-      after:left-0
-      after:-bottom-1
-      after:w-0
-      after:h-[2px]
-      after:bg-[#8b4513]
-      after:transition-all
-      after:duration-300
-      hover:after:w-full
-      hover:text-[#8b4513]
-      "
-              >
+              <Link href="#contact" className="relative after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-[2px] after:bg-[#8b4513] after:transition-all after:duration-300 hover:after:w-full hover:text-[#8b4513]">
                 Contact us
               </Link>
             </motion.div>
           </nav>
           <div className="flex items-center gap-3">
             <Link href="/login">
-              <Button
-                variant="ghost"
-                className="hidden !px-4 !py-2 sm:inline-flex"
-              >
+              <Button variant="ghost" className="hidden !px-4 !py-2 sm:inline-flex">
                 Login
               </Button>
             </Link>
 
             <Link href="/signup">
-              <Button
-                variant="solid"
-                className="!px-4 !py-2"
-              >
+              <Button variant="solid" className="!px-4 !py-2">
                 Sign up
               </Button>
             </Link>
           </div>
         </div>
-        {/* Signature #2 — XP scroll bar with Level chip */}
+
+        {/* XP scroll bar & Level indicator */}
         <div className="relative h-1.5 w-full bg-[#F1E4D8]">
           <motion.div className="h-full origin-left bg-gradient-to-r from-[#E3A860] to-[#6B2A1F]" style={{ scaleX: xpWidth }} />
-          <div className="absolute right-3 top-2.5 hidden items-center gap-1 rounded-full bg-[#3B1410] px-2.5 py-1 text-[11px] font-heading font-bold text-white sm:flex">
-            <Flame size={11} className="text-[#E3A860]" /> Lv {levelDisplay}
-          </div>
+          <ScrollLevelBadge scrollYProgress={scrollYProgress} />
         </div>
       </header>
 
-      {/* ============================================================ */}
-      {/* 1. HERO — light, matches the landing page hero exactly        */}
-      {/* ============================================================ */}
+      {/* HERO SECTION */}
       <section className="relative overflow-hidden px-6 pb-20 pt-16 sm:px-10 sm:pt-20 lg:px-16">
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 lg:grid-cols-2">
           <motion.div initial="hidden" animate="show" variants={staggerParent}>
-            <motion.div variants={fadeUp}><Pill icon={Sparkles}>About · Gamified Learning Platform</Pill></motion.div>
+            <motion.div variants={fadeUp}>
+              <Pill icon={Sparkles}>About · Gamified Learning Platform</Pill>
+            </motion.div>
             <motion.h1 variants={fadeUp} className="font-heading mt-5 text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl md:text-6xl">
               Making learning
               <br />
@@ -707,24 +568,10 @@ export default function AboutPage() {
             </motion.div>
           </motion.div>
 
-          <motion.div
-            className="relative mx-auto w-full max-w-lg lg:max-w-xl"
-            animate={reduce ? undefined : { y: [0, -10, 0] }}
-            transition={reduce ? undefined : { duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <div className="absolute inset-4 rounded-3xl bg-[#F6D9C4] blur-2xl" />
+          {/* Steady & Larger Hero Image Showcase */}
+          <div className="relative mx-auto w-full max-w-xl lg:max-w-2xl">
+            <div className="pointer-events-none absolute -inset-5 rounded-[40px] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#E3A860]/25 via-[#6B2A1F]/10 to-transparent opacity-80" />
 
-            <div
-              className="
-absolute
-- inset-5
-rounded-[40px]
-bg-gradient-to-br
-from-[#E3A860]/20
-to-[#6B2A1F]/10
-blur-3xl
-"
-            />
             <div className="relative overflow-hidden rounded-2xl border border-[#2B160E]/10 bg-white p-2 shadow-2xl">
               <Image
                 src="/images/hero-platform.png"
@@ -732,18 +579,17 @@ blur-3xl
                 width={1200}
                 height={750}
                 priority
+                sizes="(max-width: 1024px) 100vw, 800px"
                 className="w-full rounded-xl object-cover shadow-sm"
               />
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       <SectionDivider />
 
-      {/* ============================================================ */}
-      {/* 2. OUR STORY — light                                          */}
-      {/* ============================================================ */}
+      {/* OUR STORY */}
       <section className="px-6 py-16 sm:px-10 lg:px-16">
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 lg:grid-cols-2">
           <Reveal from="left">
@@ -753,65 +599,29 @@ blur-3xl
             </p>
           </Reveal>
           <Reveal from="right" delay={0.1}>
-            <div className="relative mx-auto h-[320px] w-full max-w-md sm:h-[380px]">
-              {/* Student Dashboard (Back Image, Rotated -6 deg) */}
-              <div
-                className="
-absolute
-- inset-5
-rounded-[40px]
-bg-gradient-to-br
-from-[#E3A860]/20
-to-[#6B2A1F]/10
-blur-3xl
-"
-              />
+            {/* Steady & Larger Story Showcase */}
+            <div className="relative mx-auto h-[360px] w-full max-w-lg sm:h-[420px]">
+              <div className="pointer-events-none absolute -inset-5 rounded-[40px] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#E3A860]/20 via-[#6B2A1F]/10 to-transparent" />
 
-              <div className="absolute left-0 top-0 w-[82%] -rotate-6 rounded-2xl border border-[#2B160E]/10 bg-white p-1.5 shadow-[0_35px_80px_rgba(0,0,0,0.18)] transition-transform hover:-rotate-3">
+              <div className="absolute left-0 top-0 w-[82%] -rotate-6 rounded-2xl border border-[#2B160E]/10 bg-white p-1.5 shadow-[0_35px_80px_rgba(0,0,0,0.18)] transition-transform hover:-rotate-3 duration-300">
                 <Image
                   src="/images/student-dashboard.png"
                   alt="Student Dashboard"
                   width={800}
                   height={500}
-                  className="
-w-full
-rounded-xl
-object-cover
-transition-transform
-duration-700
-group-hover:scale-105
-"
+                  sizes="(max-width: 768px) 100vw, 500px"
+                  className="w-full rounded-xl object-cover"
                 />
               </div>
-              {/* Teacher Dashboard (Front Image) */}
 
-              <div
-                className="
-absolute
-- inset-5
-rounded-[40px]
-bg-gradient-to-br
-from-[#E3A860]/20
-to-[#6B2A1F]/10
-blur-3xl
-"
-              />
-
-
-              <div className="absolute bottom-2 right-0 w-[82%] rounded-2xl border border-[#2B160E]/10 bg-white p-1.5 shadow-2xl transition-transform hover:scale-105 z-10">
+              <div className="absolute bottom-2 right-0 w-[82%] rounded-2xl border border-[#2B160E]/10 bg-white p-1.5 shadow-2xl transition-transform hover:scale-105 duration-300 z-10">
                 <Image
                   src="/images/teacher-dashboard.png"
                   alt="Teacher Dashboard"
                   width={800}
                   height={500}
-                  className="
-w-full
-rounded-xl
-object-cover
-transition-transform
-duration-700
-group-hover:scale-105
-"
+                  sizes="(max-width: 768px) 100vw, 500px"
+                  className="w-full rounded-xl object-cover"
                 />
               </div>
             </div>
@@ -821,13 +631,14 @@ group-hover:scale-105
 
       <SectionDivider />
 
-      {/* ============================================================ */}
-      {/* 3. MISSION & VISION — dark panel begins                       */}
-      {/* ============================================================ */}
+      {/* MISSION & VISION */}
       <DarkPanel className="!pb-12">
         <motion.div
           className="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2"
-          initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }} variants={staggerParent}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={staggerParent}
         >
           {[
             { title: "Mission", icon: Rocket, body: "To make learning engaging, interactive, and rewarding through modern gamification techniques." },
@@ -837,7 +648,7 @@ group-hover:scale-105
               key={title}
               variants={fadeUp}
               whileHover={reduce ? undefined : { y: -6 }}
-              className="rounded-3xl border border-white/10 bg-white/[0.06] p-8 backdrop-blur-md transition-shadow hover:shadow-[0_20px_50px_-20px_rgba(227,168,96,0.4)]"
+              className="rounded-3xl border border-white/10 bg-white/[0.06] p-8 transition-shadow hover:shadow-[0_20px_50px_-20px_rgba(227,168,96,0.4)] transform-gpu"
             >
               <Medallion icon={icon} size={52} tone="dark" />
               <h3 className="font-heading mt-4 text-2xl font-bold text-white">{title}</h3>
@@ -847,9 +658,7 @@ group-hover:scale-105
         </motion.div>
       </DarkPanel>
 
-      {/* ============================================================ */}
-      {/* 4. WHY CHOOSE GLP — Signature carousel, still on dark panel   */}
-      {/* ============================================================ */}
+      {/* WHY CHOOSE GLP */}
       <DarkPanel className="!pt-12">
         <Reveal className="mx-auto max-w-2xl">
           <SectionHead eyebrow="Why Choose GLP" title="Built for the way students actually stay motivated." tone="dark" />
@@ -859,15 +668,12 @@ group-hover:scale-105
         </div>
       </DarkPanel>
 
-      {/* ============================================================ */}
-      {/* 5. HOW GLP WORKS — light timeline & collage showcase          */}
-      {/* ============================================================ */}
+      {/* HOW GLP WORKS */}
       <section className="px-6 py-20 sm:px-10 lg:px-16">
         <Reveal className="mx-auto max-w-2xl">
           <SectionHead eyebrow="How GLP Works" title="From enrolling to certificate, in one flow." />
         </Reveal>
         <div className="mx-auto mt-14 grid max-w-6xl grid-cols-1 items-center gap-12 lg:grid-cols-2">
-          {/* Step Timeline */}
           <div className="relative mx-auto w-full max-w-md">
             <div className="absolute left-[15px] top-0 h-full w-px bg-[#2B160E]/10" />
             <motion.div
@@ -890,64 +696,31 @@ group-hover:scale-105
             </ul>
           </div>
 
-          {/* Screenshot Collage Showcase */}
           <Reveal from="right">
-            <div className="relative mx-auto w-full max-w-md pt-10">
-              {/* Leaderboard Main */}
-
-              <div
-                className="
-absolute
-- inset-5
-rounded-[40px]
-bg-gradient-to-br
-from-[#E3A860]/20
-to-[#6B2A1F]/10
-blur-3xl
-"
-              />
+            {/* Steady & Larger How It Works Showcase */}
+            <div className="relative mx-auto w-full max-w-lg lg:max-w-xl pt-6">
+              <div className="pointer-events-none absolute -inset-5 rounded-[40px] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#E3A860]/20 via-[#6B2A1F]/10 to-transparent" />
               <div className="overflow-hidden rounded-2xl border border-[#2B160E]/10 bg-white p-2 shadow-2xl">
                 <Image
                   src="/images/leaderboard.png"
                   alt="Leaderboard"
                   width={800}
                   height={500}
-                  className="
-w-full
-rounded-xl
-object-cover
-transition-transform
-duration-700
-group-hover:scale-105
-"
+                  sizes="(max-width: 768px) 100vw, 600px"
+                  className="w-full rounded-xl object-cover"
                 />
               </div>
 
-              <div
-                className="
-absolute
-- inset-5
-rounded-[40px]
-bg-gradient-to-br
-from-[#E3A860]/20
-to-[#6B2A1F]/10
-blur-3xl
-"
-              />
-              {/* Flashcards Top Left Floating */}
-              <motion.div
-                animate={reduce ? undefined : { y: [0, -10, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-2 -left-6 w-[55%] rounded-xl border border-[#2B160E]/10 bg-white p-1.5 shadow-2xl z-10"
-              >
+              <div className="absolute -top-3 -left-4 w-[52%] sm:w-[48%] rounded-xl border border-[#2B160E]/10 bg-white p-1.5 shadow-2xl z-10">
                 <Image
                   src="/images/flashcards.png"
                   alt="Flashcards"
                   width={500}
                   height={320}
+                  sizes="(max-width: 768px) 60vw, 300px"
                   className="w-full rounded-md object-cover"
                 />
-              </motion.div>
+              </div>
             </div>
           </Reveal>
         </div>
@@ -955,59 +728,33 @@ blur-3xl
 
       <SectionDivider />
 
-      {/* ============================================================ */}
-      {/* 6 & 7. FEATURES FOR STUDENTS / TEACHERS — light                */}
-      {/* ============================================================ */}
-
-      {/* 6. FEATURES FOR STUDENTS */}
+      {/* FEATURES FOR STUDENTS */}
       <section className="px-6 py-14 sm:px-10 lg:px-16">
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 lg:grid-cols-2">
           <Reveal from="left">
-            <div className="relative mx-auto w-full max-w-md">
-              {/* Main Screenshot */}
-
-              <div
-                className="
-absolute
-- inset-5
-rounded-[40px]
-bg-gradient-to-br
-from-[#E3A860]/20
-to-[#6B2A1F]/10
-blur-3xl
-"
-              />
+            {/* Steady & Larger Student Features Showcase */}
+            <div className="relative mx-auto w-full max-w-lg lg:max-w-xl">
+              <div className="pointer-events-none absolute -inset-5 rounded-[40px] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#E3A860]/20 via-[#6B2A1F]/10 to-transparent" />
               <div className="overflow-hidden rounded-2xl border border-[#2B160E]/10 bg-white p-2 shadow-[0_35px_80px_rgba(0,0,0,0.18)]">
                 <Image
                   src="/images/explore-courses.png"
                   alt="Explore Courses"
                   width={800}
                   height={500}
-                  loading="eager"
-                  className="
-w-full
-rounded-xl
-object-cover
-transition-transform
-duration-700
-group-hover:scale-105
-"
+                  sizes="(max-width: 768px) 100vw, 600px"
+                  className="w-full rounded-xl object-cover"
                 />
               </div>
-              {/* Floating Lesson View */}
-              <motion.div
-                animate={reduce ? undefined : { y: [0, -8, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -bottom-6 -right-4 w-[55%] rounded-xl border border-[#2B160E]/10 bg-white p-1.5 shadow-2xl z-10"
-              >
+              <div className="absolute -bottom-6 -right-4 w-[52%] sm:w-[48%] rounded-xl border border-[#2B160E]/10 bg-white p-1.5 shadow-2xl z-10">
                 <Image
                   src="/images/lesson-view.png"
                   alt="Lesson View"
                   width={500}
                   height={320}
+                  sizes="(max-width: 768px) 60vw, 300px"
                   className="w-full rounded-md object-cover"
                 />
-              </motion.div>
+              </div>
             </div>
           </Reveal>
           <div>
@@ -1031,7 +778,7 @@ group-hover:scale-105
 
       <SectionDivider />
 
-      {/* 7. FEATURES FOR TEACHERS */}
+      {/* FEATURES FOR TEACHERS */}
       <section className="px-6 py-14 sm:px-10 lg:px-16">
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 lg:grid-cols-2">
           <div className="order-2 lg:order-1">
@@ -1051,50 +798,30 @@ group-hover:scale-105
             </motion.ul>
           </div>
           <Reveal from="right" className="order-1 lg:order-2">
-            <div className="relative mx-auto w-full max-w-md">
-              {/* Main Screenshot */}
-              <div
-                className="
-absolute
-- inset-5
-rounded-[40px]
-bg-gradient-to-br
-from-[#E3A860]/20
-to-[#6B2A1F]/10
-blur-3xl
-"
-              />
+            {/* Steady & Larger Teacher Features Showcase */}
+            <div className="relative mx-auto w-full max-w-lg lg:max-w-xl">
+              <div className="pointer-events-none absolute -inset-5 rounded-[40px] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#E3A860]/20 via-[#6B2A1F]/10 to-transparent" />
               <div className="overflow-hidden rounded-2xl border border-[#2B160E]/10 bg-white p-2 shadow-[0_35px_80px_rgba(0,0,0,0.18)]">
                 <Image
                   src="/images/teacher-dashboard.png"
                   alt="Teacher Dashboard"
                   width={800}
                   height={500}
-                  className="
-w-full
-rounded-xl
-object-cover
-transition-transform
-duration-700
-group-hover:scale-105
-"
+                  sizes="(max-width: 768px) 100vw, 600px"
+                  className="w-full rounded-xl object-cover"
                 />
               </div>
 
-              {/* Floating Quiz Results */}
-              <motion.div
-                animate={reduce ? undefined : { y: [0, -8, 0] }}
-                transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                className="absolute -bottom-6 -left-4 w-[55%] rounded-xl border border-[#2B160E]/10 bg-white p-1.5 shadow-2xl z-10"
-              >
+              <div className="absolute -bottom-6 -left-4 w-[52%] sm:w-[48%] rounded-xl border border-[#2B160E]/10 bg-white p-1.5 shadow-2xl z-10">
                 <Image
                   src="/images/quiz-results.png"
                   alt="Quiz Results"
                   width={500}
                   height={320}
+                  sizes="(max-width: 768px) 60vw, 300px"
                   className="w-full rounded-md object-cover"
                 />
-              </motion.div>
+              </div>
             </div>
           </Reveal>
         </div>
@@ -1102,43 +829,19 @@ group-hover:scale-105
 
       <SectionDivider />
 
-      {/* ============================================================ */}
-      {/* 8 & 9. GAMIFICATION SYSTEM + PLATFORM STATS — dark panel       */}
-      {/* (styled off the dashboard's "Overview Performance" cards)     */}
-      {/* ============================================================ */}
-      <DarkPanel>
-        <Reveal className="mx-auto max-w-2xl">
-          <SectionHead eyebrow="Gamification System" title="The mechanics behind the motivation." tone="dark" />
-        </Reveal>
-        <motion.div
-          className="mx-auto mt-12 grid max-w-4xl grid-cols-2 gap-6 sm:grid-cols-4"
-          initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }} variants={staggerParent}
-        >
-          {GAMIFICATION.map(({ icon, title, body }) => (
-            <motion.div key={title} variants={fadeUp} className="flex flex-col items-center text-center">
-              <Medallion icon={icon} size={80} tone="dark" />
-              <h3 className="mt-4 font-heading font-bold text-white">{title}</h3>
-              <p className="mt-1 text-sm text-white/55">{body}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-      </DarkPanel>
-
-      {/* ============================================================ */}
-      {/* 11. MEET THE TEAM — dark panel, glass + tilt + gold ring       */}
-      {/* ============================================================ */}
+      {/* MEET THE TEAM */}
       <DarkPanel>
         <Reveal className="mx-auto max-w-2xl">
           <SectionHead eyebrow="Meet the Team" title="The people behind GLP." tone="dark" />
         </Reveal>
         <div className="mx-auto mt-14 grid max-w-3xl grid-cols-1 gap-8 sm:grid-cols-2">
-          {TEAM.map((member) => <TeamCard key={member.name} {...member} reduce={reduce} />)}
+          {TEAM.map((member) => (
+            <TeamCard key={member.name} {...member} reduce={reduce} />
+          ))}
         </div>
       </DarkPanel>
 
-      {/* ============================================================ */}
-      {/* 12. INTERNSHIP DETAILS — light                                */}
-      {/* ============================================================ */}
+      {/* INTERNSHIP DETAILS */}
       <section className="px-6 py-20 sm:px-10 lg:px-16">
         <Reveal className="mx-auto max-w-2xl rounded-3xl border border-[#2B160E]/8 bg-white p-8 text-center shadow-sm sm:p-10">
           <div className="mx-auto"><Medallion icon={Boxes} size={56} tone="light" /></div>
@@ -1161,20 +864,16 @@ group-hover:scale-105
 
       <SectionDivider />
 
-      {/* ============================================================ */}
-      {/* 13. SUPERVISOR — light                                        */}
-      {/* ============================================================ */}
+      {/* SUPERVISOR */}
       <section className="px-6 py-8 sm:px-10 lg:px-16">
         <Reveal className="mx-auto max-w-xl rounded-3xl border border-[#2B160E]/8 bg-white p-8 text-center shadow-sm sm:p-10">
           <div className="mb-10 text-center">
             <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#8B4513]">
               Under the Supervision of
             </p>
-
             <h2 className="mt-3 font-heading text-4xl font-bold text-[#2B160E]">
               Project Supervisor
             </h2>
-
             <p className="mt-2 text-[#7A6A5F]">
               This internship project was developed under the guidance of our academic supervisor.
             </p>
@@ -1186,6 +885,7 @@ group-hover:scale-105
               alt="Dr. Sameer Babu M"
               width={128}
               height={128}
+              sizes="128px"
               className="h-full w-full object-cover"
             />
           </div>
@@ -1204,21 +904,19 @@ group-hover:scale-105
 
       <SectionDivider />
 
-      {/* ============================================================ */}
-      {/* 14. CONTACT — light                                           */}
-      {/* ============================================================ */}
+      {/* CONTACT */}
       <section className="px-6 py-20 sm:px-10 lg:px-16" id="contact">
         <Reveal className="mx-auto max-w-2xl">
           <div className="mb-16">
-            <SectionHead
-              eyebrow="Contact"
-              title="Get in touch."
-            />
+            <SectionHead eyebrow="Contact" title="Get in touch." />
           </div>
         </Reveal>
         <motion.div
           className="mx-auto mt-10 grid max-w-4xl grid-cols-2 gap-4 sm:grid-cols-5"
-          initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }} variants={staggerParent}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={staggerParent}
         >
           {[
             { icon: Mail, label: "Email" },
@@ -1228,7 +926,9 @@ group-hover:scale-105
             { icon: MapPin, label: "Location" },
           ].map(({ icon: Icon, label }) => (
             <motion.a
-              href="#" key={label} variants={fadeUp}
+              href="#"
+              key={label}
+              variants={fadeUp}
               whileHover={reduce ? undefined : { y: -4 }}
               whileTap={reduce ? undefined : { scale: 0.96 }}
               className="flex flex-col items-center gap-2 rounded-2xl border border-[#2B160E]/8 bg-white py-6 text-sm font-semibold shadow-sm transition-colors hover:border-[#E3A860]/60 hover:text-[#6B2A1F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6B2A1F] focus-visible:ring-offset-2"
@@ -1242,9 +942,7 @@ group-hover:scale-105
 
       <SectionDivider />
 
-      {/* ============================================================ */}
-      {/* 15. FAQ — light                                               */}
-      {/* ============================================================ */}
+      {/* FAQ */}
       <section className="px-6 py-20 sm:px-10 lg:px-16">
         <Reveal className="mx-auto max-w-2xl">
           <SectionHead eyebrow="FAQ" title="Common questions." />
@@ -1294,123 +992,61 @@ group-hover:scale-105
 }
 
 /* -------------------------------------------------------------------- */
-/*  Team card — glass + mouse tilt + gold ring avatar                   */
+/*  Optimized Team Card Component                                       */
 /* -------------------------------------------------------------------- */
-function TeamCard({
-  name,
-  role,
-  avatar,
-  cutout,
-  reduce,
-}) {
+
+function TeamCard({ name, role, avatar, cutout, reduce }) {
   const cardRef = useRef(null);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const rotateX = useSpring(x, { stiffness: 200, damping: 25 });
+  const rotateY = useSpring(y, { stiffness: 200, damping: 25 });
 
   function handleMouseMove(e) {
     if (reduce || !cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const px = (e.clientX - rect.left) / rect.width - 0.5;
     const py = (e.clientY - rect.top) / rect.height - 0.5;
-    setTilt({ x: py * -8, y: px * 8 });
+    x.set(py * -8);
+    y.set(px * 8);
+  }
+
+  function handleMouseLeave() {
+    x.set(0);
+    y.set(0);
   }
 
   return (
     <motion.div
       ref={cardRef}
       onMouseMove={handleMouseMove}
-      onMouseLeave={() => setTilt({ x: 0, y: 0 })}
+      onMouseLeave={handleMouseLeave}
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.4 }}
       transition={{ duration: 0.6 }}
-      style={{ rotateX: tilt.x, rotateY: tilt.y, transformPerspective: 800 }}
-      className="group relative rounded-3xl border border-white/10 bg-white/[0.06] pt-10 pb-7 px-7 text-center backdrop-blur-md"
+      style={{ rotateX, rotateY, transformPerspective: 800 }}
+      className="group relative rounded-3xl border border-white/10 bg-white/[0.06] pt-10 pb-7 px-7 text-center transform-gpu"
     >
       <div className="relative mx-auto h-40 w-40">
-        {/* Gold Ring */}
-        <div
-          className="
-    absolute
-    bottom-0
-    left-1/2
-    z-20
-
-    h-40
-    w-40
-    -translate-x-1/2
-
-    overflow-hidden
-    rounded-full
-
-    border-[6px]
-    border-[#E3A860]
-
-    bg-gradient-to-br
-    from-[#6B2A1F]
-    via-[#4B2115]
-    to-[#2B160E]
-
-    shadow-[0_15px_35px_rgba(0,0,0,0.35)]
-    before:absolute
-    before:inset-0
-    before:rounded-full
-    before:bg-[radial-gradient(circle,rgba(227,168,96,0.18)_0%,transparent_70%)]
-
-    transition-all
-    duration-700
-    ease-[cubic-bezier(0.22,1,0.36,1)]
-
-    group-hover:scale-110
-    group-hover:border-[#FFD27D]
-    group-hover:shadow-[0_0_70px_rgba(227,168,96,0.9)]
-  "
-        >
-          {/* Normal Avatar */}
+        <div className="absolute bottom-0 left-1/2 z-20 h-40 w-40 -translate-x-1/2 overflow-hidden rounded-full border-[6px] border-[#E3A860] bg-gradient-to-br from-[#6B2A1F] via-[#4B2115] to-[#2B160E] shadow-[0_15px_35px_rgba(0,0,0,0.35)] before:absolute before:inset-0 before:rounded-full before:bg-[radial-gradient(circle,rgba(227,168,96,0.18)_0%,transparent_70%)] transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110 group-hover:border-[#FFD27D] group-hover:shadow-[0_0_70px_rgba(227,168,96,0.9)]">
           <Image
             src={avatar}
             alt={name}
             fill
             sizes="160px"
-            loading="eager"
-            className="
-    object-cover
-    transition-all
-    duration-300
-    group-hover:opacity-0
-  "
+            className="object-cover transition-all duration-300 group-hover:opacity-0"
           />
         </div>
 
-        {/* PNG Cutout */}
         <Image
           src={cutout}
           alt={name}
           width={260}
           height={260}
-          className="
-    absolute
-    bottom-0
-    left-1/2
-    z-30
-    w-[220px]
-    -translate-x-1/2
-
-    opacity-0
-    translate-y-8
-    scale-50
-
-    object-contain
-
-    transition-all
-    duration-700
-    ease-[cubic-bezier(0.22,1,0.36,1)]
-
-    group-hover:opacity-100
-    group-hover:scale-[1.7]
-    group-hover:-translate-y-14
-
-    pointer-events-none
-  "
+          sizes="220px"
+          className="absolute bottom-0 left-1/2 z-30 w-[220px] -translate-x-1/2 opacity-0 translate-y-8 scale-50 object-contain transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-100 group-hover:scale-[1.7] group-hover:-translate-y-14 pointer-events-none"
         />
       </div>
 
@@ -1419,7 +1055,8 @@ function TeamCard({
       <div className="mt-4 flex justify-center gap-3">
         {[Mail, Phone].map((Icon, i) => (
           <motion.a
-            key={i} href="#"
+            key={i}
+            href="#"
             whileHover={reduce ? undefined : { y: -3 }}
             whileTap={reduce ? undefined : { scale: 0.9 }}
             className="rounded-full border border-white/15 p-2 text-[#F3D9B1] transition-colors hover:border-[#E3A860] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E3A860]"

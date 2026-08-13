@@ -4,8 +4,17 @@ import authService from "@/services/authService";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  useReducedMotion,
+  useMotionValue,
+  useSpring,
+} from "framer-motion";
 import { GraduationCap, Eye, EyeOff, AlertCircle } from "lucide-react";
+
+// Static array defined outside component render cycle
+const PARTICLES = Array.from({ length: 8 });
 
 export default function LoginPage() {
   const router = useRouter();
@@ -18,16 +27,26 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // MOUSE POSITION STATE — start centered so the glow is already
-  // visible on load instead of snapping in from off-screen on first move.
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  // DIRECT MOTION VALUES (Bypasses React re-renders completely on mouse move)
+  const mouseX = useMotionValue(-300);
+  const mouseY = useMotionValue(-300);
+
+  const springX = useSpring(mouseX, { stiffness: 80, damping: 25, restDelta: 0.001 });
+  const springY = useSpring(mouseY, { stiffness: 80, damping: 25, restDelta: 0.001 });
 
   useEffect(() => {
-    setMousePosition({
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2,
-    });
-  }, []);
+    if (typeof window !== "undefined") {
+      mouseX.set(window.innerWidth / 2 - 300);
+      mouseY.set(window.innerHeight / 2 - 300);
+    }
+  }, [mouseX, mouseY]);
+
+  const handleMouseMove = (e) => {
+    if (prefersReducedMotion) return;
+    // Updates MotionValue directly without setting React state
+    mouseX.set(e.clientX - 300);
+    mouseY.set(e.clientY - 300);
+  };
 
   const handleLogin = async () => {
     if (isLoading) return;
@@ -60,34 +79,24 @@ export default function LoginPage() {
 
   return (
     <div
-      // MOUSE GLOW TRACKING ON OUTERMOST CONTAINER
-      onMouseMove={(e) => {
-        if (prefersReducedMotion) return;
-        setMousePosition({ x: e.clientX, y: e.clientY });
-      }}
+      onMouseMove={handleMouseMove}
       className="relative min-h-screen bg-gradient-to-br from-[#2b0c07] via-[#3b130d] to-[#5c2412] overflow-hidden flex items-center justify-center"
     >
-      {/* MOUSE-FOLLOWING PREMIUM GLOW EFFECT */}
+      {/* HARDWARE-ACCELERATED RADIAL GLOW (No heavy blur filter) */}
       {!prefersReducedMotion && (
         <motion.div
-          animate={{
-            x: mousePosition.x - 300,
-            y: mousePosition.y - 300,
+          style={{
+            x: springX,
+            y: springY,
           }}
-          transition={{
-            type: "spring",
-            damping: 25,
-            stiffness: 80,
-            restDelta: 0.001,
-          }}
-          className="absolute w-[600px] h-[600px] bg-[#8b4513] opacity-20 blur-[140px] rounded-full pointer-events-none left-0 top-0 z-0"
+          className="absolute w-[600px] h-[600px] pointer-events-none left-0 top-0 z-0 transform-gpu rounded-full bg-[radial-gradient(circle_at_center,_rgba(139,69,19,0.35)_0%,_transparent_70%)]"
         />
       )}
 
-      {/* EXPANDED MULTI-PARTICLE FLOATING BACKGROUND SYSTEM */}
+      {/* FLOATING BACKGROUND PARTICLES */}
       {!prefersReducedMotion && (
         <div className="absolute inset-0 pointer-events-none hidden md:block overflow-hidden">
-          {[...Array(8)].map((_, i) => (
+          {PARTICLES.map((_, i) => (
             <motion.div
               key={i}
               animate={{
@@ -99,7 +108,7 @@ export default function LoginPage() {
                 duration: 4 + i,
                 ease: "easeInOut",
               }}
-              className="absolute w-3 h-3 rounded-full bg-[#d7a46b] blur-sm"
+              className="absolute w-3 h-3 rounded-full bg-[#d7a46b] blur-sm transform-gpu"
               style={{
                 left: `${10 + i * 11}%`,
                 top: `${15 + i * 9}%`,
@@ -121,7 +130,7 @@ export default function LoginPage() {
 
       {/* MAIN SPLIT LAYOUT WRAPPER GRID */}
       <div className="relative z-10 max-w-7xl w-full min-h-screen px-4 sm:px-6 lg:px-12 py-20 lg:py-0 grid lg:grid-cols-2 items-center gap-10 lg:gap-16">
-        {/* HERO CONTENT (LEFT SIDE) — desktop only */}
+        {/* HERO CONTENT (LEFT SIDE) */}
         <div className="hidden lg:block space-y-6">
           <motion.div
             initial={{ opacity: 0, x: -40 }}
@@ -146,7 +155,6 @@ export default function LoginPage() {
               Continue your learning journey, track XP, unlock achievements, and climb your department&apos;s leaderboard.
             </p>
 
-            {/* FLOATING XP BADGE */}
             <div className="inline-flex items-center gap-2 mt-8 px-5 py-3 rounded-full border border-[#d7a46b]/20 bg-[#8b4513]/20 text-[#f3d4a2] text-sm font-semibold shadow-md">
               🏆 Track XP • Earn Badges
             </div>
@@ -159,12 +167,10 @@ export default function LoginPage() {
             initial={{ opacity: 0, y: 40, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="relative z-10 bg-white/5 backdrop-blur-xl border border-[#8b4513]/40 shadow-2xl max-w-[500px] w-full p-6 sm:p-8 rounded-2xl hover:shadow-[0_0_100px_rgba(139,69,19,0.45)] transition-shadow duration-500 overflow-hidden"
+            className="relative z-10 bg-white/5 backdrop-blur-md border border-[#8b4513]/40 shadow-2xl max-w-[500px] w-full p-6 sm:p-8 rounded-2xl hover:shadow-[0_0_80px_rgba(139,69,19,0.35)] transition-shadow duration-500 overflow-hidden transform-gpu"
           >
-            {/* PREMIUM INSET BORDER OUTLINE */}
             <div className="absolute inset-0 rounded-2xl border border-[#d7a46b]/10 pointer-events-none" />
 
-            {/* FLOATING & ROTATING GRADUATION CAP ICON */}
             <motion.div
               animate={
                 prefersReducedMotion
@@ -172,14 +178,13 @@ export default function LoginPage() {
                   : { y: [0, -8, 0], rotate: [0, 4, 0, -4, 0] }
               }
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              className="flex justify-center mb-4"
+              className="flex justify-center mb-4 transform-gpu"
             >
               <div className="bg-[#8b4513] p-4 rounded-full shadow-lg border border-white/5">
                 <GraduationCap size={32} className="text-white" />
               </div>
             </motion.div>
 
-            {/* HEADING & SUBTITLE */}
             <div className="text-center mb-6">
               <h2 className="text-white text-2xl sm:text-3xl font-bold tracking-wide">
                 Welcome Back
@@ -189,14 +194,12 @@ export default function LoginPage() {
               </p>
             </div>
 
-            {/* XP / ACHIEVEMENTS BADGE */}
             <div className="flex justify-center mb-6">
               <div className="px-4 py-1.5 rounded-full bg-[#8b4513]/30 border border-[#d7a46b]/20 text-[#f3d4a2] text-xs font-semibold tracking-wide text-center">
                 🎮 XP • Achievements • Leaderboards
               </div>
             </div>
 
-            {/* INLINE ERROR — replaces the native alert() for a calmer, on-brand failure state */}
             <AnimatePresence>
               {errorMessage && (
                 <motion.div
@@ -214,11 +217,10 @@ export default function LoginPage() {
               )}
             </AnimatePresence>
 
-            {/* ROLE */}
             <div className="mb-4">
               <select
                 disabled={isLoading}
-                className="w-full p-3 bg-black/25 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#d7a46b] focus:scale-[1.01] focus-visible:ring-2 focus-visible:ring-[#d7a46b]/60 hover:border-[#d7a46b]/50 focus:shadow-lg focus:shadow-[#8b4513]/30 transition-all disabled:opacity-60"
+                className="w-full p-3 bg-black/25 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#d7a46b] focus-visible:ring-2 focus-visible:ring-[#d7a46b]/60 hover:border-[#d7a46b]/50 transition-all disabled:opacity-60"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
               >
@@ -231,20 +233,18 @@ export default function LoginPage() {
               </select>
             </div>
 
-            {/* EMAIL */}
             <div className="mb-4">
               <input
                 type="email"
                 placeholder="Email Address"
                 disabled={isLoading}
                 onKeyDown={handleKeyDown}
-                className="w-full p-3 bg-black/25 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#d7a46b] focus:scale-[1.01] focus-visible:ring-2 focus-visible:ring-[#d7a46b]/60 hover:border-[#d7a46b]/50 focus:shadow-lg focus:shadow-[#8b4513]/30 transition-all disabled:opacity-60"
+                className="w-full p-3 bg-black/25 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#d7a46b] focus-visible:ring-2 focus-visible:ring-[#d7a46b]/60 hover:border-[#d7a46b]/50 transition-all disabled:opacity-60"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
-            {/* PASSWORD — with show/hide toggle */}
             <div className="mb-6">
               <div className="relative">
                 <input
@@ -252,7 +252,7 @@ export default function LoginPage() {
                   placeholder="Password"
                   disabled={isLoading}
                   onKeyDown={handleKeyDown}
-                  className="w-full p-3 pr-11 bg-black/25 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#d7a46b] focus:scale-[1.01] focus-visible:ring-2 focus-visible:ring-[#d7a46b]/60 hover:border-[#d7a46b]/50 focus:shadow-lg focus:shadow-[#8b4513]/30 transition-all disabled:opacity-60"
+                  className="w-full p-3 pr-11 bg-black/25 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#d7a46b] focus-visible:ring-2 focus-visible:ring-[#d7a46b]/60 hover:border-[#d7a46b]/50 transition-all disabled:opacity-60"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
@@ -268,15 +268,13 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* SIGN IN BUTTON */}
             <motion.button
               whileHover={isLoading ? {} : { scale: 1.02 }}
               whileTap={isLoading ? {} : { scale: 0.98 }}
               onClick={handleLogin}
               disabled={isLoading}
-              className="group relative overflow-hidden w-full bg-[#431b11] text-white py-3.5 rounded-lg text-lg sm:text-xl font-semibold shadow-md hover:bg-[#522216] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d7a46b]/70 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="group relative overflow-hidden w-full bg-[#431b11] text-white py-3.5 rounded-lg text-lg sm:text-xl font-semibold shadow-md hover:bg-[#522216] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d7a46b]/70 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 transform-gpu"
             >
-              {/* Shine Sweep Overlay */}
               <span className="absolute top-0 left-[-100%] w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:left-[100%] transition-all duration-1000 ease-in-out" />
 
               {isLoading ? (
@@ -296,7 +294,6 @@ export default function LoginPage() {
               )}
             </motion.button>
 
-            {/* FOOTER LINKS */}
             <div className="text-center mt-6">
               <p className="text-gray-300/90 text-sm mb-3">
                 Forgot password? Contact your department
