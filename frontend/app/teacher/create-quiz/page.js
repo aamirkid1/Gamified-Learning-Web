@@ -39,21 +39,20 @@ export default function CreateQuiz() {
     loadLessons();
   }, []);
 
-  const loadCourses = async () => {
-    try {
-      const user = JSON.parse(
-        localStorage.getItem("user") || "{}"
-      );
+const loadCourses = async () => {
+  try {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-      const response = await fetch(
-  `${API_URL}/courses/teacher/${user.id}`
-);
-      const data = await res.json();
-      setCourses(data);
-    } catch (error) {
-      console.error("Error loading courses:", error);
-    }
-  };
+    const res = await fetch(
+      `${API_URL}/courses/teacher/${user.id}`
+    );
+
+    const data = await res.json();
+    setCourses(data);
+  } catch (error) {
+    console.error("Error loading courses:", error);
+  }
+};
 
   const loadLessons = async () => {
     try {
