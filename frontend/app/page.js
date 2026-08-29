@@ -110,8 +110,8 @@ items-center
             }}
           >
             <Link
-    href="/about"
-    className="
+              href="/about"
+              className="
       relative
       after:absolute
       after:left-0
@@ -124,12 +124,12 @@ items-center
       hover:after:w-full
       hover:text-[#8b4513]
     "
-  >
-    About us
-  </Link>
+            >
+              About us
+            </Link>
           </motion.div>
 
-          <motion.div
+          {/* <motion.div
             whileHover={{
               y: -3,
             }}
@@ -152,6 +152,32 @@ items-center
             >
               Courses
             </Link>
+          </motion.div> */}
+
+
+          <motion.div
+            whileHover={{
+              y: -3,
+            }}
+          >
+            <span
+              className="
+      relative
+      after:absolute
+      after:left-0
+      after:-bottom-1
+      after:w-0
+      after:h-[2px]
+      after:bg-[#8b4513]
+      after:transition-all
+      after:duration-300
+      hover:after:w-full
+      hover:text-[#8b4513]
+      cursor-default
+    "
+            >
+              Courses
+            </span>
           </motion.div>
 
           <motion.div
@@ -293,12 +319,16 @@ sm:gap-4
             About Us
           </Link>
 
-          <Link
+          {/* <Link
             href="/courses"
             className="block font-medium"
           >
             Courses
-          </Link>
+          </Link> */}
+
+          <span className="block font-medium cursor-default">
+            Courses
+          </span>
 
           <Link
             href="/leaderboard"
@@ -455,7 +485,7 @@ mt-8
                 scale: 0.95,
               }}
             >
-              <Link
+              {/* <Link
                 href="/courses"
                 className="
         border
@@ -468,7 +498,21 @@ mt-8
       "
               >
                 Explore Courses
-              </Link>
+              </Link> */}
+
+              <span
+                className="
+    border
+    px-8
+    py-4
+    rounded-lg
+    cursor-default
+    inline-block
+    text-gray-500
+  "
+              >
+                Explore Courses
+              </span>
             </motion.div>
 
           </div>

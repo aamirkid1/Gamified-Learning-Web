@@ -164,13 +164,13 @@ function Reveal({ children, className = "", from = "up", delay = 0 }) {
   const variants = reduce
     ? { hidden: { opacity: 1 }, show: { opacity: 1 } }
     : {
-        hidden: {
-          opacity: 0,
-          y: from === "up" ? 30 : from === "down" ? -30 : 0,
-          x: from === "left" ? -36 : from === "right" ? 36 : 0,
-        },
-        show: { opacity: 1, y: 0, x: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1], delay } },
-      };
+      hidden: {
+        opacity: 0,
+        y: from === "up" ? 30 : from === "down" ? -30 : 0,
+        x: from === "left" ? -36 : from === "right" ? 36 : 0,
+      },
+      show: { opacity: 1, y: 0, x: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1], delay } },
+    };
 
   return (
     <motion.div
@@ -250,9 +250,8 @@ function SectionHead({ eyebrow, title, tone = "light", center = true }) {
       <div className={`inline-flex items-center gap-3 ${center ? "justify-center" : ""}`}>
         <span className="h-7 w-[5px] rounded-full bg-gradient-to-b from-[#F3C27A] via-[#E3A860] to-[#6B2A1F]" />
         <span
-          className={`font-heading text-lg sm:text-xl font-bold uppercase tracking-[0.22em] ${
-            tone === "dark" ? "text-[#F0C285]" : "text-[#B5702F]"
-          }`}
+          className={`font-heading text-lg sm:text-xl font-bold uppercase tracking-[0.22em] ${tone === "dark" ? "text-[#F0C285]" : "text-[#B5702F]"
+            }`}
         >
           {eyebrow}
         </span>
@@ -260,9 +259,8 @@ function SectionHead({ eyebrow, title, tone = "light", center = true }) {
 
       {title && (
         <h2
-          className={`font-heading mt-5 text-5xl sm:text-6xl font-extrabold leading-[1.05] tracking-tight ${
-            tone === "dark" ? "text-white" : "text-[#2B160E]"
-          }`}
+          className={`font-heading mt-5 text-5xl sm:text-6xl font-extrabold leading-[1.05] tracking-tight ${tone === "dark" ? "text-white" : "text-[#2B160E]"
+            }`}
         >
           {title}
         </h2>
@@ -449,9 +447,8 @@ function Carousel3D({ items }) {
                 key={item.title}
                 onClick={() => setActive(i)}
                 aria-label={`Go to ${item.title}`}
-                className={`h-1.5 rounded-full transition-all ${
-                  i === activeIdx ? "w-6 bg-gradient-to-r from-[#E3A860] to-[#6B2A1F]" : "w-1.5 bg-white/20"
-                }`}
+                className={`h-1.5 rounded-full transition-all ${i === activeIdx ? "w-6 bg-gradient-to-r from-[#E3A860] to-[#6B2A1F]" : "w-1.5 bg-white/20"
+                  }`}
               />
             );
           })}
@@ -504,10 +501,16 @@ export default function AboutPage() {
               </Link>
             </motion.div>
 
-            <motion.div whileHover={{ y: -3 }}>
+            {/* <motion.div whileHover={{ y: -3 }}>
               <Link href="/courses" className="relative after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-[2px] after:bg-[#8b4513] after:transition-all after:duration-300 hover:after:w-full hover:text-[#8b4513]">
                 Courses
               </Link>
+            </motion.div> */}
+
+            <motion.div whileHover={{ y: -3 }}>
+              <span className="relative after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-[2px] after:bg-[#8b4513] after:transition-all after:duration-300 hover:after:w-full hover:text-[#8b4513] cursor-default">
+                Courses
+              </span>
             </motion.div>
 
             <motion.div whileHover={{ y: -3 }}>
