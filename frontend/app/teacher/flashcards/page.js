@@ -1,6 +1,24 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { API_URL } from "@/lib/api";
+
+const getStoredUser = () => {
+  try {
+    const storedUser = localStorage.getItem("user");
+
+    if (!storedUser) {
+      return null;
+    }
+
+    return JSON.parse(storedUser);
+  } catch (error) {
+    console.error("Invalid user data in localStorage:", error);
+    localStorage.removeItem("user");
+    return null;
+  }
+};
+
 
 export default function TeacherFlashcardsPage() {
   const [deckName, setDeckName] = useState("");
@@ -25,12 +43,15 @@ export default function TeacherFlashcardsPage() {
 
   const fetchDecks = async () => {
     try {
-      const user = JSON.parse(
-  localStorage.getItem("user") || "{}"
-);
+      const user = getStoredUser();
+
+if (!user?.id) {
+  console.error("User not found. Please log in again.");
+  return;
+}
 
 const response = await fetch(
-  `http://localhost:3000/flashcards/decks/teacher/${user.id}`
+  `${API_URL}/flashcards/decks/teacher/${user.id}`
 );
 
       const data = await response.json();
@@ -49,12 +70,15 @@ const response = await fetch(
 
   const fetchCourses = async () => {
     try {
-      const user = JSON.parse(
-  localStorage.getItem("user") || "{}"
-);
+      const user = getStoredUser();
+
+if (!user?.id) {
+  console.error("User not found. Please log in again.");
+  return;
+}
 
 const response = await fetch(
-  `http://localhost:3000/courses/teacher/${user.id}`
+  `${API_URL}/courses/teacher/${user.id}`
 );
 
       const data = await response.json();
@@ -68,8 +92,8 @@ const response = await fetch(
   const fetchCards = async (deckId) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/flashcards/decks/${deckId}/cards`
-      );
+  `${API_URL}/flashcards/decks/${deckId}/cards`
+);
 
       const cards = await response.json();
 
@@ -98,12 +122,15 @@ const response = await fetch(
     }
 
     try {
-      const user = JSON.parse(
-  localStorage.getItem("user") || "{}"
-);
+      const user = getStoredUser();
+
+if (!user?.id) {
+  alert("Please log in again.");
+  return;
+}
 
 const response = await fetch(
-  "http://localhost:3000/flashcards/decks",
+  `${API_URL}/flashcards/decks`,
   {
     method: "POST",
     headers: {
@@ -135,11 +162,11 @@ const response = await fetch(
   const handleDeleteDeck = async (deckId) => {
     try {
       await fetch(
-        `http://localhost:3000/flashcards/decks/${deckId}`,
-        {
-          method: "DELETE",
-        }
-      );
+  `${API_URL}/flashcards/decks/${deckId}`,
+  {
+    method: "DELETE",
+  }
+);
 
       setDecks(
         decks.filter(
@@ -161,9 +188,9 @@ const response = await fetch(
 
     try {
       await fetch(
-        "http://localhost:3000/flashcards/cards",
-        {
-          method: "POST",
+  `${API_URL}/flashcards/cards`,
+  {
+    method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
@@ -189,7 +216,7 @@ const response = await fetch(
   const handleDeleteCard = async (cardId) => {
     try {
       await fetch(
-        `http://localhost:3000/flashcards/cards/${cardId}`,
+        `${API_URL}/flashcards/cards/${cardId}`,
         {
           method: "DELETE",
         }
@@ -212,7 +239,7 @@ const response = await fetch(
   const handleUpdateCard = async () => {
     try {
       await fetch(
-        `http://localhost:3000/flashcards/cards/${editingCardId}`,
+         `${API_URL}/flashcards/cards/${editingCardId}`,
         {
           method: "PUT",
           headers: {

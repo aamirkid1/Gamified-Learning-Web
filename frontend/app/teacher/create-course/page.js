@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { API_URL } from "@/lib/api";
 
 export default function CreateCourse() {
   const [title, setTitle] = useState("");
@@ -22,12 +23,12 @@ export default function CreateCourse() {
       );
 
       const uploadRes = await fetch(
-        "http://localhost:3000/upload/course-image",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+  `${API_URL}/upload/course-image`,
+  {
+    method: "POST",
+    body: formData,
+  }
+);
 
       const uploadData =
         await uploadRes.json();
@@ -42,7 +43,7 @@ if (!user.id) {
   return;
 }
 
-const response = await fetch("http://localhost:3000/courses", {
+const response = await fetch(`${API_URL}/courses`, {
   method: "POST",
   headers: {
     "Content-Type": "application/json",

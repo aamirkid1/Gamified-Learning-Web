@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { API_URL } from "@/lib/api";
 import lessonService from "../../../services/lessonService";
 
 const TIPS = [
@@ -61,7 +62,8 @@ export default function CreateLesson() {
       const user = JSON.parse(localStorage.getItem("user") || "{}");
 
       const response = await fetch(
-        `http://localhost:3000/courses/teacher/${user.id}`
+        `${API_URL}/courses/teacher/${user.id}`
+
       );
       const data = await response.json();
       setCourses(data);

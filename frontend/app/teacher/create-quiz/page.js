@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import quizService from "@/services/quizService";
+import { API_URL } from "@/lib/api";
 import { 
   BookOpen, 
   FileQuestion, 
@@ -44,9 +45,9 @@ export default function CreateQuiz() {
         localStorage.getItem("user") || "{}"
       );
 
-      const res = await fetch(
-        `http://localhost:3000/courses/teacher/${user.id}`
-      );
+      const response = await fetch(
+  `${API_URL}/courses/teacher/${user.id}`
+);
       const data = await res.json();
       setCourses(data);
     } catch (error) {
@@ -61,7 +62,7 @@ export default function CreateQuiz() {
       );
 
       const courseRes = await fetch(
-        `http://localhost:3000/courses/teacher/${user.id}`
+        `${API_URL}/courses/teacher/${user.id}`
       );
 
       const teacherCourses = await courseRes.json();
@@ -70,7 +71,7 @@ export default function CreateQuiz() {
 
       for (const course of teacherCourses) {
         const res = await fetch(
-          `http://localhost:3000/lessons/course/${course.id}`
+          `${API_URL}/lessons/course/${course.id}`
         );
 
         const lessons = await res.json();

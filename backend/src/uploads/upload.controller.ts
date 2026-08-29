@@ -29,9 +29,12 @@ export class UploadController {
   uploadFile(
     @UploadedFile() file: Express.Multer.File,
   ) {
+    const baseUrl =
+      process.env.BASE_URL || 'http://localhost:3000';
+
     return {
       imageUrl:
-        `http://localhost:3000/uploads/course-images/${file.filename}`,
+        `${baseUrl}/uploads/course-images/${file.filename}`,
     };
   }
 }

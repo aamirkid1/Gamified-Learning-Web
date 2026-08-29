@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useEffect } from "react";
+import { API_URL } from "@/lib/api";
 
 import {
   BookOpen,
@@ -58,8 +59,8 @@ export default function StudentFlashcardsPage() {
     if (!user) return;
 
     fetch(
-      `http://localhost:3000/flashcards/student/${user.id}/decks`
-    )
+  `${API_URL}/flashcards/student/${user.id}/decks`
+)
       .then((res) => res.json())
       .then((data) => setCourseDecks(data))
       .catch(console.error);
@@ -73,8 +74,8 @@ export default function StudentFlashcardsPage() {
     if (!user) return;
 
     fetch(
-      `http://localhost:3000/flashcards/personal-decks/student/${user.id}`
-    )
+  `${API_URL}/flashcards/personal-decks/student/${user.id}`
+)
       .then((res) => res.json())
       .then((data) => setPersonalDecks(data))
       .catch(console.error);
@@ -94,8 +95,8 @@ export default function StudentFlashcardsPage() {
 
     try {
       const res = await fetch(
-        "http://localhost:3000/flashcards/personal-decks",
-        {
+  `${API_URL}/flashcards/personal-decks`,
+  {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -129,8 +130,8 @@ export default function StudentFlashcardsPage() {
 
     try {
       const response = await fetch(
-        "http://localhost:3000/flashcards/personal-cards",
-        {
+  `${API_URL}/flashcards/personal-cards`,
+  {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -147,8 +148,8 @@ export default function StudentFlashcardsPage() {
       console.log("Response:", await response.text());
 
       const res = await fetch(
-        `http://localhost:3000/flashcards/personal-decks/${selectedDeck.id}/cards`
-      );
+  `${API_URL}/flashcards/personal-decks/${selectedDeck.id}/cards`
+);
 
       const cards = await res.json();
 
@@ -180,15 +181,15 @@ export default function StudentFlashcardsPage() {
   const handleDeleteCard = async (cardId) => {
     try {
       await fetch(
-        `http://localhost:3000/flashcards/personal-cards/${cardId}`,
-        {
-          method: "DELETE",
-        }
-      );
+  `${API_URL}/flashcards/personal-cards/${cardId}`,
+  {
+    method: "DELETE",
+  }
+);
 
       const res = await fetch(
-        `http://localhost:3000/flashcards/personal-decks/${selectedDeck.id}/cards`
-      );
+  `${API_URL}/flashcards/personal-decks/${selectedDeck.id}/cards`
+);
 
       const cards = await res.json();
 
@@ -215,8 +216,8 @@ export default function StudentFlashcardsPage() {
   const startStudy = async (deck, isPersonal) => {
     try {
       const url = isPersonal
-        ? `http://localhost:3000/flashcards/personal-decks/${deck.id}/cards`
-        : `http://localhost:3000/flashcards/decks/${deck.id}/cards`;
+  ? `${API_URL}/flashcards/personal-decks/${deck.id}/cards`
+  : `${API_URL}/flashcards/decks/${deck.id}/cards`;
 
       const res = await fetch(url);
 
@@ -418,8 +419,8 @@ export default function StudentFlashcardsPage() {
                   onClick={async () => {
                     try {
                       const res = await fetch(
-                        `http://localhost:3000/flashcards/personal-decks/${deck.id}/cards`
-                      );
+  `${API_URL}/flashcards/personal-decks/${deck.id}/cards`
+);
 
                       const cards = await res.json();
                       

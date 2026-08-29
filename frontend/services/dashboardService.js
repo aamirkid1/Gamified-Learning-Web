@@ -1,4 +1,6 @@
-const API = "http://localhost:3000";
+import { API_URL } from "@/lib/api";
+
+const API = API_URL;
 
 const dashboardService = {
   async getStats(teacherId) {

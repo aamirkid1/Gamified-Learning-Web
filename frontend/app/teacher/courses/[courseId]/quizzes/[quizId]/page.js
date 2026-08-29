@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { API_URL } from "@/lib/api";
 
 export default function QuizDetailsPage() {
   const { courseId, quizId } = useParams();
@@ -17,8 +18,8 @@ export default function QuizDetailsPage() {
   async function loadStudents() {
     try {
       const response = await fetch(
-        `http://localhost:3000/quizzes/${quizId}/students`
-      );
+  `${API_URL}/quizzes/${quizId}/students`
+);
 
       const data = await response.json();
 

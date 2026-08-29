@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { API_URL } from "@/lib/api";
 import {
   FileText,
   Play,
@@ -101,10 +102,10 @@ export default function CourseDetails() {
       let url;
 
       if (studentId) {
-        url = `http://localhost:3000/lessons/course/${params.id}/student/${studentId}`;
-      } else {
-        url = `http://localhost:3000/lessons/course/${params.id}`;
-      }
+  url = `${API_URL}/lessons/course/${params.id}/student/${studentId}`;
+} else {
+  url = `${API_URL}/lessons/course/${params.id}`;
+}
 
       const response = await fetch(url);
       const data = await response.json();
@@ -120,8 +121,8 @@ export default function CourseDetails() {
   const loadCourse = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3000/courses/${params.id}`
-      );
+  `${API_URL}/courses/${params.id}`
+);
 
       const data = await response.json();
 
@@ -134,8 +135,8 @@ export default function CourseDetails() {
   const loadQuizzes = async () => {
     try {
       const response = await fetch(
-        "http://localhost:3000/quizzes"
-      );
+  `${API_URL}/quizzes`
+);
 
       const data = await response.json();
 

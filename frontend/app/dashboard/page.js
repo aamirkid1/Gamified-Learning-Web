@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import dashboardStatsService from "@/services/dashboardStatsService";
 import badgeService from "@/services/badgeService";
+import { API_URL } from "@/lib/api";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -213,7 +214,7 @@ export default function Dashboard() {
                   className="group border border-gray-100 rounded-xl p-3 sm:p-4 bg-[#f9f6f3] flex items-center gap-3 sm:gap-4 hover:border-[#d7a46b] hover:bg-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
                 >
                   <img
-                    src={`http://localhost:3000/uploads/badges/${badge?.image}`}
+                    src={`${API_URL}/uploads/badges/${badge?.image}`}
                     alt={badge?.name}
                     className="w-20 h-20 object-contain drop-shadow-lg transform group-hover:scale-105 transition-transform duration-300 shrink-0"
                   />

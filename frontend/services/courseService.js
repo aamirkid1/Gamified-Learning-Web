@@ -1,4 +1,6 @@
-const BASE_URL = "http://localhost:3000";
+import { API_URL } from "@/lib/api";
+
+const BASE_URL = API_URL;
 
 const courseService = {
   // Student Courses

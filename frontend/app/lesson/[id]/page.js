@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { API_URL } from "@/lib/api";
 import {
   Video,
   FileText,
@@ -63,8 +64,8 @@ const [courseInfo, setCourseInfo] = useState(null);
      * First load the current lesson
      */
     const lessonResponse = await fetch(
-      "http://localhost:3000/lessons"
-    );
+  `${API_URL}/lessons`
+);
 
     const allLessons =
       await lessonResponse.json();
@@ -85,9 +86,9 @@ const [courseInfo, setCourseInfo] = useState(null);
      * Now load lesson progression
      */
     const progressResponse =
-      await fetch(
-        `http://localhost:3000/lessons/course/${foundLesson.courseId}/student/${user.id}`
-      );
+  await fetch(
+    `${API_URL}/lessons/course/${foundLesson.courseId}/student/${user.id}`
+  );
 
     const lessonProgress =
       await progressResponse.json();
@@ -124,8 +125,8 @@ const [courseInfo, setCourseInfo] = useState(null);
   const loadCourseInfo = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3000/courses/${lesson.courseId}`
-      );
+  `${API_URL}/courses/${lesson.courseId}`
+);
       const data = await response.json();
       setCourseInfo(data);
     } catch (error) {
@@ -140,7 +141,7 @@ const [courseInfo, setCourseInfo] = useState(null);
     );
 
     const response = await fetch(
-      "http://localhost:3000/lesson-progress/complete",
+      `${API_URL}/lesson-progress/complete`,
       {
         method: "POST",
         headers: {
