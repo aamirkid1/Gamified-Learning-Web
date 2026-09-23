@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import 'dotenv/config';
 
 import { UserModule } from './user/user.module';
 import { CourseModule } from './course/course.module';
@@ -31,15 +32,11 @@ import { CourseProgressModule } from "./course-progress/course-progress.module";
     }),
 
     TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: '123456',
-      database: 'gamified_app',
-      autoLoadEntities: true,
-      synchronize: true,
-    }),
+  type: 'postgres',
+  url: process.env.DATABASE_URL,
+  autoLoadEntities: true,
+  synchronize: true,
+}),
 
     UserModule,
     CourseModule,
