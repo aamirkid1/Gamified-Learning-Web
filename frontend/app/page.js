@@ -32,70 +32,75 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white overflow-x-hidden">
 
       {/* Top Strip */}
       <div className="h-4 bg-[#6b1f0f]"></div>
 
-      {/* Navbar */}
-      <nav
-        className="
+      {/* Sticky header wrapper (navbar + mobile menu) */}
+      <header className="sticky top-0 z-50">
+
+        {/* Navbar */}
+        <nav
+          className="
     h-20
     flex
     items-center
     justify-between
     px-4
-sm:px-6
-lg:px-12
-xl:px-20
+    sm:px-6
+    lg:px-12
+    xl:px-20
     border-b
     backdrop-blur-md
     bg-white/70
-    sticky
-    top-0
-    z-50
     shadow-sm
   "
-      >
-
-        <motion.div
-          initial={{
-            opacity: 0,
-            scale: 0.5,
-          }}
-          animate={{
-            opacity: 1,
-            scale: 1,
-          }}
-          transition={{
-            duration: 0.8,
-          }}
-          className="text-3xl font-bold text-[#6b1f0f]"
         >
-          GLP
-        </motion.div>
 
-        <button
-          onClick={() =>
-            setMobileMenuOpen(
-              !mobileMenuOpen
-            )
-          }
-          className="
+          <motion.div
+            initial={{
+              opacity: 0,
+              scale: 0.5,
+            }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+            }}
+            transition={{
+              duration: 0.8,
+            }}
+            className="text-3xl font-bold text-[#6b1f0f]"
+          >
+            GLP
+          </motion.div>
+
+          {/* Hamburger (below lg only) */}
+          <button
+            type="button"
+            aria-label="Toggle navigation menu"
+            aria-expanded={mobileMenuOpen}
+            onClick={() =>
+              setMobileMenuOpen(
+                !mobileMenuOpen
+              )
+            }
+            className="
   lg:hidden
   text-[#6b1f0f]
-  p-2
-  rounded-lg
+  p-2.5
+  rounded-xl
   hover:bg-[#f5ede8]
+  active:bg-[#eaded4]
   transition
+  duration-200
   "
-        >
-          <Menu size={28} />
-        </button>
+          >
+            <Menu size={26} />
+          </button>
 
-
-
-        <div className="
+          {/* Desktop navigation (lg and above) */}
+          <div className="
 hidden
 lg:flex
 gap-10
@@ -104,14 +109,14 @@ font-medium
 items-center
 ">
 
-          <motion.div
-            whileHover={{
-              y: -3,
-            }}
-          >
-            <Link
-              href="/about"
-              className="
+            <motion.div
+              whileHover={{
+                y: -3,
+              }}
+            >
+              <Link
+                href="/about"
+                className="
       relative
       after:absolute
       after:left-0
@@ -124,12 +129,12 @@ items-center
       hover:after:w-full
       hover:text-[#8b4513]
     "
-            >
-              About us
-            </Link>
-          </motion.div>
+              >
+                About us
+              </Link>
+            </motion.div>
 
-          {/* <motion.div
+            {/* <motion.div
             whileHover={{
               y: -3,
             }}
@@ -155,13 +160,13 @@ items-center
           </motion.div> */}
 
 
-          <motion.div
-            whileHover={{
-              y: -3,
-            }}
-          >
-            <span
-              className="
+            <motion.div
+              whileHover={{
+                y: -3,
+              }}
+            >
+              <span
+                className="
       relative
       after:absolute
       after:left-0
@@ -175,19 +180,19 @@ items-center
       hover:text-[#8b4513]
       cursor-default
     "
-            >
-              Courses
-            </span>
-          </motion.div>
+              >
+                Courses
+              </span>
+            </motion.div>
 
-          <motion.div
-            whileHover={{
-              y: -3,
-            }}
-          >
-            <Link
-              href="/leaderboard"
-              className="
+            <motion.div
+              whileHover={{
+                y: -3,
+              }}
+            >
+              <Link
+                href="/leaderboard"
+                className="
       relative
       after:absolute
       after:left-0
@@ -200,19 +205,19 @@ items-center
       hover:after:w-full
       hover:text-[#8b4513]
     "
-            >
-              Leaderboards
-            </Link>
-          </motion.div>
+              >
+                Leaderboards
+              </Link>
+            </motion.div>
 
-          <motion.div
-            whileHover={{
-              y: -3,
-            }}
-          >
-            <Link
-              href="#"
-              className="
+            <motion.div
+              whileHover={{
+                y: -3,
+              }}
+            >
+              <Link
+                href="#"
+                className="
       relative
       after:absolute
       after:left-0
@@ -225,31 +230,32 @@ items-center
       hover:after:w-full
       hover:text-[#8b4513]
     "
-            >
-              Contact us
-            </Link>
-          </motion.div>
+              >
+                Contact us
+              </Link>
+            </motion.div>
 
-        </div>
+          </div>
 
-        <div className="
-flex
-gap-2
-sm:gap-4
+          {/* Desktop auth buttons (lg and above) */}
+          <div className="
+hidden
+lg:flex
+gap-4
 ">
 
-          <motion.div
-            whileHover={{
-              y: -3,
-              scale: 1.05,
-            }}
-            whileTap={{
-              scale: 0.95,
-            }}
-          >
-            <Link
-              href="/login"
-              className="
+            <motion.div
+              whileHover={{
+                y: -3,
+                scale: 1.05,
+              }}
+              whileTap={{
+                scale: 0.95,
+              }}
+            >
+              <Link
+                href="/login"
+                className="
         border
         border-gray-300
         px-6
@@ -261,23 +267,23 @@ sm:gap-4
         transition-all
         duration-300
       "
-            >
-              Login
-            </Link>
-          </motion.div>
+              >
+                Login
+              </Link>
+            </motion.div>
 
-          <motion.div
-            whileHover={{
-              y: -3,
-              scale: 1.05,
-            }}
-            whileTap={{
-              scale: 0.95,
-            }}
-          >
-            <Link
-              href="/signup"
-              className="
+            <motion.div
+              whileHover={{
+                y: -3,
+                scale: 1.05,
+              }}
+              whileTap={{
+                scale: 0.95,
+              }}
+            >
+              <Link
+                href="/signup"
+                className="
         bg-[#8b4513]
         text-white
         px-6
@@ -289,63 +295,185 @@ sm:gap-4
         transition-all
         duration-300
       "
-            >
-              Sign up
-            </Link>
-          </motion.div>
+              >
+                Sign up
+              </Link>
+            </motion.div>
 
-        </div>
+          </div>
 
-      </nav>
+        </nav>
 
-      {mobileMenuOpen && (
-        <div
-          className="
+        {/* Mobile / tablet menu (below lg only) */}
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="
     lg:hidden
+    absolute
+    left-0
+    right-0
+    top-full
     bg-white
     border-b
     border-[#eaded4]
-    shadow-md
-    px-6
-    py-5
-    space-y-4
+    shadow-lg
+    px-4
+    sm:px-6
+    pt-3
+    pb-5
+    max-h-[calc(100vh-6rem)]
+    overflow-y-auto
     "
-        >
-
-          <Link
-            href="#"
-            className="block font-medium"
           >
-            About Us
-          </Link>
 
-          {/* <Link
+            <div className="flex flex-col">
+
+              <Link
+                href="/about"
+                onClick={() => setMobileMenuOpen(false)}
+                className="
+        block
+        px-3
+        py-3.5
+        rounded-xl
+        font-medium
+        text-gray-800
+        hover:bg-[#f8f1ed]
+        hover:text-[#8b4513]
+        transition-colors
+        duration-200
+      "
+              >
+                About Us
+              </Link>
+
+              {/* <Link
             href="/courses"
             className="block font-medium"
           >
             Courses
           </Link> */}
 
-          <span className="block font-medium cursor-default">
-            Courses
-          </span>
+              <span
+                onClick={() => setMobileMenuOpen(false)}
+                className="
+        block
+        px-3
+        py-3.5
+        rounded-xl
+        font-medium
+        text-gray-800
+        cursor-default
+        hover:bg-[#f8f1ed]
+        transition-colors
+        duration-200
+      "
+              >
+                Courses
+              </span>
 
-          <Link
-            href="/leaderboard"
-            className="block font-medium"
-          >
-            Leaderboards
-          </Link>
+              <Link
+                href="/leaderboard"
+                onClick={() => setMobileMenuOpen(false)}
+                className="
+        block
+        px-3
+        py-3.5
+        rounded-xl
+        font-medium
+        text-gray-800
+        hover:bg-[#f8f1ed]
+        hover:text-[#8b4513]
+        transition-colors
+        duration-200
+      "
+              >
+                Leaderboards
+              </Link>
 
-          <Link
-            href="#"
-            className="block font-medium"
-          >
-            Contact Us
-          </Link>
+              <Link
+                href="#"
+                onClick={() => setMobileMenuOpen(false)}
+                className="
+        block
+        px-3
+        py-3.5
+        rounded-xl
+        font-medium
+        text-gray-800
+        hover:bg-[#f8f1ed]
+        hover:text-[#8b4513]
+        transition-colors
+        duration-200
+      "
+              >
+                Contact Us
+              </Link>
 
-        </div>
-      )}
+            </div>
+
+            {/* Divider */}
+            <div className="my-4 h-px bg-[#eaded4]"></div>
+
+            {/* Auth buttons */}
+            <div className="flex flex-col gap-3">
+
+              <Link
+                href="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="
+        block
+        w-full
+        text-center
+        bg-white
+        border
+        border-[#eaded4]
+        text-[#6b1f0f]
+        font-medium
+        px-6
+        py-3
+        rounded-xl
+        hover:bg-[#f8f1ed]
+        transition-all
+        duration-300
+      "
+              >
+                Login
+              </Link>
+
+              <Link
+                href="/signup"
+                onClick={() => setMobileMenuOpen(false)}
+                className="
+        block
+        w-full
+        text-center
+        text-white
+        font-medium
+        px-6
+        py-3
+        rounded-xl
+        bg-gradient-to-r
+        from-[#6b1f0f]
+        to-[#8b4513]
+        shadow-md
+        hover:shadow-xl
+        transition-all
+        duration-300
+      "
+              >
+                Sign Up
+              </Link>
+
+            </div>
+
+          </motion.div>
+        )}
+
+      </header>
 
       {/* Hero Section */}
 

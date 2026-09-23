@@ -299,9 +299,8 @@ export default function QuizPage() {
                                                 damping: 18,
                                                 delay: 0.3,
                                             }}
-                                            className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm sm:text-base font-bold shadow-lg ${
-                                                passed ? "bg-green-500 text-white" : "bg-red-500 text-white"
-                                            }`}
+                                            className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm sm:text-base font-bold shadow-lg ${passed ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                                                }`}
                                         >
                                             {passed ? "PASS ✅" : "FAIL ❌"}
                                         </motion.span>
@@ -422,7 +421,20 @@ export default function QuizPage() {
                                             whileTap={{ scale: 0.98 }}
                                             className="w-full sm:w-auto bg-gradient-to-r from-red-600 to-red-500 hover:opacity-95 text-white px-8 py-3 rounded-full font-semibold shadow-lg transition"
                                             onClick={() => {
-                                                alert("Reappear feature will be enabled in the next phase.");
+                                                // Reset quiz state for a new attempt
+                                                setAnswers({});
+                                                setSavedAnswers({});
+                                                setScore(0);
+                                                setSubmitted(false);
+                                                setAlreadyAttempted(false);
+                                                setCourseCompleted(false);
+                                                setIsSubmitting(false);
+
+                                                // Move back to the top of the quiz
+                                                window.scrollTo({
+                                                    top: 0,
+                                                    behavior: "smooth",
+                                                });
                                             }}
                                         >
                                             🔁 Reappear Exam

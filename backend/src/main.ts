@@ -7,7 +7,15 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Enable CORS
-  app.enableCors({
+//  app.enableCors({
+//   origin: [
+//     'http://localhost:3001',
+//     'http://10.43.59.172:3001',
+//   ],
+//   credentials: true,
+// });
+
+ app.enableCors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3001',
     credentials: true,
   });
@@ -18,7 +26,7 @@ async function bootstrap() {
     express.static(join(__dirname, '..', 'uploads')),
   );
 
-  await app.listen(3000);
+  await app.listen(3000, '0.0.0.0');
 }
 
 bootstrap();

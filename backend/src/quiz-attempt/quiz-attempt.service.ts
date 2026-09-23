@@ -128,22 +128,59 @@ export class QuizAttemptService {
   //   );
   // }
 
+  // async create(data: any) {
+  //   const existingAttempt =
+  //     await this.repo.findOne({
+  //       where: {
+  //         userId: data.userId,
+  //         quizId: data.quizId,
+  //       },
+  //     });
+
+  //   if (existingAttempt) {
+  //     return {
+  //       message: "Quiz already attempted",
+  //     };
+  //   }
+
+  //   const attempt = new QuizAttempt();
+
+
   async create(data: any) {
-    const existingAttempt =
-      await this.repo.findOne({
-        where: {
-          userId: data.userId,
-          quizId: data.quizId,
-        },
-      });
+  // Check the most recent attempt
+  const latestAttempt = await this.repo.findOne({
+    where: {
+      userId: data.userId,
+      quizId: data.quizId,
+    },
+    order: {
+      submittedAt: "DESC",
+    },
+  });
 
-    if (existingAttempt) {
-      return {
-        message: "Quiz already attempted",
-      };
-    }
+  // If the student has already passed this quiz,
+  // do not allow another attempt.
+  if (latestAttempt?.passed) {
+    return {
+      message: "Quiz already passed",
+      alreadyPassed: true,
+    };
+  }
 
-    const attempt = new QuizAttempt();
+  // If the previous attempt contains short answers
+  // and is still waiting for teacher review,
+  // don't allow another attempt yet.
+  if (latestAttempt && !latestAttempt.reviewed) {
+    return {
+      message: "Previous attempt is waiting for teacher review",
+      pendingReview: true,
+    };
+  }
+
+  // If latest attempt was reviewed and failed,
+  // a new attempt is allowed.
+
+  const attempt = new QuizAttempt();
 
     Object.assign(attempt, {
       ...data,
@@ -612,12 +649,15 @@ if (quiz) {
     quizId: number,
   ) {
     const attempt =
-      await this.repo.findOne({
-        where: {
-          userId,
-          quizId,
-        },
-      });
+  await this.repo.findOne({
+    where: {
+      userId,
+      quizId,
+    },
+    order: {
+      submittedAt: "DESC",
+    },
+  });
 
     if (!attempt) {
       return null;
